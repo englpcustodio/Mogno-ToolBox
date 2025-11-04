@@ -1,0 +1,50 @@
+/* Versao 0.1 */
+syntax = "proto2";
+
+message EventoRegrasViolacoes
+{
+	required string dispositivo_numero_serie = 1;
+	required int64 data_hora_evento = 2;
+
+	message RegraViolada
+	{
+		required int32 id = 1;
+		required string nome = 2;
+
+		message Condicao
+		{
+			required int32 id = 1;
+			required string nome = 2;
+		}
+
+		repeated Condicao condicoes = 3;
+
+		message Alerta
+		{
+			required int32 id = 1;
+			required string destino = 2;
+
+			enum TiposEnvios
+			{
+				SMS = 1;
+				EMAIL = 2;
+				TWITTER = 3;
+			}
+
+			enum Sleep
+			{
+				TEMPO = 1;
+				UNICO = 2;
+				SEMPRE = 3;
+			}
+
+			required Sleep sleep = 3;
+			optional int32 delay_sleep = 4;
+			required TiposEnvios tipo = 5;
+		}
+
+		repeated Alerta alertasEnviados = 4;
+	}
+
+	repeated RegraViolada regrasVioladas = 3;
+}

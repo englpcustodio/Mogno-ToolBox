@@ -1,0 +1,26 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+
+/**
+CRIADO INTEIRO NA HANDS!!!
+ */
+message CustomerData
+{
+  optional uint64 customerId = 1;
+  optional uint64 agreementId = 2;
+  optional uint64 localId = 3;
+  optional uint64 localEquipmentId = 4;
+  optional uint64 equipmentItemId = 5;
+  optional uint64 equipmentId = 6;
+  optional uint64 groupId = 7;
+  optional float latitude = 8;
+  optional float longitude = 9;
+  optional uint64 companyId = 10;
+  optional string deviceModel = 11;
+  optional uint64 deviceId = 12;
+  optional string iccid                  = 13;
+  optional uint64 imei                   = 14;
+  optional uint64 loraId = 15;
+  optional uint64 loraWanEUI = 16;
+  optional uint64 clone_to_company_list = 17;
+}

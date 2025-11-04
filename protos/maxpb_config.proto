@@ -1,0 +1,174 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_debug.proto";            /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2]
+import "maxpb_gpio.proto";             /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, A6X, MTC8XX, DLR, MTC8XX_MCU, TD80, A90, MAXIO2, MAXIO2_MCU]
+import "maxpb_gps.proto";              /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]
+import "maxpb_filetransfer.proto";     /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2, MOBILE_PHONE]
+import "maxpb_interfaces.proto";       /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, A6X, MTC8XX, DLR, FINDER]
+import "maxpb_report.proto";           /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]
+import "maxpb_transmission.proto";     /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]
+import "maxpb_telemetry.proto";        /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE]
+import "maxpb_lora.proto";             /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A40, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2]
+import "maxpb_sigfox.proto";           /// $SUPPORTEDBY[A6X]
+import "maxpb_customer_data.proto";    /// $SUPPORTEDBY[]
+//import "maxpb_lora_gateway.proto";   /// $SUPPORTEDBY[]
+import "maxpb_wifi.proto";             /// $SUPPORTEDBY[MTC8XX, DLR, AS80, TD80, A6X, A90, MAXIO2]
+import "maxpb_data_terminal.proto";    /// $SUPPORTEDBY[MTC8XX, DLR, TD80]
+import "maxpb_beacon.proto";           /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+import "maxpb_network.proto";          /// $SUPPORTEDBY[MTC8XX, DLR, TD80]
+enum LEDMode {
+   LEM_ALL_AVAILABLE  = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2] $DESCRIPTION[Todos disponíveis] $DESCRIPTION_ENGLISH[All available]
+   LEM_STEALTH        = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2] $DESCRIPTION[LEM_STEALTH] $DESCRIPTION[LEM_STEALTH]
+   LEM_WIFI_STATUS    = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] 
+   LEM_RFU_03         = 3;  /// $SUPPORTEDBY[]
+   LEM_RFU_04         = 4;  /// $SUPPORTEDBY[]
+   LEM_RFU_05         = 5;  /// $SUPPORTEDBY[]
+   LEM_RFU_06         = 6;  /// $SUPPORTEDBY[]
+   LEM_RFU_07         = 7;  /// $SUPPORTEDBY[]
+}
+enum BatteryChargerSpeed {
+   BCS_SLOW     = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR] $DESCRIPTION[Lento] $DESCRIPTION_ENGLISH[Slow mode.]
+   BCS_MEDIUM   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR] $DESCRIPTION[Médio] $DESCRIPTION_ENGLISH[Medium mode.]
+   BCS_FAST     = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR] $DESCRIPTION[Rápido] $DESCRIPTION_ENGLISH[Fast mode.]
+   BCS_RFU_03   = 3;  /// $SUPPORTEDBY[]
+   BCS_RFU_04   = 4;  /// $SUPPORTEDBY[]
+   BCS_RFU_05   = 5;  /// $SUPPORTEDBY[]
+   BCS_RFU_06   = 6;  /// $SUPPORTEDBY[]
+   BCS_RFU_07   = 7;  /// $SUPPORTEDBY[]
+}
+enum BatteryChargerMode {
+   BCM_MOVING_OR_IGNITION_ON  = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Movendo ou ignição ligada] $DESCRIPTION_ENGLISH[Device with external power and (moving or ignition on)]
+   BCM_ALWAYS                 = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Sempre] $DESCRIPTION_ENGLISH[Device with external power]
+   BCM_RFU_02                 = 2;  /// $SUPPORTEDBY[]
+   BCM_RFU_03                 = 3;  /// $SUPPORTEDBY[]
+   BCM_RFU_04                 = 4;  /// $SUPPORTEDBY[]
+   BCM_RFU_05                 = 5;  /// $SUPPORTEDBY[]
+   BCM_RFU_06                 = 6;  /// $SUPPORTEDBY[]
+}
+message ExternalStorageFileConfig {
+   optional uint32 percentSize         = 1;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional uint64 size                = 2;  /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+message ExternalStorageConfig {
+   optional ExternalStorageFileConfig positionLog              = 1;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional ExternalStorageFileConfig blackboxLog              = 2;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional ExternalStorageFileConfig audioLib                 = 3;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional ExternalStorageFileConfig geographilLib            = 4;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional ExternalStorageFileConfig appsLog                  = 5;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional ExternalStorageFileConfig dataTerminalMsg          = 6;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional ExternalStorageFileConfig computerVisionCache      = 7;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional ExternalStorageFileConfig computerVisionEvidences  = 8;  /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+message LowPowerConfig {
+   optional uint32 timeBeforeLowPower              = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $COMMENT[Valor 0 desabilita a funcionalidade] $DESCRIPTION[Tempo para entrar no modo Low Power (desliga GPS, Bluetooth e mantem modem ligado)] $DESCRIPTION_ENGLISH[Time to enter Low Power state (turns off GPS, Bluetooth and keeps modem on). If 0, no low power won't be used.] $DEFAULTVALUE[0]
+   optional uint32 timeBeforeSleep                 = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $COMMENT[Valor 0 desabilita a funcionalidade] $DESCRIPTION[Tempo para entrar no modo sleep (desliga tudo)] $DESCRIPTION_ENGLISH[Time to enter Sleep state (turns off everything). If 0, sleep won't be used.] $DEFAULTVALUE[600]
+   optional bool onlyBatteryMode                   = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90, MAXIO2] $COMMENT[(0: Desabilita; 1: Habilita) ] $DESCRIPTION[Transforma o modo de funcionamento do produto veicular no modo de funcionamento do produto portatil] $DESCRIPTION_ENGLISH[Change product operation to portable mode.] $DEFAULTVALUE[0] $VALIDATOR[^(1|0)$]
+   optional bool turnOffRs232OnLowPower            = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR] $COMMENT[(0: Desabilita; 1: Habilita)] $DESCRIPTION[Desligar a porta de comunicação serial quando o equipamento entrar no modo Low Power] $DESCRIPTION_ENGLISH[Shutdown serial port communication when product is on Low Power state.] $DEFAULTVALUE[0] $VALIDATOR[^(1|0)$]
+   optional bool preventSleepDuringLoraEmergency   = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $COMMENT[(0: Desabilita; 1: Habilita)] $DESCRIPTION[Evita modo sleep durante emergência Lora] $DESCRIPTION_ENGLISH[Avoid Sleep state during Lora emergency mode.] $DEFAULTVALUE[0] $VALIDATOR[^(1|0)$]
+   optional ModulesPowerControl normalMode         = 6;  /// $SUPPORTEDBY[MTC8XX, DLR, A90, MAXIO2]
+   optional ModulesPowerControl ignitionOffMode    = 7;  /// $SUPPORTEDBY[MTC8XX, DLR, A90, MAXIO2]
+   optional ModulesPowerControl lowPowerMode       = 8;  /// $SUPPORTEDBY[MTC8XX, DLR, A90, MAXIO2]
+   optional ModulesPowerControl sleepMode          = 9;  /// $SUPPORTEDBY[MTC8XX, DLR, A90, MAXIO2]
+}
+message TimeZoneConfig {
+   optional int32 timeAdjust                       = 1;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional uint64 nextSummerTimeUTCstart          = 2;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional uint64 nextSummerTimeUTCend            = 3;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional int32 summerTimeAdjust                 = 4;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional uint64 nextWinterTimeUTCstart          = 5;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional uint64 nextWinterTimeUTCend            = 6;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional int32 winterTimeAdjust                 = 7;  /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+/// General system configs
+message SystemConfig {
+   optional PeripheralsConfig peripherals             = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, DLR, FINDER] $DESCRIPTION[Configuração de periféricos] $DESCRIPTION_ENGLISH[Peripherals configuration]
+   optional LowPowerConfig lowPower                   = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Configuração do modo low power] $DESCRIPTION_ENGLISH[Low Power state configuration]
+   optional bytes packetEncryptKey                    = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR]     $DESCRIPTION[Chave de criptografia do pacote] $DESCRIPTION_ENGLISH[Package encryption key]
+   optional DeviceEventsTransmissionMask events       = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Máscara de transmissão dos eventos do dispositivo] $DESCRIPTION_ENGLISH[Device event transmission mask]
+   optional DebugConfig debug                         = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2] $DESCRIPTION[Configuração de debug] $DESCRIPTION_ENGLISH[Debug configuration]
+   optional LEDMode ledMode                           = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2] $DESCRIPTION[Configura o funcionamento do LED] $DESCRIPTION_ENGLISH[Configures LED's operation] $DEFAULTVALUE[0]
+   optional uint32 lowBatteryVoltageThreshold         = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2] $UNIT[Milivolts] $DESCRIPTION[Limite de tensão de bateria baixa] $DEFAULTVALUE[3600] $DESCRIPTION_ENGLISH[Low battery voltage limit - Milivolts]
+   optional BatteryChargerSpeed batteryChargerSpeed   = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR] $DESCRIPTION[Velocidade de carregamento da bateria] $DESCRIPTION_ENGLISH[Battery charge speed] $DEFAULTVALUE[1]
+   optional BatteryChargerMode batteryChargerMode     = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Modo de carregamento da bateria] $DESCRIPTION_ENGLISH[Battery charge mode] $DEFAULTVALUE[0]
+   repeated ButtonAction buttonActions                = 10; /// $SUPPORTEDBY[MXT180, A6X, TD80, A90, MAXIO2] $DESCRIPTION[Botões de ação] $DESCRIPTION_ENGLISH[Action button]
+   optional TrackingType trackingType                 = 11; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X] $DESCRIPTION[Modo de rastreamando (Caminhão ou Carga)/Summer] $DESCRIPTION_ENGLISH[Tracking type (0 - None, 1 - Truck, 2 - Cargo)]
+   optional bool extendGeoObjectLibraryMaxSize        = 12; /// $SUPPORTEDBY[MXT13X, MXT16X] $DESCRIPTION[Usar área de troca de firmware do modem como armazenamento da biblioteca de motoristas] $DESCRIPTION_ENGLISH[Increase GeoObject library max size by placint it on modem firmware change area]
+   optional uint32 timeToShutdown                     = 13; /// $SUPPORTEDBY[MTC8XX, DLR, A90, MAXIO2] $COMMENT[Valor 0 desabilita a funcionalidade] $DESCRIPTION[Tempo para shutdown depois de ignição desligada)] $DESCRIPTION_ENGLISH[Time to enter shutdown after ignition off. If 0, no low power won't be used.] $DEFAULTVALUE[0]
+   optional DeviceEventsDrvRequests dvrRequests       = 14; /// $SUPPORTEDBY[MTC8XX, DLR] 
+   optional TimeZoneConfig timeZone                   = 15; /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional ExternalStorageConfig externalStorage     = 16; /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional uint32 lowBatteryVoltageNotificationTime  = 17; /// $SUPPORTEDBY[A90] $UNIT[Minutes] $DESCRIPTION[Tempo para alerta de bateria baixa] $DEFAULTVALUE[0] $DESCRIPTION_ENGLISH[Low battery voltage notification time]
+   optional uint32 deactivateEmergencyTime  		  = 18; /// $SUPPORTEDBY[A90] $UNIT[Minutes] $DESCRIPTION[Tempo para desativar emergencia (0-função desabilitada)] $DEFAULTVALUE[0] $DESCRIPTION_ENGLISH[Deactivate emergency time (0-disabled)]
+}
+message UserConfig {
+   optional bool acceptAnyUser                        = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR] $MINVALUE[0] $MAXVALUE[1] $COMMENT[(0:Desabilita; 1:Habilita)] $DESCRIPTION[Aceita qualquer identificação de usuario. Não avalia a biblioteca de usuários.] $DEFAULTVALUE[1] $VALIDATOR[^(0|1)$]
+   optional bool ignitionOffGenerateLogout            = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR] $MINVALUE[0] $MAXVALUE[1] $COMMENT[(0:Desabilita; 1:Habilita)] $DESCRIPTION[Executa logout de usuário assim que identificar ignicão desligada] $DEFAULTVALUE[1] $VALIDATOR[^(0|1)$]
+   optional uint32 autoLogoffPassengerInterval        = 3;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional uint32 minIntervalPassengerLogoff         = 4;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional bool driverLogoffForcesPassengersLogoff   = 5;  /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+message MaxConfig {
+   optional PositionInterval positionInterval         = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Intervalo de transmissão] $DESCRIPTION_ENGLISH[Interval to generate a ReportData]
+   optional GprsTransmissionConfig gprs               = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Intervalo  para transmitir um relatorio de dados usando GPRS] $DESCRIPTION_ENGLISH[Interval to transmit a ReportData using GPRS]
+   optional GprsConnectivityConfig gprsConnectivity   = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Servidor para conexão e envio dos dados] $DESCRIPTION_ENGLISH[Server for connection and data transfer]
+   optional SmsConfig sms                             = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Configuração sms] $DESCRIPTION_ENGLISH[SMS configuration.]
+   optional BluetoothConfig bluetooth                 = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Configuração bluetooth] $DESCRIPTION_ENGLISH[Bluetooth configuration.]
+   optional SystemConfig system                       = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Configuração do sistema] $DESCRIPTION_ENGLISH[System configuration.]
+   optional IOsConfig ios                             = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Configuração I/Os] $DESCRIPTION_ENGLISH[I/Os configuration.]
+   optional TelemetryConfig telemetry                 = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE] $DESCRIPTION[Configuração telemetria] $DESCRIPTION_ENGLISH[Telemetry configuration.]
+   optional GpsConfig gps                             = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Configuração GPS] $DESCRIPTION_ENGLISH[GPS configuration.]
+   optional LoraConfig lora                           = 11; /// $SUPPORTEDBY[MXT13X, MXT180, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2] $DESCRIPTION[Configuração lora] $DESCRIPTION_ENGLISH[LoRa configuration.]
+   optional UserConfig user                           = 12; /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR] $DESCRIPTION[Configuração do usuário] $DESCRIPTION_ENGLISH[User configuration.]
+   optional SigfoxConfig sigfox                       = 14; /// $SUPPORTEDBY[A6X] $DESCRIPTION[Configuração sigfox] $DESCRIPTION_ENGLISH[Sigfox configuration.]
+// 15 and 16 should not be used
+//   optional SuperLogConfig superLog 	               = 17; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION_ENGLISH[]
+   optional MaxWifiConfig wifiConfig                  = 19; /// $SUPPORTEDBY[A6X, A90, MAXIO2] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+   optional BeaconsConfig beacons				         = 20; /// $SUPPORTEDBY[A6X, A90, MAXIO2] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+   optional ModulesPowerControl powerControl          = 21; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION_ENGLISH[This checks disable all functions related, even if other parameters says to use]
+}
+message ChangeMaxConfig {
+   required uint64 deviceID   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE]
+   required uint64 commandID  = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE]
+   required MaxConfig config  = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE]
+   optional FileInfo fileinfo = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]
+}
+message ReportMaxConfig {
+   required uint64 deviceID   = 1;            /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE]
+   required uint64 commandID  = 2;            /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE]
+   required MaxConfig config  = 3;            /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE]
+   optional CustomerData customerData  = 128; /// $SUPPORTEDBY[GATEWAY] $DESCRIPTION[Informações adicionais inclusas pelo gateway] $DESCRIPTION_ENGLISH[Additional data add by gateway]
+}
+message MaxIOConfig {
+   optional SystemConfig system        = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, FINDER] $DESCRIPTION[Configuração do sistema]
+   optional IOsConfig ios              = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR] $DESCRIPTION[Configuração IOS] $DESCRIPTION_ENGLISH[I/O configurations]
+   optional TelemetryConfig telemetry  = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR] $DESCRIPTION[Configuração de telemetria] $DESCRIPTION_ENGLISH[Telemetry configurations]
+}
+message ReportMaxIOConfig {
+   required uint64 deviceID            = 1;         /// $SUPPORTEDBY[MAXIO]
+   required uint64 commandID           = 2;         /// $SUPPORTEDBY[MAXIO]
+   required MaxIOConfig config         = 3;         /// $SUPPORTEDBY[MAXIO]
+   optional CustomerData customerData  = 128; /// $SUPPORTEDBY[GATEWAY] $DESCRIPTION[Informações adicionais inclusas pelo gateway] $DESCRIPTION_ENGLISH[Additional data add by gateway]
+}
+message TD80Config {
+   optional TD80ScreenConfig screenConfig             = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80]
+ ///   optional TD80ContactlessCardConfig cardConfig  = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80]
+   optional WiFiClientConfig wifiConfig               = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80]
+   optional SystemConfig system                       = 4;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80]
+   optional Network route                             = 5;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80]
+}
+message MaxDataTerminalConfig {
+   optional uint64 deviceID                           = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, AS80]
+   optional TD80Config td80Config                     = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80]
+}
+message AS80Config {
+   optional uint32 lineInGain                         = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, AS80] $DESCRIPTION[]
+   optional uint32 speakerVolumeMin                   = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, AS80]
+   optional uint32 speakerVolumeMax                   = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, AS80]
+   optional uint32 speakerVolumeDefault               = 4;  /// $SUPPORTEDBY[MTC8XX, DLR, AS80]
+   optional WiFiClientConfig wifiConfig               = 5;  /// $SUPPORTEDBY[MTC8XX, DLR, AS80]
+   optional SystemConfig system                       = 6;  /// $SUPPORTEDBY[MTC8XX, DLR, AS80]
+}
+message MaxAudioAmplifierConfig {
+   optional uint64 deviceID                           = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, AS80]
+   optional AS80Config as80Config                     = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, AS80]
+}

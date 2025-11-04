@@ -1,0 +1,39 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+enum JourneyState {
+    JS_OUT_OF_JOURNEY               = 0;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    JS_JOURNEY_OPEN                 = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    JS_JOURNEY_OPERATION            = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    JS_JOURNEY_LOADING_UNLOADING    = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    JS_JOURNEY_RESTING              = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    JS_JOURNEY_FEEDING              = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message Journey {
+    optional uint64 journeyID                 = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 userID                    = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional JourneyState actualState         = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional JourneyState previousState       = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 journeyInterval           = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 operationInterval         = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 loadingUnloadingInterval  = 7;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 restingInterval           = 8;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 feedingInterval           = 9;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 intervalSinceLastRest     = 10; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 intervalSinceLastFeed     = 11; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 intervalActualState       = 12; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 operationQty              = 13; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 loadingUnloadingQty       = 14; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 restingQty                = 15; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 feedingQty                = 16; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message JourneyInfo {
+    optional Journey actualJourney             = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional Journey previousJourney           = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+/// MT 0x0043
+message JourneyCommand {
+    optional uint64 deviceID                        = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 commandID                       = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 userID                          = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional JourneyState state                     = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}

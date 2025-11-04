@@ -1,0 +1,344 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_transmission.proto";     /// $SUPPORTEDBY[MTC8XX, DLR]
+import "maxpb_wifi.proto";             /// $SUPPORTEDBY[MTC8XX, DLR]
+import "maxpb_gpio.proto";             /// $SUPPORTEDBY[MTC8XX, DLR]
+enum DvrEvent {
+   DVRE_NONE               = 0;  /// $SUPPORTEDBY[]
+   DVRE_CAMERA_DISCONNECT  = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   DVRE_CAMERA_CONNECT     = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   DVRE_CAMERA_TAMPERING   = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   DVRE_RFU_04             = 4;  /// $SUPPORTEDBY[]
+   DVRE_RFU_05             = 5;  /// $SUPPORTEDBY[]
+   DVRE_RFU_06             = 6;  /// $SUPPORTEDBY[]
+   DVRE_RFU_07             = 7;  /// $SUPPORTEDBY[]
+   DVRE_RFU_08             = 8;  /// $SUPPORTEDBY[]
+   DVRE_RFU_09             = 9;  /// $SUPPORTEDBY[]
+   DVRE_STREAM_START       = 10; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   DVRE_STREAM_STOP        = 11; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   DVRE_RFU_12             = 12; /// $SUPPORTEDBY[]
+   DVRE_RFU_13             = 13; /// $SUPPORTEDBY[]
+   DVRE_RFU_14             = 14; /// $SUPPORTEDBY[]
+   DVRE_RFU_15             = 15; /// $SUPPORTEDBY[]
+   DVRE_RFU_16             = 16; /// $SUPPORTEDBY[]
+   DVRE_RFU_17             = 17; /// $SUPPORTEDBY[]
+}
+enum CameraResolution {
+   CR_NONE                 = 0;  /// $SUPPORTEDBY[]
+   CR_QCIF                 = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   CR_CIF                  = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   CR_D1                   = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   CR_960H                 = 4;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   CR_HD                   = 5;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   CR_FULL_HD              = 6;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   CR_RFU_07               = 7;  /// $SUPPORTEDBY[]
+   CR_RFU_08               = 8;  /// $SUPPORTEDBY[]
+   CR_RFU_09               = 9;  /// $SUPPORTEDBY[]
+   CR_RFU_10               = 10; /// $SUPPORTEDBY[]
+   CR_AUTO                 = 11; /// $SUPPORTEDBY[]
+}
+enum CameraRecordMode {
+   CRM_NONE                = 0; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   CRM_ALWAYS              = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   CRM_MOTION_DETECTION    = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   CRM_RFU_03              = 3; /// $SUPPORTEDBY[]
+   CRM_RFU_04              = 4; /// $SUPPORTEDBY[]
+   CRM_RFU_05              = 5; /// $SUPPORTEDBY[]
+   CRM_RFU_06              = 6; /// $SUPPORTEDBY[]
+   CRM_RFU_07              = 7; /// $SUPPORTEDBY[]
+}
+enum RecordMedia {
+   RM_NONE                 = 0; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   RM_NFS                  = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   RM_UDISK                = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   RM_EMMC                 = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   RM_RFU_4                = 4; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+   RM_RFU_5                = 5; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+}
+enum CameraState {
+  CS_NONE                  = 0; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CS_DISCONNECTED          = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CS_CONNECTED             = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CS_TAMPERING             = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CS_SPOOFING              = 4; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION_ENGLISH[]
+  CS_RFU_5                 = 5; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+  CS_RFU_6                 = 6; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+}
+enum CameraMode {
+  CM_NONE                  = 0; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CM_ON                    = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CM_OFF                   = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CM_PRIVATE               = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CM_RFU_4                 = 4; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+  CM_RFU_5                 = 5; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+}
+enum CameraLiveStreamMode {
+  CLSM_NONE                = 0; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CLSM_VIDEO_AUDIO         = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CLSM_VIDEO               = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CLSM_AUDIO               = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CLSM_RFU_4               = 4; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+  CLSM_RFU_5               = 5; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+}
+enum CameraChannel {
+  CC_NONE                  = 0;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CC_CAMERA_MOSAIC         = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CC_CAMERA_01             = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CC_CAMERA_02             = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CC_CAMERA_03             = 4;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CC_CAMERA_04             = 5;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CC_RFU_06                = 6;  /// $SUPPORTEDBY[]
+  CC_RFU_07                = 7;  /// $SUPPORTEDBY[]
+  CC_RFU_08                = 8;  /// $SUPPORTEDBY[]
+  CC_RFU_09                = 9;  /// $SUPPORTEDBY[]
+  CC_RFU_10                = 10; /// $SUPPORTEDBY[]
+}
+enum CameraSystem {
+  CSYS_NONE                = 0; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CSYS_PAL                 = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  CSYS_NTSC                = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+enum UploaderControl {
+  DC_NONE                  = 0;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  DC_ALL                   = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  DC_WIFI_ETHERNET         = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+enum UploaderOrder {
+  UO_NONE                  = 0;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  UO_ASCENDING             = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  UO_DESCENDING            = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+enum DvrChannels {
+  DCN_NONE                 = 0;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  DCN_MOSAIC               = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  DCN_CAMERA1              = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  DCN_CAMERA2              = 4;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  DCN_CAMERA3              = 8;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  DCN_CAMERA4              = 16; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+enum DvrLiveStreamControl {
+  DLSC_NONE                = 0;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  DLSC_START               = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  DLSC_STOP                = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+enum CameraCropConfigType{
+  CCT_NONE              = 0;    /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION_ENGLISH[]
+  CCT_FIXED             = 1;    /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION_ENGLISH[]
+  CCT_DYNAMIC           = 2;    /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION_ENGLISH[]
+  CCT_RFU03             = 3;    /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+  CCT_RFU04             = 4;    /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+  CCT_RFU05             = 5;    /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+}
+message RecordMediaConfig {
+  optional RecordMedia media   = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional string url          = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional string mountPath    = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message CameraRecordConfig {
+  optional CameraResolution resolution       = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 bitRate                    = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 frameRate                  = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraRecordMode mode             = 4; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional bool enableAudio                       = 5; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 iFrameInterval             = 6; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION[intervalo entre frames tipo I em segundos] $DESCRIPTION_ENGLISH[Frame type I interval in seconds]
+}
+message CameraLiveStreamConfig {
+  optional CameraResolution resolution       = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 bitRate                    = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 frameRate                  = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraLiveStreamMode mode         = 4; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 iFrameInterval             = 5; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION[intervalo entre frames tipo I em segundos] $DESCRIPTION_ENGLISH[Frame type I interval in seconds]
+}
+message DvrOsdConfig {
+  optional string displayText                = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional bool includePositionOSD           = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional bool includeDateTimeOSD           = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 borderWidth                = 4;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 borderColor                = 5;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message StreamClientConfig {
+  optional string login                      = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional string password                   = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional string url                        = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message CameraUploadConfig {
+  optional FtpClientConfig ftp               = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional AwsS3ClientConfig awsS3           = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR, WIFI] $DESCRIPTION_ENGLISH[]
+  optional StreamClientConfig stream         = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message CameraCropConfig {
+  optional bool enabled                      = 1;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+  optional uint32 width                      = 2;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+  optional uint32 height                     = 3;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+  optional int32 offsetX                     = 4;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+  optional int32 offsetY                     = 5;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+  optional CameraCropConfigType type         = 6;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+  optional uint32 maxSpeedCalibration        = 7;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+  optional uint32 timeBetweenEachCalibCheck  = 8;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+}
+message CameraInstallConfig {
+  optional bool   cropEnabled                    = 1;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+  optional uint32 cropWidth                      = 2;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+  optional uint32 cropHeight                     = 3;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+  optional int32  cropOffsetX                    = 4;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+  optional int32  cropOffsetY                    = 5;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+  optional bool   angleEnabledYaw                = 6;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+  optional int32  angleYaw                       = 7;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+  optional int32  anglePitch                     = 8;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+  optional int32  angleRoll                      = 9;   /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+}
+message CameraConfig {
+  optional uint64 cameraVirtualID                    =  1;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional string description                        =  2;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraResolution resolution               =  3;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraSystem system                       =  4;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraRecordConfig record                 =  5;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraLiveStreamConfig liveStream         =  6;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraUploadConfig uploadConfig           =  7;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraUploadConfig localUploadConfig      =  8;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraCropConfig cropConfig               =  9;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraInstallConfig installConfig         = 10;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraUploadConfig uploadConfigJourney    = 11;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraCropConfig cropRoiConfig            = 12;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message CameraMosaicConfig {
+  optional CameraConfig config               = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional DvrChannels audioRecordingChannel = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message RTSPServerConfig {
+  optional bool active                       = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional string login                      = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional string password                   = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message CameraStatus {
+  optional CameraState cameraState           = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraMode streamMode             = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraMode recordMode             = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint64 cameraVirtualID            = 4; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message DvrEvents {
+  optional DvrEvent eventID                  = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint64 cameraVirtualID            = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraChannel channel             = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 duration                   = 4; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message DvrUploadStorage {
+  optional uint64 diskCapacity               = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint64 diskUsage                  = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint64 diskQuota                  = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint64 dateTimeBegin              = 4; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint64 dateTimeEnd                = 5; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message DvrUploadPendingInfo {
+  optional uint32 videoCountForDump                = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 videoCountForWifi                = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 videoCountForAllInterfaces       = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 thumbnailCountForDump            = 4; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 thumbnailCountForWifi            = 5; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 thumbnailCountForAllInterfaces   = 6; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message DvrUploadStatus {
+  optional DvrUploadStorage     internalStorage    = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional DvrUploadStorage     extraStorage       = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional DvrUploadStorage     dumpStorage        = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional DvrUploadPendingInfo autoControlInfo    = 4; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional DvrUploadPendingInfo eventControlInfo   = 5; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional DvrUploadPendingInfo commandControlInfo = 6; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message DvrInfo {
+  optional CameraStatus cameraMosaic               = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraStatus camera01                   = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraStatus camera02                   = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraStatus camera03                   = 4; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraStatus camera04                   = 5; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional DvrUploadPendingInfo autoControlInfo    = 6; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional DvrUploadPendingInfo eventControlInfo   = 7; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional DvrUploadPendingInfo commandControlInfo = 8; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message DvrRequest {
+   optional UploaderControl control          = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   optional uint32 intervalBefore            = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   optional uint32 intervalAfter             = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   optional uint32 videoChannels             = 4; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[Field DvrChannels]
+   optional uint32 thumbnailChannels         = 5; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[Field DvrChannels]
+}
+message DvrRequests {
+   optional DvrRequest dvr1                  = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   optional DvrRequest dvr2                  = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   optional DvrRequest dvr3                  = 3; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+   optional DvrRequest dvr4                  = 4; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+   optional DvrRequest cvCameras             = 5; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION_ENGLISH[]
+   optional bool dynamicInterval             = 11; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message DvrRequestsInfo {
+   optional DvrRequest dvr1                  = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   optional DvrRequest dvr2                  = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   optional DvrRequest dvr3                  = 3; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+   optional DvrRequest dvr4                  = 4; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+   optional DvrRequest cvCameras             = 5; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION_ENGLISH[]
+}
+message DvrPeriodRequest {
+   optional UploaderControl control          = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   optional uint64 startDateTime             = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   optional uint64 endDateTime               = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   optional uint32 videoChannels             = 4; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[Field DvrChannels]
+   optional uint32 thumbnailChannels         = 5; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[Field DvrChannels]
+}
+message DvrPeriodRequests {
+   optional DvrPeriodRequest dvr1            = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   optional DvrPeriodRequest dvr2            = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   optional DvrPeriodRequest dvr3            = 3; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+   optional DvrPeriodRequest dvr4            = 4; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+   optional DvrPeriodRequest cvCameras       = 5; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION_ENGLISH[]
+}
+message DvrLiveStreamRequest {
+   optional uint32 videoChannels               = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[Field DvrChannels]
+   optional DvrLiveStreamControl streamControl = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[Field DvrChannels]
+}
+message DvrLiveStreamRequests {
+   optional DvrLiveStreamRequest dvr1        = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   optional DvrLiveStreamRequest dvr2        = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   optional DvrLiveStreamRequest dvr3        = 3; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+   optional DvrLiveStreamRequest dvr4        = 4; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+   optional DvrLiveStreamRequest cvCameras   = 5; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION_ENGLISH[]
+}
+message DvrRequestsCommand {
+  optional uint64 deviceID                   = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint64 commandID                  = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional DvrRequests request               = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional DvrLiveStreamRequests liveRequest = 4;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional DvrPeriodRequests requestByPeriod = 5;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional string options                    = 20; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message DvrUploaderConfig
+{
+  optional UploaderControl videoAutoUploadControl     = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 videoAutoUploadChannels             = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[Field DvrChannels]
+  optional UploaderOrder order                        = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional UploaderControl thumbnailAutoUploadControl = 4; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 thumbnailAutoUploadChannels         = 5; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[Field DvrChannels]
+}
+message DvrTransmissionConfig{
+   optional uint32 reportInterval            = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION[]
+   optional uint32 statusInterval            = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION[]
+}
+message DvrRearCam {
+   optional uint32      camNum               = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION[Camera de re (0=desativada, 1=camera01, 2=camera02, 3=camera03, 4=camera04]
+   optional InputSource inputSource          = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION[Se inputSource = ISRC_NONE, procura na CAN]
+   optional InputState  inputState           = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION[Estado para ativacao (IST_DIGITAL_HIGH/IST_DIGITAL_LOW)]
+}
+message MaxDvrConfig {
+  optional uint64 deviceID                    = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional AddressConfig mqttServerConfig     = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional RTSPServerConfig rtspServer        = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional DvrOsdConfig osdConfig             = 4;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraMosaicConfig cameraMosaic    = 5;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraConfig camera01              = 6;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraConfig camera02              = 7;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraConfig camera03              = 8;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional CameraConfig camera04              = 9;  /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional RecordMediaConfig recordMedia      = 10; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional DvrUploaderConfig uploader         = 11; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional DvrTransmissionConfig transmission = 12; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION[Configurações de transmissão]
+  optional DvrRearCam rearCam                 = 20; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION[Configuracao de camera de re]
+}

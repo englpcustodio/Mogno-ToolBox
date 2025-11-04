@@ -1,0 +1,174 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_transmission.proto";   /// $SUPPORTEDBY[MTC8XX, DLR]
+import "maxpb_users.proto";   	     /// $SUPPORTEDBY[MTC8XX]
+enum DataTerminalResponseType {
+    DTRT_NONE                   = 0;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTRT_YES_OR_NO              = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTRT_TEXT                   = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTRT_STORED_REPLY           = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTRT_RFU_01                 = 4;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTRT_RFU_02                 = 5;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTRT_RFU_03                 = 6;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTRT_RFU_04                 = 7;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTRT_RFU_05                 = 8;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+enum DataTerminalConfirmation {
+    DTC_NONE                    = 0;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTC_DELIVERED               = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTC_READ                    = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTC_RESPONSE                = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTC_ERASE                   = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTC_RFU_01                  = 5;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTC_RFU_02                  = 6;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTC_RFU_03                  = 7;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTC_RFU_04                  = 8;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTC_RFU_05                  = 9;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+enum StoredMessageGroup {
+    SMG_NONE                    = 0;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SMG_EMERGENCY               = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SMG_OPERATIONAL             = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SMG_VEHICLE_INFORMATION     = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SMG_ROAD_INFORMATION        = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SMG_REPLIES                 = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SMG_RFU_01                  = 6;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SMG_RFU_02                  = 7;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SMG_RFU_03                  = 8;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SMG_RFU_04                  = 9;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SMG_RFU_05                  = 10; /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+enum DataTerminalMessageType {
+    DTMT_NONE                   = 0;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTMT_EMERGENCY              = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTMT_OPERATION              = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTMT_POP_UP                 = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTMT_RFU_01                 = 4;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTMT_RFU_02                 = 5;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTMT_RFU_03                 = 6;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTMT_RFU_04                 = 7;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTMT_RFU_05                 = 8;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+enum DataTerminalScreenType {
+    DTST_NONE                 = 0;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTST_JOURNEY              = 1;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTST_MAPS                 = 2;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTST_MESSENGER            = 3;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTST_INFO                 = 4;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTST_BOOK                 = 5;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTST_ROTOGRAM             = 6;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTST_INSTAL               = 7;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTST_WWW                  = 8;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+enum DataTerminalColorType {
+    DTCT_NONE                 = 0;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTCT_WHITE                = 1;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTCT_BLACK                = 2;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTCT_BLUE                 = 3;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTCT_GREEN                = 4;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    DTCT_ORANGE               = 5;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message StoredMessages {
+    optional uint64 storedMessageID                 = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional StoredMessageGroup group               = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string shortText                       = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string description                     = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message StoredMessagesList {
+    repeated StoredMessages messages                = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message DataTerminalMessage {
+    optional uint64 messageID                       = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string text                            = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional DataTerminalMessageType type           = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 storedMessageID                 = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 dateTime                        = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 userID                          = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional DataTerminalResponseType responseType  = 7;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string audioURL                        = 8;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message DataTerminalMessageCommand {
+    required uint64 deviceID   	                    = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    required uint64 commandID  	                    = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional DataTerminalMessage message            = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message DataTerminalResponse {
+    optional uint64 messageID                       = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 userID                          = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 dateTime                        = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional DataTerminalConfirmation confirmation  = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional bool responseYesOrNo                   = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string responseText                    = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 responseStoredMessageID         = 7;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string audioURL                        = 8;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message DataTerminalResponseCommand {
+    required uint64 deviceID   	                    = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    required uint64 commandID  	                    = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional DataTerminalResponse response          = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message TD80ScreenConfig {
+    optional uint32 minBrightness                   = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80] $DESCRITPION[Brigthness config 0 to 100 - minimal value for driver option] $DESCRIPTION_ENGLISH[]
+    optional uint32 maxBrightness                   = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80] $DESCRITPION[Brigthness config 0 to 100 - maximal value for driver option] $DESCRIPTION_ENGLISH[]
+    optional uint32 defaultBrightness               = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80] $DESCRITPION[Brigthness config 0 to 100 - default value for driver option] $DESCRIPTION_ENGLISH[]
+    optional bool autoAdjustBrightness              = 4;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional int32 autoAdjustOffset                 = 5;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80] $DESCRITPION[Brigthness adjust -100 to 100 - applied to final result of auto adjustment] $DESCRIPTION_ENGLISH[]
+}
+message TD80Command {
+    optional uint32 actualBrightness                = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80] $DESCRITPION[Brigthness config 0 to 100 - minimal value for driver option] $DESCRIPTION_ENGLISH[]
+    optional bool ledStatus                         = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80] $DESCRITPION[]
+}
+message TD80ContactlessCardConfig {
+    optional bool NFCActive                         = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message LightSensorInfo {
+    optional uint32 illuminance                     = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message DataTerminalInfo {
+    optional LightSensorInfo lightSensor            = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    repeated DataTerminalMessage messages           = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    repeated DataTerminalResponse responses         = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional bool standby                           = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional bool blocked                           = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional bool cam1ForceOnDisplay                = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional bool cam2ForceOnDisplay                = 7;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional bool cam3ForceOnDisplay                = 8;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional bool cam4ForceOnDisplay                = 9;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+//message DataTerminalFunctionsConfig {
+//    optional bool messages                          = 1;
+//    optional bool storedMessages                    = 2;
+//    optional bool can...
+//}
+message IconConfig {
+    optional DataTerminalScreenType type           = 1;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string iconPath           		   = 2;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional DataTerminalColorType colorIcon	   = 3;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string url           		   = 4;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message ScreenConfig {
+    optional UserType user           		   = 1;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]   
+    repeated IconConfig icon                       = 2;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message UserScreenConfig {
+    optional UserType user           		   = 1;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    repeated DataTerminalScreenType typeVisible    = 2;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message DataTerminalScreenConfig {
+    repeated ScreenConfig screen                   = 1;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]	
+}
+message DataTerminalScreenUserConfig {
+    repeated UserScreenConfig userConfig           = 1;  /// $SUPPORTEDBY[MTC8XX] $DESCRITPION[] $DESCRIPTION_ENGLISH[]	
+}
+message MessageConfig {
+    optional bool beepWhenMsgIsReceived             = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 keepBeepIntervalWhenMsgIsUnread = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional bool beepWhenMsgUnreadIgnitionOff      = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 keepLastHoursOfMessages         = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message DataTerminalConfig {
+    optional uint32 sleepInterval                   = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional AwsS3ClientConfig upload               = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional AwsS3ClientConfig download             = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional MessageConfig messagesConfig           = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}

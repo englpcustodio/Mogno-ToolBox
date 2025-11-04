@@ -1,0 +1,34 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_report.proto";        /// $SUPPORTEDBY[] 
+import "maxpb_gpio.proto";          /// $SUPPORTEDBY[] 
+import "maxpb_gps.proto";           /// $SUPPORTEDBY[] 
+import "maxpb_telemetry.proto";     /// $SUPPORTEDBY[] 
+import "maxpb_customer_data.proto"; /// $SUPPORTEDBY[] 
+import "maxpb_users.proto";         /// $SUPPORTEDBY[]
+import "maxpb_beacon.proto";        /// $SUPPORTEDBY[]
+enum SatelliteProvider{
+    SP_UNKNOWN                            = 0;     /// $SUPPORTEDBY[GATEWAY]
+    SP_SKYWAVE                            = 1;     /// $SUPPORTEDBY[GATEWAY]
+}
+message SatelliteData {
+   required string deviceID               = 1;     /// $SUPPORTEDBY[GATEWAY]
+   required string messageID              = 2;     /// $SUPPORTEDBY[GATEWAY]
+   optional IDPack identificationPack     = 3;     /// $SUPPORTEDBY[GATEWAY]
+   optional SatelliteProvider provider    = 4;     /// $SUPPORTEDBY[GATEWAY]
+   repeated PositionInfo position         = 5;     /// $SUPPORTEDBY[GATEWAY]
+   optional IOsInfo ios                   = 6;     /// $SUPPORTEDBY[GATEWAY]
+   optional FlagsInfo flags               = 7;     /// $SUPPORTEDBY[GATEWAY]
+   optional TelemetryInfo telemetry       = 8;     /// $SUPPORTEDBY[GATEWAY]
+   optional uint64 sentDateTime           = 9;     /// $SUPPORTEDBY[GATEWAY]
+   optional uint64 receivedDateTime       = 10;    /// $SUPPORTEDBY[GATEWAY]
+   optional string accountID              = 11;    /// $SUPPORTEDBY[GATEWAY]
+   optional string subAccountID           = 12;    /// $SUPPORTEDBY[GATEWAY]
+   optional GpsInfo gps                   = 13;    /// $SUPPORTEDBY[GATEWAY]
+   optional Events events                 = 14;    /// $SUPPORTEDBY[GATEWAY]
+   optional bytes openData                = 15;    /// $SUPPORTEDBY[GATEWAY]
+   repeated UserInfo user                 = 16;    /// $SUPPORTEDBY[GATEWAY]
+   repeated ReportBeacons beacons         = 17;    /// $SUPPORTEDBY[GATEWAY]
+  
+   optional CustomerData customerData     = 128;   /// $SUPPORTEDBY[GATEWAY] $DESCRIPTION[Informação adicional inclusa pelo gateway] $DESCRIPTION_ENGLISH[Additional data add by gateway]
+}

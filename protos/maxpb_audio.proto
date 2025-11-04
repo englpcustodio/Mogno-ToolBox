@@ -1,0 +1,52 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+enum AudioEvent {
+   AE_START              = 0;  /// $SUPPORTEDBY[MTC8XX]
+   AE_STOP               = 1;  /// $SUPPORTEDBY[MTC8XX]
+   AE_PAUSE              = 2;  /// $SUPPORTEDBY[MTC8XX]
+   AE_RESUME             = 3;  /// $SUPPORTEDBY[MTC8XX]
+   AE_FINISH             = 4;  /// $SUPPORTEDBY[MTC8XX]
+   AE_FILE_NOT_FOUND     = 5;  /// $SUPPORTEDBY[MTC8XX]
+   AE_UNSUPPORTED_FORMAT = 6;  /// $SUPPORTEDBY[MTC8XX]
+   AE_RFU_01             = 7;  /// $SUPPORTEDBY[]
+   AE_RFU_02             = 8;  /// $SUPPORTEDBY[]
+}
+enum AudioCommandType {
+   ACT_PLAY                   = 0;  /// $SUPPORTEDBY[MTC8XX]
+   ACT_STOP                   = 1;  /// $SUPPORTEDBY[MTC8XX]
+   ACT_PAUSE                  = 2;  /// $SUPPORTEDBY[MTC8XX]
+   ACT_RESUME                 = 3;  /// $SUPPORTEDBY[MTC8XX]
+   ACT_RFU_03                 = 4;  /// $SUPPORTEDBY[]
+   ACT_RFU_04                 = 5;  /// $SUPPORTEDBY[]
+   ACT_RFU_05                 = 6;  /// $SUPPORTEDBY[]
+}
+message AudioIdentification
+{
+  optional uint64 audioID         = 1;  /// $SUPPORTEDBY[MTC8XX]
+  optional string audioPath       = 2;  /// $SUPPORTEDBY[MTC8XX]
+}
+message AudioEvents {
+   required AudioIdentification audioIdentification = 1;  /// $SUPPORTEDBY[MTC8XX]
+   required AudioEvent eventID                      = 2;  /// $SUPPORTEDBY[MTC8XX]
+   optional uint32 duration                         = 3;  /// $SUPPORTEDBY[MTC8XX] $DESCRIPTION[(Minutos)] $DESCRIPTION_ENGLISH[(Minutes)]
+}
+message AudioEntry {
+   required AudioIdentification audioIdentification = 1;  /// $SUPPORTEDBY[MTC8XX]
+   optional bytes audioContent                      = 2;   /// $SUPPORTEDBY[MTC8XX]
+}
+message Audios {
+   repeated AudioEntry audio = 1;  /// $SUPPORTEDBY[MTC8XX]
+}
+message AudioCommand {
+   required uint64 deviceID                         = 1;  /// $SUPPORTEDBY[MTC8XX]
+   required uint64 commandID                        = 2;  /// $SUPPORTEDBY[MTC8XX]
+   required AudioCommandType commandType            = 3;  /// $SUPPORTEDBY[MTC8XX]
+   repeated AudioIdentification audioIdentification = 4;  /// $SUPPORTEDBY[MTC8XX]
+   optional uint32 repeat                           = 5;  /// $SUPPORTEDBY[MTC8XX] $DESCRIPTION[(Loop 0xFFFFFFFF)] $DESCRIPTION_ENGLISH[(Loop 0xFFFFFFFF)]
+   optional uint32 volume                           = 6;  /// $SUPPORTEDBY[MTC8XX]
+}
+message AudiosEdit {
+   repeated AudioEntry audioAdd       = 1;  /// $SUPPORTEDBY[]
+   repeated AudioEntry audioReplace   = 2;  /// $SUPPORTEDBY[]
+   repeated AudioEntry audioDelete    = 3;  /// $SUPPORTEDBY[]
+}

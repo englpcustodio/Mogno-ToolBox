@@ -1,0 +1,671 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_customer_data.proto";    
+import "maxpb_report.proto";           
+import "maxpb_gpio.proto";             
+import "maxpb_gps.proto";              
+import "maxpb_geographic.proto";       
+import "maxpb_telemetry.proto";        
+import "maxpb_filetransfer.proto";     
+import "maxpb_users.proto";            
+import "maxpb_beacon.proto";           
+
+enum LoraNetwork {
+   LN_UNKNOWN  = 0;  
+   LN_LORAWAN  = 1;  
+   LN_P2P      = 2;  
+}
+enum LoraModulation {
+   LM_UNKNOWN  = 0;  
+   LM_LORA     = 1;  
+   LM_FSK      = 2;  
+}
+enum LoraCodingRate {
+   CR_UNKNOWN  = 0;  
+   CR_4_5      = 1;  
+   CR_4_6      = 2;  
+   CR_4_7      = 3;  
+   CR_4_8      = 4;  
+}
+enum LoraSpreadingFactor {
+   SF_UNKNOWN   = 0;  
+   SF6          = 6;  
+   SF7          = 7;  
+   SF8          = 8;  
+   SF9          = 9;  
+   SF10         = 10; 
+   SF11         = 11; 
+   SF12         = 12; 
+}
+enum LoraWanDataRate {
+   DR_UNKNOWN   = 0;  
+   DR0          = 1;  
+   DR1          = 2;  
+   DR2          = 3;  
+   DR3          = 4;  
+   DR4          = 5;  
+   DR5          = 6;  
+   DR6          = 7;  
+   DR7          = 8;  
+}
+enum LoraBandwidth {
+   LBW_UNKNOWN = 0;  
+   LBW_125kHz  = 1;  
+   LBW_250kHz  = 2;  
+   LBW_500kHz  = 3;  
+}
+
+enum LoraMode {
+   LM_NONE                       = 0;  
+   LM_P2P_GATEWAY                = 7;  
+   LM_P2P_FINDER                 = 8;  
+   LM_P2P_PAIRING_DEVICE         = 9;  
+   LM_P2P_PAIRING_COORDINATOR    = 10; 
+   LM_P2P_EMERGENCY_ONLY         = 11; 
+   LM_P2P_EMERGENCY_AND_COMMAND  = 12; 
+   LM_P2P_STATE_MACHINE	  = 14; 
+   LM_RFU_01                     = 15; 
+   LM_RFU_02                     = 16; 
+   LM_RFU_03                     = 17; 
+   LM_RFU_04                     = 18; 
+   LM_RFU_05                     = 19; 
+}
+enum LoraProtocol {
+   LP_VER1     = 0;   
+   LP_RFU_01   = 1;   
+   LP_RFU_02   = 2;   
+   LP_RFU_03   = 3;   
+   LP_RFU_04   = 4;   
+   LP_RFU_05   = 5;   
+}
+enum LoraWanFrequencyPlan {
+   LWF_US915         = 0;  
+   LWF_AU915         = 3;  
+   LWF_LA915         = 4;  
+   LWF_RFU_01        = 5;  
+   LWF_RFU_02        = 6;  
+   LWF_RFU_03        = 7;  
+   LWF_RFU_04        = 8;  
+   LWF_RFU_05        = 9;  
+}
+enum LoraWanActivation {
+   LWA_OTAA = 0;  
+   LWA_ABP  = 1;  
+}
+enum LoraActionID {
+   LA_ACTION_NONE             = 0;  
+   LA_ACTION_ALARM_STATE      = 1;  
+   LA_ACTION_OUTPUT_CONTROL   = 2;  
+   LA_ACTION_SET_ZIGBEE_KEY   = 3;  
+   LA_ACTION_RESET_DEFAULT    = 4;  
+   LA_ACTION_ACTIVE_CONFIG    = 5;  
+   LA_ACTION_ENTER_STOCK      = 6;  
+   LA_ACTION_RESET_SYSTEM     = 7;  
+   LA_ACTION_SET_DATETIME     = 8;  
+   LA_ACTION_SET_PARAMS       = 9;  
+   LA_ACTION_RFU01            = 10; 
+   LA_ACTION_RFU02            = 11; 
+   LA_ACTION_RFU03            = 12; 
+   LA_ACTION_RFU04            = 13; 
+   LA_ACTION_RFU05            = 14; 
+}
+
+enum LoraChannel {
+   LCH_DEFAULT    = 0;  
+   LCH_COMMAND    = 1;  
+   LCH_EMERGENCY  = 2;  
+   LCH_PAIRING    = 3;  
+   LCH_POSITION   = 4;  
+   LCH_RFU_01     = 5;  
+   LCH_RFU_02     = 6;  
+   LCH_RFU_03     = 7;  
+   LCH_RFU_04     = 8;  
+   LCH_RFU_05     = 9;  
+}
+enum LoraResponseType {
+   LRT_UNKNOWN    = 0;  
+   LRT_FINISHED   = 1;  
+   LRT_ERROR      = 2;  
+   LRT_TIMEOUT    = 3;  
+   LRT_CANCELED   = 4;  
+   LRT_RETRY      = 5;  
+   LRT_PROGRESS   = 6;  
+   LRT_RFU_01     = 7;  
+   LRT_RFU_02     = 8;  
+   LRT_RFU_03     = 9;  
+   LRT_RFU_04     = 10; 
+   LRT_RFU_05     = 11; 
+}
+
+enum LoraWANMode {
+   LRWM_NONE                        = 0;  
+   LRWM_POSITIONS                   = 1;  
+   LRWM_POSITIONS_GPRS_UNAVAILABLE  = 2;  
+   LRWM_RFU_01                      = 3;  
+   LRWM_RFU_02                      = 4;  
+   LRWM_RFU_03                      = 5;  
+   LRWM_RFU_04                      = 6;  
+   LRWM_RFU_05                      = 7;  
+}
+
+enum ADRMode {
+   ADRM_OFF          = 0;  
+   ADRM_ON           = 1;  
+   ADRM_FIXED_DR0    = 2;  
+   ADRM_FIXED_DR1    = 3;  
+   ADRM_FIXED_DR2    = 4;  
+   ADRM_FIXED_DR3    = 5;  
+   ADRM_FIXED_DR4    = 6;  
+   ADRM_FIXED_DR5    = 7;  
+   ADRM_FIXED_DR6    = 8;  
+   ADRM_FIXED_DR7    = 9;  
+   ADRM_FIXED_DR8    = 10; 
+   ADRM_FIXED_DR9    = 11; 
+   ADRM_FIXED_DR10   = 12; 
+   ADRM_FIXED_DR11   = 13; 
+   ADRM_FIXED_DR12   = 14; 
+   ADRM_FIXED_DR13   = 15; 
+   ADRM_FIXED_DR14   = 16; 
+   ADRM_FIXED_DR15   = 17; 
+   ADRM_RFU_01       = 18; 
+   ADRM_RFU_02       = 19; 
+   ADRM_RFU_03       = 20; 
+   ADRM_RFU_04       = 21; 
+   ADRM_RFU_05       = 22; 
+}
+
+enum LoraDataType {
+   LRDT_POSITION        = 0;   
+   LRDT_TELEMETRY       = 1;   
+   LRDT_GSENSOR         = 2;   
+   LRDT_ID_AND_POSITION = 3;   
+   LRDT_DELTA           = 4;   
+   LRDT_DRIVER_BEHAVIOR = 5;   
+   LRDT_BEACON          = 6;   
+   LRDT_RFU_07          = 7;   
+   LRDT_RFU_08          = 8;   
+   LRDT_RFU_09          = 9;   
+   LRDT_RFU_10          = 10;  
+   LRDT_RFU_11          = 11;  
+}
+enum LoraActionsOrderType {
+   LAOT_KEEP_FILE_SEQUENCE = 0;  
+   LAOT_DISTANCE           = 1;  
+   LAOT_RFU_01             = 2;  
+   LAOT_RFU_02             = 3;  
+   LAOT_RFU_03             = 4;  
+   LAOT_RFU_04             = 5;  
+   LAOT_RFU_05             = 6;  
+}
+message LoraRadioInfo {
+   optional sint32 RSSI             = 1;  
+   optional sint32 SNR              = 2;  
+   optional uint32 channel          = 3;  
+   optional uint32 frequency        = 4;  
+   optional LoraSpreadingFactor SF  = 5;  
+   optional LoraCodingRate CR       = 6;  
+   optional LoraBandwidth BW        = 8;  
+}
+message LoraData {
+   required uint32 loraID                 = 1;     
+   required uint32 sequenceNumber         = 2;     
+   optional IDPack identificationPack     = 3;     
+   optional LoraRadioInfo loraRadio       = 4;     
+   repeated PositionInfo position         = 5;     
+   optional IOsInfo ios                   = 6;     
+   optional FlagsInfo flags               = 7;     
+   optional TelemetryInfo telemetry       = 8;     
+   optional uint64 gatewayDateTime        = 9;     
+   optional uint64 gatewayDeviceId        = 10;    
+   repeated PositionInfo gatewayPosition  = 11;    
+   optional LoraNetwork loraNetwork       = 12;    
+   optional GpsInfo gps                   = 13;    
+   optional GpsInfo gatewayGps            = 14;    
+   optional uint64 deviceDateTime         = 15;    
+   optional Events events                 = 16;    
+   optional bytes openData                = 17;    
+   optional bool isAck                    = 18;    
+   optional uint32 port                   = 19;    
+   repeated AccessoryStatus accessories   = 20;    
+   repeated UserInfo user                 = 21;    
+   optional uint32 commandSequenceRx      = 22;    
+   optional uint32 commandSequenceTx      = 23;    
+   optional uint64 rxTimestamp		  = 24;    
+   repeated ReportBeacons beacons         = 25;    
+   optional CustomerData customerData     = 128;   
+}
+message LoraConfigChannelEmergency {
+   optional uint32 frequency                    = 1;  
+   optional LoraSpreadingFactor SF              = 2;  
+   optional LoraCodingRate CR                   = 3;  
+   optional LoraBandwidth BW                    = 4;  
+   optional uint32 power                        = 5;  
+   optional uint32 moveTxInterval               = 6;  
+   optional uint32 stopTxInterval               = 7;  
+   optional uint32 moveRxONInterval             = 8;  
+   optional uint32 moveRxOFFInterval            = 9;  
+   optional uint32 stopRxONInterval             = 10; 
+   optional uint32 stopRxOFFInterval            = 11; 
+   optional LoraProtocol protocol               = 13; 
+   optional bytes  loraP2PKey                   = 18; 
+   
+   optional uint32 moveTxIntervalDevice         = 19; 
+   optional uint32 stopTxIntervalDevice         = 20; 
+   
+   optional OutputControl emergencyOutput       = 21; 
+   optional bool jammingForcesEmergency         = 22; 
+   optional bool batteryModeForcesEmergency     = 23; 
+   optional bool movingStoppedForcesEmergency   = 24; 
+   optional bool gsensorAnglesForcesEmergency   = 25; 
+   optional uint32 dynamicTransmissionQty       = 26; 
+   optional uint32 dynamicTransmissionInterval  = 27; 
+   optional bool receiveNoEncryptedPackets      = 28; 
+   optional bool useFrequencyHop                = 29; 
+   optional bool disableTXWhenGPRSAvailable     = 30; 
+   optional LoraDataType datatype				= 31; 
+}
+message LoraConfigChannelCommand {
+   optional uint32 frequency                            = 1;  
+   optional LoraSpreadingFactor SF                      = 2;  
+   optional LoraCodingRate CR                           = 3;  
+   optional LoraBandwidth BW                            = 4;  
+   optional uint32 power                                = 5;  
+   
+   optional uint32 moveRxONInterval                     = 8;  
+   optional uint32 moveRxOFFInterval                    = 9;  
+   optional uint32 stopRxONInterval                     = 10; 
+   optional uint32 stopRxOFFInterval                    = 11; 
+   
+   optional LoraProtocol protocol                       = 13; 
+   optional bytes  loraP2PKey                           = 18; 
+   optional bool useRXOnlyWhenGPRSUnavailable           = 19; 
+   optional uint32 rxIntervalAfterEmergencyTransmission = 20; 
+   optional bool useFrequencyHop                        = 21; 
+   optional uint32 useTXWindowWhenGPRSUnavaible			  = 22; 
+}
+message BatteryDeviceParams {
+   optional uint32 moveKeepAliveTimeout                  = 1; 
+   optional uint32 stopKeepAliveTimeout                  = 2; 
+   optional uint32 newKeepAliveIntervalAfterFirstMissing = 3; 
+   optional uint32 timeoutToStartCommandChannelRecovery  = 4; 
+}
+message LoraConfigChannelPairing {
+   optional uint32 frequency                    = 1;  
+   optional LoraSpreadingFactor SF              = 2;  
+   optional LoraCodingRate CR                   = 3;  
+   optional LoraBandwidth BW                    = 4;  
+   optional uint32 power                        = 5;  
+   optional uint32 moveTxInterval               = 6;  
+   optional uint32 stopTxInterval               = 7;  
+   optional uint32 moveRxONInterval             = 8;  
+   optional uint32 moveRxOFFInterval            = 9;  
+   optional uint32 stopRxONInterval             = 10; 
+   optional uint32 stopRxOFFInterval            = 11; 
+   optional LoraProtocol protocol               = 13; 
+   optional uint32 moveKeepAliveTimeout         = 14; 
+   optional uint32 stopKeepAliveTimeout         = 15; 
+   optional uint32 moveTxIntervalCommand        = 16; 
+   optional uint32 stopTxIntervalCommand        = 17; 
+   optional bytes  loraP2PKey                   = 18; 
+   optional BatteryDeviceParams batteryDevice   = 19; 
+   optional LoraModulation modulation           = 20; 
+   optional bool pairingDisableGSM              = 21; 
+   optional bool pairingDisableGPS              = 22; 
+   optional bool pairingDisableLoRaWAN          = 23; 
+   optional bool pairingDisableSigfox           = 24; 
+}
+message LoraConfigChannelPosition {
+   optional uint32 frequency                 = 1;  
+   optional LoraSpreadingFactor SF           = 2;  
+   optional LoraCodingRate CR                = 3;  
+   optional LoraBandwidth BW                 = 4;  
+   optional uint32 power                     = 5;  
+   optional uint32 moveTxInterval            = 6;  
+   optional uint32 stopTxInterval            = 7;  
+   
+   optional uint32 moveRxONInterval          = 8;  
+   optional uint32 moveRxOFFInterval         = 9;  
+   optional uint32 stopRxONInterval          = 10; 
+   optional uint32 stopRxOFFInterval         = 11; 
+   
+   optional LoraProtocol protocol            = 13; 
+   optional bytes  loraP2PKey                = 18; 
+   optional bool distributedTxInterval       = 19; 
+   optional bool useFrequencyHop             = 20; 
+   optional LoraDataType dataType            = 21; 
+   optional bool disableTXWhenGPRSAvailable  = 22; 
+}
+message LoraConfigWANPosition {
+   optional uint32 moveTxInterval            = 6;  
+   optional uint32 stopTxInterval            = 7;  
+   optional uint32 moveEmergencyTxInterval   = 22; 
+   optional uint32 stopEmergencyTxInterval   = 23; 
+   
+   optional uint32 forceGpsRacing            = 26; 
+}
+message LoraWanChannels {
+   optional bool loraUplinkChannel00				= 1;   
+   optional bool loraUplinkChannel01				= 2;   
+   optional bool loraUplinkChannel02				= 3;   
+   optional bool loraUplinkChannel03				= 4;   
+   optional bool loraUplinkChannel04				= 5;   
+   optional bool loraUplinkChannel05				= 6;   
+   optional bool loraUplinkChannel06				= 7;   
+   optional bool loraUplinkChannel07				= 8;   
+   optional bool loraUplinkChannel08				= 9;   
+   optional bool loraUplinkChannel09				= 10;  
+   optional bool loraUplinkChannel10				= 11;  
+   optional bool loraUplinkChannel11				= 12;  
+   optional bool loraUplinkChannel12				= 13;  
+   optional bool loraUplinkChannel13				= 14;  
+   optional bool loraUplinkChannel14				= 15;  
+   optional bool loraUplinkChannel15				= 16;  
+   optional bool loraUplinkChannel16				= 17;  
+   optional bool loraUplinkChannel17				= 18;  
+   optional bool loraUplinkChannel18				= 19;  
+   optional bool loraUplinkChannel19				= 20;  
+   optional bool loraUplinkChannel20				= 21;  
+   optional bool loraUplinkChannel21				= 22;  
+   optional bool loraUplinkChannel22				= 23;  
+   optional bool loraUplinkChannel23				= 24;  
+   optional bool loraUplinkChannel24				= 25;  
+   optional bool loraUplinkChannel25				= 26;  
+   optional bool loraUplinkChannel26				= 27;  
+   optional bool loraUplinkChannel27				= 28;  
+   optional bool loraUplinkChannel28				= 29;  
+   optional bool loraUplinkChannel29				= 30;  
+   optional bool loraUplinkChannel30				= 31;  
+   optional bool loraUplinkChannel31				= 32;  
+   optional bool loraUplinkChannel32				= 33;  
+   optional bool loraUplinkChannel33				= 34;  
+   optional bool loraUplinkChannel34				= 35;  
+   optional bool loraUplinkChannel35				= 36;  
+   optional bool loraUplinkChannel36				= 37;  
+   optional bool loraUplinkChannel37				= 38;  
+   optional bool loraUplinkChannel38				= 39;  
+   optional bool loraUplinkChannel39				= 40;  
+   optional bool loraUplinkChannel40				= 41;  
+   optional bool loraUplinkChannel41				= 42;  
+   optional bool loraUplinkChannel42				= 43;  
+   optional bool loraUplinkChannel43				= 44;  
+   optional bool loraUplinkChannel44				= 45;  
+   optional bool loraUplinkChannel45				= 46;  
+   optional bool loraUplinkChannel46				= 47;  
+   optional bool loraUplinkChannel47				= 48;  
+   optional bool loraUplinkChannel48				= 49;  
+   optional bool loraUplinkChannel49				= 50;  
+   optional bool loraUplinkChannel50				= 51;  
+   optional bool loraUplinkChannel51				= 52;  
+   optional bool loraUplinkChannel52				= 53;  
+   optional bool loraUplinkChannel53				= 54;  
+   optional bool loraUplinkChannel54				= 55;  
+   optional bool loraUplinkChannel55				= 56;  
+   optional bool loraUplinkChannel56				= 57;  
+   optional bool loraUplinkChannel57				= 58;  
+   optional bool loraUplinkChannel58				= 59;  
+   optional bool loraUplinkChannel59				= 60;  
+   optional bool loraUplinkChannel60				= 61;  
+   optional bool loraUplinkChannel61				= 62;  
+   optional bool loraUplinkChannel62				= 63;  
+   optional bool loraUplinkChannel63				= 64;  
+   optional bool loraUplinkChannel64				= 65;  
+   optional bool loraUplinkChannel65				= 66;  
+   optional bool loraUplinkChannel66				= 67;  
+   optional bool loraUplinkChannel67				= 68;  
+   optional bool loraUplinkChannel68				= 69;  
+   optional bool loraUplinkChannel69				= 70;  
+   optional bool loraUplinkChannel70				= 71;  
+   optional bool loraUplinkChannel71				= 72;  
+   optional bool loraDownlinkChannel00				= 73;  
+   optional bool loraDownlinkChannel01				= 74;  
+   optional bool loraDownlinkChannel02				= 75;  
+   optional bool loraDownlinkChannel03				= 76;  
+   optional bool loraDownlinkChannel04				= 77;  
+   optional bool loraDownlinkChannel05				= 78;  
+   optional bool loraDownlinkChannel06				= 79;  
+   optional bool loraDownlinkChannel07				= 80;  
+   optional bool loraDownlinkChannel08				= 81;  
+}
+message LoraJammerDetection {
+   optional uint32 loraJammerDetectionInterval				= 1;   
+   optional uint32 loraJammerDetectionCheckLevel			= 2;   
+   optional uint32 loraJammerDetectionClearLevel			= 3;   
+   optional bool loraJammerDetectionGsmConnectionCheck		= 4;   
+   optional uint32 loraJammerDetectionVerifyInterval		= 5;   
+   optional uint32 loraJammerDetectionVerifyQty				= 6;   
+}
+message LoraConfig {
+   optional LoraMode loraModeConfig                      = 1;  
+   optional LoraWanFrequencyPlan loraWanFrequencyPlan    = 7;  
+   optional LoraWanActivation loraWanActivation          = 8;  
+   optional uint64 loraWanOTAAApplicationEUI             = 9;  
+   optional bytes  loraWanOTAAApplicationKey             = 10; 
+   optional uint64 loraWanABPDeviceAddress               = 11; 
+   optional bytes  loraWanABPNetworkSessionKey           = 12; 
+   optional bytes  loraWanABPApplicationSessionKey       = 13; 
+   optional LoraConfigChannelEmergency emergencyChannel  = 14; 
+   optional LoraConfigChannelCommand commandChannel      = 15; 
+   optional LoraConfigChannelPairing pairingChannel      = 16; 
+   optional LoraConfigChannelPosition positionChannel    = 17; 
+   optional uint32 loraP2PCoordinatorID                  = 19; 
+   optional uint32 keepMovingState                       = 20; 
+   optional uint32 gatewayP2PFilterPackets               = 21; 
+   optional LoraConfigWANPosition wanPosition            = 22; 
+   optional LoraWANMode loraWANMode                      = 23; 
+   optional ADRMode adrMode                              = 24; 
+   optional uint32 loraWANMaxPower                       = 25; 
+   optional LoraDataType loraWANDataType                 = 26; 
+   optional bool emergencyOnlyForcesLoraWANAckAnalysis   = 27; 
+   optional uint32 gatewayP2PFilterMinIntervalToResend   = 28; 
+   optional LoraWanDataRate loraWanDataRate				 = 29; 
+   optional LoraWanChannels loraWanChannels				 = 30; 
+   optional uint32 loraWanRx1							 = 31; 
+   optional uint32 loraWanRx2							 = 32; 
+   optional LoraJammerDetection jammerDetection 	     = 33; 
+   optional LoraStateMachine stateMachine                = 50; 
+   optional LoraFrequencyHopConfig frequencyHop          = 51; 
+   optional bool packetReceivedForceConnection			 = 52; 
+}
+message DeviceItem {
+   required uint32 index                                 = 1;  
+   required uint32 LoraID                                = 2;  
+   required uint64 IEEE                                  = 3;  
+   optional bool forceEmergency                          = 4;  
+   optional LoraMode loraModeConfig                      = 5;  
+   optional LoraWANMode loraWANMode                      = 6;  
+   optional LoraDataType loraWANDataType                 = 7;  
+   optional LoraDataType loraP2PDataType                 = 8;  
+   optional bool emergencyOnlyForcesLoraWANAckAnalysis   = 9;  
+}
+message LoraWANNetworkConfig {
+   optional LoraWanFrequencyPlan loraWanFrequencyPlan = 1; 
+   optional LoraWanActivation loraWanActivation       = 2; 
+   optional uint64 loraWanOTAAApplicationEUI          = 3; 
+   optional bytes  loraWanOTAAApplicationKey          = 4; 
+   optional uint64 loraWanABPDeviceAddress            = 5; 
+   optional bytes  loraWanABPNetworkSessionKey        = 6; 
+   optional bytes  loraWanABPApplicationSessionKey    = 7; 
+   optional ADRMode adrMode                           = 8; 
+   optional uint32 loraWANMaxPower                    = 9; 
+}
+message LoraWANNetworkConfigPeripheral {
+   required uint32 loraID                 = 1;  
+   required LoraWANNetworkConfig config   = 2;  
+}
+message LoraWANNetworkConfigList {
+   repeated LoraWANNetworkConfigPeripheral peripheral = 1;  
+}
+message LoraConfigPeripherals {
+   optional LoraMode loraModeConfig                      = 1;  
+   optional LoraWanFrequencyPlan loraWanFrequencyPlan    = 7;  
+   optional LoraWanActivation loraWanActivation          = 8;  
+   optional uint64 loraWanOTAAApplicationEUI             = 9;  
+   optional bytes  loraWanOTAAApplicationKey             = 10; 
+   optional uint64 loraWanABPDeviceAddress               = 11; 
+   optional bytes  loraWanABPNetworkSessionKey           = 12; 
+   optional bytes  loraWanABPApplicationSessionKey       = 13; 
+   optional LoraConfigChannelEmergency emergencyChannel  = 14; 
+   optional LoraConfigChannelCommand commandChannel      = 15; 
+   optional LoraConfigChannelPairing pairingChannel      = 16; 
+   optional LoraConfigChannelPosition positionChannel    = 17; 
+   repeated DeviceItem loraDevices                       = 21; 
+   repeated DeviceItem zigbeeDevices                     = 22; 
+   optional LoraConfigWANPosition wanPosition            = 23; 
+   optional LoraWANMode loraWANMode                      = 24; 
+   optional ADRMode adrMode                              = 25; 
+   optional uint32 loraWANMaxPower                       = 26; 
+   optional LoraDataType loraWANDataType                 = 28; 
+   optional TelemetryConfig telemetry                    = 29; 
+   optional uint32 reportStatusInterval                  = 30; 
+   repeated ButtonAction buttonActions                   = 31; 
+   optional LoraDataType loraP2PDataType                 = 32; 
+   optional bool emergencyOnlyForcesLoraWANAckAnalysis   = 33; 
+   optional IOsConfig ios                                = 34; 
+}
+message ReportLoraConfigPeripherals {
+   required uint64 deviceID               = 1;  
+   required uint64 commandID              = 2;  
+   required LoraConfigPeripherals config  = 3;  
+}
+message ReportLoraWANNetworkConfigList {
+   required uint64 deviceID                  = 1;  
+   required uint64 commandID                 = 2;  
+   required LoraWANNetworkConfigList config  = 3;  
+}
+message LoraActions {
+   required uint32 loraID             = 1;  
+   required LoraActionID actionID     = 2;  
+   optional int32 actionParamINT      = 3;  
+   optional uint64 expirationDateTime = 4;  
+   optional bytes actionParam         = 5;  
+   optional uint64 txTimestamp        = 6;  
+   optional uint32 commandSeq         = 8;  
+}
+message LoraActionsFileItem {
+   required uint32 loraID             = 1; 
+   required LoraActionID actionID     = 2; 
+   optional uint64 expirationDateTime = 4; 
+   optional bytes actionParam         = 5; 
+   optional GeoLocation lastPosition  = 7; 
+   optional uint32 commandSeq         = 8; 
+}
+message LoraActionsFile {
+   repeated LoraActionsFileItem loraActionsFileItem  = 1; 
+   optional uint32 maxActionsPerCycleTX              = 2; 
+   optional uint32 maxActionsTotal                   = 3; 
+   optional uint32 maxRadiusLastPosition             = 4; 
+   optional LoraActionsOrderType loraActionsOrder    = 5; 
+}
+message LoraActionsFileEdit {
+   repeated LoraActionsFileItem actionAdd       = 1;  
+   repeated LoraActionsFileItem actionReplace   = 2;  
+   repeated LoraActionsFileItem actionDelete    = 3;  
+}
+message LoraGatewayCmd {
+   required uint64 deviceID            = 1;  
+   required uint64 commandID           = 2;  
+   repeated LoraActions includeActions = 3;  
+   repeated LoraActions removeActions  = 4;  
+   optional bool removeALL             = 5;  
+}
+message LoraCommand {
+   required uint64 deviceID            = 1;  
+   required uint64 commandID           = 2;  
+   optional uint32 loraID              = 3;  
+   optional LoraChannel channel        = 4;  
+   optional uint32 waitInterval        = 5;  
+   optional uint32 retries             = 6;  
+   optional LoraActions sendAction     = 7;  
+   optional bool sendCoordinatorConfig = 8;  
+   optional bool sendCoordinatorFW     = 9;  
+   optional bool sendDeviceFW          = 10; 
+   optional bool sendWanNetwork        = 11; 
+   optional bool useFrequencyHop       = 12; 
+}
+message LoraResponse {
+   optional uint64 commandID           = 1;  
+   optional uint32 loraID              = 2;  
+   optional LoraResponseType response  = 3;  
+   optional uint32 retryCounter        = 4;  
+   optional uint32 progress            = 5;  
+}
+message MultipleReportLora {
+   required uint64 gatewayID              = 1;  
+   required uint64 packetID               = 2;  
+   required uint64 gatewayDateTime        = 3;  
+   repeated PositionInfo gatewayPosition  = 4;  
+   repeated LoraData data                 = 5;  
+   repeated LoraActions gatewayTXQueue    = 6;  
+   repeated LoraResponse response         = 7;  
+   optional GpsInfo gatewayGps            = 8;  
+   optional FileInfo loraActionsFileInfo  = 9;  
+   optional CustomerData customerData     = 128;
+}
+enum LoraState {
+   LST_IDLE                = 0;  
+   LST_RESET               = 1;  
+   LST_P2P_RX_EMERGENCY    = 2;  
+   LST_P2P_RX_COMMAND      = 3;  
+   LST_P2P_RX_TX_PAIRING   = 4;  
+   LST_P2P_RX_POSITION     = 5;  
+   LST_RFU_01              = 6;  
+   LST_RFU_02              = 7;  
+   LST_RFU_03              = 8;  
+   LST_RFU_04              = 9;  
+   LST_RFU_05              = 10;  
+   
+   LST_P2P_TX_COMMAND_LIST = 20; 
+   LST_RFU_06              = 21; 
+   LST_RFU_07              = 22; 
+   LST_RFU_08              = 23; 
+   LST_RFU_09              = 24; 
+   LST_RFU_10              = 25; 
+}
+
+message LoraStateRule {
+   optional LoraState state                           = 1;  
+   optional uint32 duration                           = 2;  
+   
+   optional bool canBeInterruptedByEvents             = 3;  
+   optional bool sendPendingTransmissionsWhenFinished = 4;  
+   optional bool sendCommandResponseImmediately       = 5;  
+   
+   optional bool useFrequencyHop                      = 6;  
+}
+
+message LoraStateMachine {
+   optional LoraStateRule state00            = 1;  
+   optional LoraStateRule state01            = 2;  
+   optional LoraStateRule state02            = 3;  
+   optional LoraStateRule state03            = 4;  
+   optional LoraStateRule state04            = 5;  
+   optional LoraStateRule state05            = 6;  
+   optional LoraStateRule state06            = 7;  
+   optional LoraStateRule state07            = 8;  
+   optional LoraStateRule state08            = 9;  
+   optional LoraStateRule state09            = 10; 
+   
+   optional LoraStateRule stateEmergency00   = 20;  
+   optional LoraStateRule stateEmergency01   = 21;  
+   optional LoraStateRule stateEmergency02   = 22;  
+   optional LoraStateRule stateEmergency03   = 23;  
+   optional LoraStateRule stateEmergency04   = 24;  
+   optional LoraStateRule stateEmergency05   = 25;  
+   optional LoraStateRule stateEmergency06   = 26;  
+   optional LoraStateRule stateEmergency07   = 27;  
+   optional LoraStateRule stateEmergency08   = 28;  
+   optional LoraStateRule stateEmergency09   = 29;  
+}
+
+message LoraFrequencyHopConfig {
+   optional uint32 startFrequency00 = 1;  
+   optional uint32 endFrequency00   = 2;  
+   optional uint32 startFrequency01 = 3;  
+   optional uint32 endFrequency01   = 4;  
+   optional uint32 startFrequency02 = 5;  
+   optional uint32 endFrequency02   = 6;  
+   
+   optional uint32 frequencyStep    = 7;  
+   optional uint32 updateInterval   = 8;  
+   optional bytes  hopKey           = 9;  
+}

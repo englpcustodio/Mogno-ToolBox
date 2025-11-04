@@ -1,0 +1,102 @@
+ideias para o script
+
+
+FUNCIONALIDADES DA GUI INICIAL/ REQUISIÇÃO DE ÚLTIMAS POSIÇÕES
+
+
+Inserir função para identificar, pela última posição que pode rodar a cada X minutos, e mostrar um pop up para alertar quando um evento acontecer
+Enviar comando, na aba de comandos
+
+
+Ajustar a barra de progresso para as requisições em paralelo
+
+mostrar os consumos de dados (via API da operadora) para os respectivos ICCIDs e seriais
+
+ajustar as imagens de ícones
+
+
+aba de ajuda: instruções de como utilizar a aplicação
+
+
+botão de pausar e salvar até o momento.
+
+Botão de cancelar as requisições, zerando o cronometro e voltando aos valores iniciais. Dar opção de cancelar e salvar até o momento (gerar arquivo excel) ou cancelar todo o processo (não gera excel)
+
+inserir consulta direta no banco de dados (verificar como e qual banco acessar), se necessário login/senha além da do mogno
+
+Se a consulta no banco for possível:
+- automatizar o início das requisições em dias e horários específicos - criar aba "Automações"
+- requisitar dados da frota de clientes específicos (placas, seriais, modelos de rastreadores, versão de fw, gps fix, lat long, tipo de evento, última OS realizada, tipo de OS), com filtro data e hora (validações para possíveis manutenções) 
+
+criar função de atualização sem redistribuição (armazenar em local imutável, servidor)
+
+--------------------------------------------------------------------------------------------------------------------
+TRATAMENTO DO ARQUIVO EXCEL GERADO
+
+ajustar o processo de criar aba protos para iscas: formato JSON (verificar se não está truncando dados)
+
+vincular com o cliente, modelos de dispositivo, serial, data/hora
+
+Poder escolher quais informações serão colocadas nos arquivos Excel (aba de proto-colunas, separado em modelos de equipamentos, separado em clientes)
+
+--------------------------------------------------------------------------------------------------------------------
+TRATAMENTO DE GRÁFICOS
+Gráficos de porcentagem e de valores absolutos
+
+Para aqueles dispositivos que posicionaram hoje, plotar um gráfico com as coordenadas em verde
+
+Para aqueles dispositivos que posicionaram até 15 dias, plotar um gráfico com as coordenadas em amarelo
+
+Para aqueles dispositivos que posicionaram a mais de 15 dias, plotar um gráfico com as coordenadas em vermelho
+
+Legenda: cliente/modelo de equipamento/nº de série/versão de FW/última posição
+
+
+ver sobre folium - plotar em cores (em função do tempo de última posição)
+
+planos futuros:
+- cobertura de sinal das operadoras ( integrar mapa das operadoras, se possível, um filtro)
+- plotar as coordenadas do equipamento que escutou o outro por P2P (pacote RF)
+
+-----------------------------------------------------------------------------------------------------------------------------
+FUNCIONALIDADES DA ABA DE COMANDO
+Criar outra aba na aplicação para envio de comandos
+
+listar os seriais (campo reservado) ou selecionar um arquivo .CSV
+
+caixa de opções para selecionar os comandos (verificar como acessar a lista de comandos)
+
+caixa de texto para inserir comandos personalizados
+
+Envio de comandos agendado: por horário (caixa para selecionar)
+
+ou por status (a cada XX minutos, rodar a última posição dos seriais: se ignição on/posição, iniciar o envio dos comandos)
+
+Caso o perfil logado não tenha a opção da aba de envio de comandos, mostrar a mensagem: "Seu perfil de usuário não possui este acesso".
+
+-----------------------------------------------------------------------------------------------------------------------------
+SAÚDE DA BASE
+criar aba saúde da base do cliente (informações de equipamentos posicionando, divido em data/hora, últimos eventos, gráfico de equipamentos on-line e off-line, separando em períodos sem comunicação):
+- 1º momento, apenas mostrar um relatório
+- 2º momento, criar automação para relatórios periódicos por e-mail
+- 3º momento, integrar com o motor gerador de OS do CORE
+- 4º momento, integração com cliente, via bot, para agendar manutenção
+
+Com geração de mapas interativos, com filtros e localização das últimas posições dos veículo da frota do cliente
+
+gráfico de equipamentos on-line/offline - ignição on/off
+
+
+
+pyinstaller --noconfirm --onefile --windowed --icon=mogno.ico --add-data "icon_CEABS.png;." main.py
+
+
+Como posso apresentar os dados contidos neste arquivo em excel? Dê sugestões que posso manipular em linguagem python, trazendo umas perspectiva de status dos seriais, em suas versões (1.0, 1.2), os valores de latitude e longitude, dias de últimas posições (separado os serias em que posicionaram no dia mais atual, em até 7 dias, em até 15 dias e mais de 15 dias). se possível, trazer uma visualização em gráficos e dashboards para tomada de decisões.
+
+
+
+
+862092065614665;862092065614749;862092065653515;862092065690772;862092065733648;862092068888977;862092068889058;862092068889074;862092068889116;862092068889371;862092068889413;862092068889421;862092068937444;862092068938376;862092068958275;862092068993876;862092069040552;862092069106890;862092069115412;862092069117913;862092069118028;862092069118036;862092069118044;862092069119471;862092069119554;862092069119612;862092069119703;862092069129348;862092069129363;862092069129371;862092069129389;862092069129397;862092069129405;862092069129413;862092069129421;862092069129470;862092069129488;862092069135378;862092069156317;862092069157174;862092069157182;862092069157190;862092069157208;862092069157216;862092069157224;862092069157257;862092069157273;862092069157281;862092069157299;862092069157307;862092069157315;862092069157323;862092069157331;862092069157349;862092069157364;862092069157380;862092069157406;862092069157430;862092069157463;862092069157471;862092069157489;862092069157497;862092069157505;862092069157513;862092069157521;862092069157539;862092069157547;862092069157554;862092069157570;862092069157588;862092069157596;862092069157604;862092069157620;862092069157638;862092069157646;862092069157653;862092069157661;862092069157950;862092069181117;863829071033417;863829071037541;863829071074031;863829071074924;863829071075954;863829071076994;863829071077042;863829071077109;863829071077117;863829071077133;863829071077141;863829071077158;863829071077174;863829071077182;863829071077190;863829071077257;863829071077299;863829071077315;863829071077349;863829071077356;863829071077380;863829071077422;863829071077489;863829071077562;863829071077588
+
+
+

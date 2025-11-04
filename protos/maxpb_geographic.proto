@@ -1,0 +1,90 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_gps.proto";        /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+import "maxpb_multimedia.proto"; /// $SUPPORTEDBY[MTC8XX, DLR, A90]
+import "maxpb_dvr.proto";        /// $SUPPORTEDBY[MTC8XX, DLR]
+/// This enum will be used as bitmask
+enum GeographicEvent {
+    GE_NONE       = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90, MOBILE_PHONE] $DESCRIPTION[Compatibilidade Proto3] $DESCRIPTION_ENGLISH[Proto3 compatibility]
+    GE_CANCELLED  = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90] $DESCRIPTION[Bit 0] $DESCRIPTION_ENGLISH[Bit 0]
+    GE_ENTER      = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90] $DESCRIPTION[Bit 1] $DESCRIPTION_ENGLISH[Bit 1]
+    GE_EXIT       = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90] $DESCRIPTION[Bit 2] $DESCRIPTION_ENGLISH[Bit 2]
+    GE_PERMANENCY = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90] $DESCRIPTION[Bit 3] $DESCRIPTION_ENGLISH[Bit 3]
+}
+enum GeoObjectType {
+   GOT_RECTANGLE_SIZE         = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90, MOBILE_PHONE]
+   GOT_RECTANGLE_CORNERS      = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+   GOT_CIRCULAR               = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+   GOT_POLYGONAL              = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   GOT_FENCE                  = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   GOT_ANCHOR                 = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+   GOT_RFU_01                 = 6;  /// $SUPPORTEDBY[]
+   GOT_RFU_02                 = 7;  /// $SUPPORTEDBY[]
+   GOT_RFU_03                 = 8;  /// $SUPPORTEDBY[]
+   GOT_RFU_04                 = 9;  /// $SUPPORTEDBY[]
+   GOT_RFU_05                 = 10; /// $SUPPORTEDBY[]
+}
+message GeoLocation {
+   required sfixed32 latitude  = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90] $DESCRIPTION[Formato do valor: Graus.decimaisDoGrau * 10.000.000] $DESCRIPTION_ENGLISH[Value format: Degrees.decimalsOfDegrees * 10,000,000]
+   required sfixed32 longitude = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90] $DESCRIPTION[Formato do valor: Graus.decimaisDoGrau * 10.000.000] $DESCRIPTION_ENGLISH[Value format: Degrees.decimalsOfDegrees * 10,000,000]
+}
+message GeoObjectRectangleSize {
+   required GeoLocation location  = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+   required uint32 width          = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90] $DESCRIPTION[(Metros)] $DESCRIPTION_ENGLISH[(Meters)]
+   required uint32 height         = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90] $DESCRIPTION[(Metros)] $DESCRIPTION_ENGLISH[(Meters)]
+}
+message GeoObjectRectangleCorners {
+   required GeoLocation upperLeftCorner   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+   required GeoLocation lowerRightCorner  = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+}
+message GeoObjectCircular {
+   required GeoLocation location = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+   required uint32 circleRadius  = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90] $DESCRIPTION[(Metros)] $DESCRIPTION_ENGLISH[(Meters)]
+}
+message GeoObjectPolygonal {
+   optional GeoObjectRectangleCorners circumscribedRectangle   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   repeated GeoLocation locations                              = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+}
+message GeoObjectFence {
+   optional GeoObjectRectangleCorners circumscribedRectangle   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   repeated GeoLocation locations                              = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   required uint32 threshold                                   = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90] $DESCRIPTION[(Metros)] $DESCRIPTION_ENGLISH[(Meters)]
+}
+message GeoObject {
+   required uint64 geoObjectId                         = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+   required uint32 geographicEventMask                 = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90] $DESCRIPTION[Utilizando o enum GeographicEvent's, esse bitmask é atribuído por cada posicição do enum na potência de 2. EX.: se precisarmos do evento "GE_EXIT", então definimos o valor 2^2 = 4, portanto a máscara será 0x00000100.] $DESCRIPTION_ENGLISH[Using GeographicEvent's enum, this bitmask is set by each enum's position as a power of 2. E.g.: if we need "GE_EXIT" event, then we set the value 2^2 = 4, thus the mask will be 0x00000100.]
+   optional GeoObjectCircular circle                   = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+   optional GeoObjectRectangleSize rectancleSize       = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+   optional GeoObjectRectangleCorners rectancleCorners = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+   optional GeoObjectPolygonal polygon                 = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional GeoObjectFence fence                       = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 maxSpeed                            = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90] $DESCRIPTION[Define a velocidade máxima com esse valor. (km/h)] $DESCRIPTION_ENGLISH[Sets global max speed limit with this value (km/h)]
+   optional uint32 maxTemporarySpeed                   = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90] $DESCRIPTION[Use temporariamente (RAM) (km/h)] $DESCRIPTION_ENGLISH[Use it temporarily (RAM) (km/h)]
+   optional uint32 maxRainySpeed                       = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90] $DESCRIPTION[Define a velocidade máxima em condição de chuva com esse valor (km/h)] $DESCRIPTION_ENGLISH[Sets global max rainy speed limit with this value (km/h)]
+   optional uint32 maxTemporaryRainySpeed              = 11; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90] $DESCRIPTION[Use temporariamente (RAM) (km/h)] $DESCRIPTION_ENGLISH[Use it temporarily (RAM) (km/h)]
+   optional uint32 geoObjectGroupID                    = 12; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+   optional Heading enterHeading                       = 13; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90] $DESCRITPION[Começa a considerar que entrou em geo-Objeto] $DESCRIPTION_ENGLISH[Heading to consider that entered on geoObject]
+   optional Playlist geoPlaylistEnter                  = 14; /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[]
+   optional Playlist geoPlaylistExit                   = 15; /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[]
+   optional DvrRequests dvrRequests                    = 16; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[]
+   optional uint32 maxTemporaryAbsoluteSpeedLimit1     = 17;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Use temporariamente (RAM) (km/h)] $DESCRIPTION_ENGLISH[Use it temporarily (RAM) (km/h)]
+   optional uint32 maxTemporaryAbsoluteSpeedLimit2     = 18;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Use temporariamente (RAM) (km/h)] $DESCRIPTION_ENGLISH[Use it temporarily (RAM) (km/h)]
+   optional uint32 maxTemporaryAbsoluteRainySpeedLimit1= 19;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Use temporariamente (RAM) (km/h)] $DESCRIPTION_ENGLISH[Use it temporarily (RAM) (km/h)]
+   optional uint32 maxTemporaryAbsoluteRainySpeedLimit2= 20;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Use temporariamente (RAM) (km/h)] $DESCRIPTION_ENGLISH[Use it temporarily (RAM) (km/h)]
+}
+message GeoReferenceLibrary {
+   repeated GeoObject objects  = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+}
+message GeographicEvents {
+   required GeographicEvent eventID       	= 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+   required uint64 geoObjectId            	= 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+   required GeoObjectType geoObjectType   	= 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90]
+   optional uint32 timeInside             	= 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR, A90] $DESCRIPTION[(Segundos)] $DESCRIPTION_ENGLISH[(Seconds)]
+   optional DvrRequestsInfo dvrRequestsInfo = 5;  /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+message GeographicInfo {
+   required uint64 geoObjectId            = 1;  /// $SUPPORTEDBY[GATEWAY]
+   optional GeoObjectType geoObjectType   = 2;  /// $SUPPORTEDBY[GATEWAY]
+   optional uint64 enterTimestamp		   = 3;  /// $SUPPORTEDBY[GATEWAY]
+   optional uint64 exitTimestamp		      = 4;  /// $SUPPORTEDBY[GATEWAY]
+}

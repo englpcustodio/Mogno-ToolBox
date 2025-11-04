@@ -1,0 +1,266 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+/// Describes all reasons to device reboot
+enum ResetReason {
+   RSTR_POWER_ON              = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, FINDER] $DESCRIPTION[Ligado]
+   RSTR_SIM_LOSS              = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, FINDER] $DESCRIPTION[Perda de SIM] $DESCRIPTION_ENGLISH[SIM Chip loss.]
+   RSTR_SIM_FOUND             = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, FINDER] $DESCRIPTION[SIM encontrado] $DESCRIPTION_ENGLISH[SIM Chip found.]
+   RSTR_SERVER_REQUISITION    = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, FINDER] $DESCRIPTION[Requisição do servidor] $DESCRIPTION_ENGLISH[Server request.]
+   RSTR_FIRMWARE_UPDATE       = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, FINDER] $DESCRIPTION[Atualização de firmware] $DESCRIPTION_ENGLISH[Firmware update.]
+   RSTR_NO_CONNECTION         = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, FINDER] $DESCRIPTION[Sem conexão] $DESCRIPTION_ENGLISH[No connection.]
+   RSTR_TEMPERATURE_RESUMED   = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, FINDER] $DESCRIPTION[Temperatura resumida] $DESCRIPTION_ENGLISH[Temperature resumed.]
+   RSTR_SMS_COMMAND           = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, FINDER]   $DESCRIPTION[Comando SMS] $DESCRIPTION_ENGLISH[SMS command.]
+   RSTR_THREAD_WATCHDOG       = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, FINDER] $DESCRIPTION[Thread Watchdog] $DESCRIPTION_ENGLISH[Thread Watchdog]
+   RSTR_ASSERT                = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, FINDER] $DESCRIPTION[RSTR_ASSERT] $DESCRIPTION_ENGLISH[RSTR_ASSERT]
+   RSTR_LWIP_ASSERT           = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, FINDER] $DESCRIPTION[RSTR_LWIP_ASSERT] $DESCRIPTION_ENGLISH[RSTR_LWIP_ASSERT]
+   RSTR_RESET_BUTTON          = 11; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, FINDER] $DESCRIPTION[Botão reset] $DESCRIPTION_ENGLISH[Reset button.]
+   RSTR_UNKNOWN               = 12; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, FINDER] $DESCRIPTION[Desconhecido] $DESCRIPTION_ENGLISH[Unkwnown.]
+   RSTR_STOCK_MODE            = 13; /// $SUPPORTEDBY[MXT180, A40, A6X] $DESCRIPTION[Modo de estocagem] $DESCRIPTION_ENGLISH[Stock mode.]
+   RSTR_BATTERY_BROWN_OUT     = 14; /// $SUPPORTEDBY[MXT180, A6X] $DESCRIPTION[Restrição de bateria] $DESCRIPTION_ENGLISH[Battery brown out.]
+   RSTR_HARDWARE_WATCHDOG     = 15; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A40, A6X, MTC8XX, FINDER] $DESCRIPTION[Hardware watchdog] $DESCRIPTION_ENGLISH[Hardware watchdog]
+   RSTR_MEMORY_FAIL           = 16; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A40, A6X, MTC8XX, FINDER] $DESCRIPTION[Falha de memória]  $DESCRIPTION_ENGLISH[Memory fail.]
+   RSTR_UPDATE_CONFIG         = 17; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A40, A6X, MTC8XX, FINDER] $DESCRIPTION[Atualização de configuração]
+   RSTR_RFU_01                = 18; /// $SUPPORTEDBY[]
+   RSTR_RFU_02                = 19; /// $SUPPORTEDBY[]
+   RSTR_RFU_03                = 20; /// $SUPPORTEDBY[]
+   RSTR_RFU_04                = 21; /// $SUPPORTEDBY[]
+   RSTR_RFU_05                = 22; /// $SUPPORTEDBY[]
+}
+enum TraceChannel {
+   TRC_DISABLE    = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A6X, MTC8XX, FINDER] $DESCRIPTION[Desabilitado] $DESCRIPTION_ENGLISH[Disable.]
+   TRC_RS232_A    = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, FINDER] $DESCRIPTION[RS232_A] $DESCRIPTION_ENGLISH[RS232_A.]
+   TRC_RS232_B    = 2;  /// $SUPPORTEDBY[MAXIO, FINDER] $DESCRIPTION[RS232_B] $DESCRIPTION_ENGLISH[R232_B.]
+   TRC_VCP_1      = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX] $DESCRIPTION[VCP_1] $DESCRIPTION_ENGLISH[VCP_1.]
+   TRC_VCP_2      = 4;  /// $SUPPORTEDBY[] $DESCRIPTION[VCP_2] $DESCRIPTION_ENGLISH[VCP_2.]
+   TRC_FLASH      = 6;  ///@exclude  $SUPPORTEDBY[] $DESCRIPTION[Flash]  $DESCRIPTION_ENGLISH[Flash.]
+   TRC_BLUETOOTH  = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX] $DESCRIPTION[Bluetooth] $DESCRIPTION_ENGLISH[Bluetooth.]
+   TRC_WIFI       = 8;  /// $SUPPORTEDBY[A6X] $DESCRIPTION[WiFi] $DESCRIPTION_ENGLISH[WiFi.]
+   TRC_RFU_01     = 9;  /// $SUPPORTEDBY[] $DESCRIPTION[RSTR_RFU_01]
+   TRC_RFU_02     = 10; /// $SUPPORTEDBY[] $DESCRIPTION[RSTR_RFU_02]
+   TRC_RFU_03     = 11; /// $SUPPORTEDBY[] $DESCRIPTION[RSTR_RFU_03]
+   TRC_RFU_04     = 12; /// $SUPPORTEDBY[] $DESCRIPTION[RSTR_RFU_04]
+   TRC_RFU_05     = 13; /// $SUPPORTEDBY[] $DESCRIPTION[RSTR_RFU_05]
+   TRC_RFU_06     = 14; /// $SUPPORTEDBY[] $DESCRIPTION[RSTR_RFU_06]
+   TRC_RFU_07     = 15; /// $SUPPORTEDBY[] $DESCRIPTION[RSTR_RFU_07]
+   TRC_RFU_08     = 16; /// $SUPPORTEDBY[] $DESCRIPTION[RSTR_RFU_08]
+   TRC_RFU_09     = 17; /// $SUPPORTEDBY[] $DESCRIPTION[RSTR_RFU_09]
+}
+///@exclude
+enum TraceLevel {
+   TRL_OFF      = 0; /// $SUPPORTEDBY[] $DESCRIPTION[Desligado]  $DESCRIPTION_ENGLISH[Off.]
+   TRL_ERROR    = 1; /// $SUPPORTEDBY[] $DESCRIPTION[Erro]  $DESCRIPTION_ENGLISH[Error.]
+   TRL_WARNING  = 2; /// $SUPPORTEDBY[] $DESCRIPTION[Alerta] $DESCRIPTION_ENGLISH[Warning.]
+   TRL_INFO     = 3; /// $SUPPORTEDBY[] $DESCRIPTION[Informação] $DESCRIPTION_ENGLISH[Info.]
+   TRL_VERBOSE  = 4; /// $SUPPORTEDBY[] $DESCRIPTION[Verbose] $DESCRIPTION_ENGLISH[Verbose.]
+}
+///@exclude
+enum MemoryType {
+   MT_STACK       = 0; /// $SUPPORTEDBY[MXT180, A6X]
+   MT_HEAP        = 1; /// $SUPPORTEDBY[A6X]
+   MT_FS_STACK    = 2; /// $SUPPORTEDBY[]
+   MT_LUA_STACK   = 3; /// $SUPPORTEDBY[]
+   MT_IRQ_STACK   = 4; /// $SUPPORTEDBY[]
+   MT_RFU_01      = 5; /// $SUPPORTEDBY[]
+   MT_RFU_02      = 6; /// $SUPPORTEDBY[]
+   MT_RFU_03      = 7; /// $SUPPORTEDBY[]
+   MT_RFU_04      = 8; /// $SUPPORTEDBY[]
+   MT_RFU_05      = 9; /// $SUPPORTEDBY[]
+   MT_RFU_06      = 10;/// $SUPPORTEDBY[]
+   MT_RFU_07      = 11;/// $SUPPORTEDBY[]
+   MT_RFU_08      = 12;/// $SUPPORTEDBY[]
+   MT_RFU_09      = 13;/// $SUPPORTEDBY[]
+   MT_RFU_10      = 14;/// $SUPPORTEDBY[]
+   MT_RFU_11      = 15;/// $SUPPORTEDBY[]
+   MT_RFU_12      = 16;/// $SUPPORTEDBY[]
+   MT_RFU_13      = 17;/// $SUPPORTEDBY[]
+   MT_RFU_14      = 18;/// $SUPPORTEDBY[]
+   MT_RFU_15      = 19;/// $SUPPORTEDBY[]
+   MT_RFU_16      = 20;/// $SUPPORTEDBY[]
+}
+///@exclude
+message TraceMaskLevel {
+   optional TraceLevel init         = 1;  /// $SUPPORTEDBY[] $DESCRIPTION[Início]  $DESCRIPTION_ENGLISH[Init.]
+   optional TraceLevel sys          = 2;  /// $SUPPORTEDBY[] $DESCRIPTION[Sistema] $DESCRIPTION_ENGLISH[System.]
+   optional TraceLevel openData     = 3;  /// $SUPPORTEDBY[] $DESCRIPTION[Dado aberto] $DESCRIPTION_ENGLISH[Open data.]
+   optional TraceLevel fileSystem   = 4;  /// $SUPPORTEDBY[] $DESCRIPTION[Sistema de arquivo] $DESCRIPTION_ENGLISH[File system.]
+   optional TraceLevel luac         = 5;  /// $SUPPORTEDBY[] $DESCRIPTION[Luac]  $DESCRIPTION_ENGLISH[Luac.]
+   optional TraceLevel luat         = 6;  /// $SUPPORTEDBY[] $DESCRIPTION[Luat]  $DESCRIPTION_ENGLISH[Luat.]
+   optional TraceLevel usb          = 7;  /// $SUPPORTEDBY[] $DESCRIPTION[Usb]   $DESCRIPTION_ENGLISH[Usb.]
+   optional TraceLevel flash        = 8;  /// $SUPPORTEDBY[] $DESCRIPTION[Flash] $DESCRIPTION_ENGLISH[Flash.]
+   optional TraceLevel dbg          = 9;  /// $SUPPORTEDBY[] $DESCRIPTION[Dbg]   $DESCRIPTION_ENGLISH[Dbg.]
+   optional TraceLevel zigbee       = 10; /// $SUPPORTEDBY[] $DESCRIPTION[Zigbee]$DESCRIPTION_ENGLISH[Zigbee.]
+   optional TraceLevel wifi         = 11; /// $SUPPORTEDBY[] $DESCRIPTION[Wifi]  $DESCRIPTION_ENGLISH[WiFi.]
+   optional TraceLevel satellite    = 12; /// $SUPPORTEDBY[] $DESCRIPTION[Satélite]$DESCRIPTION_ENGLISH[Satellite.]
+   optional TraceLevel tracker      = 13; /// $SUPPORTEDBY[] $DESCRIPTION[Rastreador] $DESCRIPTION_ENGLISH[Tracker.]
+   optional TraceLevel gsm          = 14; /// $SUPPORTEDBY[] $DESCRIPTION[Gsm]   $DESCRIPTION_ENGLISH[GSM.]
+   optional TraceLevel gps          = 15; /// $SUPPORTEDBY[] $DESCRIPTION[Gps]   $DESCRIPTION_ENGLISH[GPS.]
+   optional TraceLevel lora         = 16; /// $SUPPORTEDBY[] $DESCRIPTION[Lora]  $DESCRIPTION_ENGLISH[LoRa.]
+   optional TraceLevel gsensor      = 17; /// $SUPPORTEDBY[] $DESCRIPTION[Gsensor] $DESCRIPTION_ENGLISH[Gsensor.]
+}
+message TraceConfig {
+   optional TraceChannel channel = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A6X, MTC8XX, FINDER]    $COMMENT[0:Desabilitado; 1:Serial RS232_A; 2:Serial RS232_B; 3:USB; 7:BLUETOOTH] $DESCRIPTION[Configura o canal de comunicação para o tracelog/debug] $DESCRIPTION_ENGLISH[Configures communication channel for tracelog/debug.] $DEFAULTVALUE[0] $VALIDATOR[^(0|1|2|3|7)$]
+   optional TraceMaskLevel mask  = 2;  ///@exclude $SUPPORTEDBY[] $DESCRIPTION[Máscara] $DESCRIPTION_ENGLISH[Mask.]
+}
+///@exclude
+message DiagnosticGsm {
+   optional uint32 activeInterval            = 1; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 resetQty                  = 2; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 registrationInterval      = 3; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 linkInterval              = 4; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 socketInterval            = 5; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 extendedSocketInterval    = 6; /// $SUPPORTEDBY[MXT180]
+   optional uint32 lowFreqRegistrationQty    = 7; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 highFreqRegistrationQty   = 8; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 lowCsqRegistrationQty     = 9; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 highCsqRegistrationQty    = 10; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 dtrOnInterval             = 11; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 dtrOffInterval            = 12; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 registrationOkQty         = 13; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 registrationFailQty       = 14; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 linkOkQty                 = 15; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 linkFailQty               = 16; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 socketsOkQty              = 17; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 socketsFailQty            = 18; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 handoverQty               = 19; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 txBytesQty                = 20; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 rxBytesQty                = 21; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 txPacketsOkQty            = 22; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 txPacketsFailQty          = 23; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 rxPacketsQty              = 24;/// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 primarySimcardFailQty     = 25;/// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 secondarySimcardFailQty   = 26;/// $SUPPORTEDBY[]
+   optional uint32 presettingInterval        = 27;/// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 waitingPinInterval        = 28;/// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 linkIdleInterval          = 29;/// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 turningOffInterval        = 30;/// $SUPPORTEDBY[MXT180]
+   optional uint32 presettingOkQty           = 31;/// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 presettingFailQty         = 32;/// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 waitingPinOkQty           = 33;/// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 waitingPinFailQty         = 34;/// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 idleInterval              = 35;/// $SUPPORTEDBY[MXT180]
+}
+///@exclude
+message DiagnosticGps {
+   optional uint32 activeInterval                     = 1; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 resetQty                           = 2; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 ephemerisRetriesQty                = 3; /// $SUPPORTEDBY[MXT180]
+   optional uint32 agpsDownloadOnlineQty              = 4; /// $SUPPORTEDBY[]
+   optional uint32 agpsDownloadOfflineQty             = 5; /// $SUPPORTEDBY[]
+   optional uint32 fixWithAssistanceQty               = 6; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 notFixWithAssistanceQty            = 7; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 fixWithoutAssistanceQty            = 8; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 notFixWithoutAssistanceQty         = 9; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 antennaFailQty                     = 10;/// $SUPPORTEDBY[]
+   optional uint32 AGPSUploadingInterval              = 11;/// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 filterInterval                     = 12;/// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 totalTimeToFixWithAssistance       = 13;/// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 totalTimeToFixWithoutAssistance    = 14;/// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 smallestTimeToFixWithAssistance    = 15;/// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 smallestTimeToFixWithoutAssistance = 16;/// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 greatestTimeToFixWithAssistance    = 17;/// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 greatestTimeToFixWithoutAssistance = 18;/// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 fixInterruptInterval               = 19;/// $SUPPORTEDBY[]
+   optional uint32 dateTimeIntervalToSendAGPS         = 20;/// $SUPPORTEDBY[]
+   optional uint32 AGPSDownloadTime                   = 21;/// $SUPPORTEDBY[]
+   optional uint32 powerQty                           = 22;/// $SUPPORTEDBY[MXT180, A6X]
+}
+///@exclude
+message DiagnosticCore 
+{
+   optional uint32 firmwareChangeQty      = 1; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 intervalSleep          = 2; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 intervalRunning        = 3; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 intervalUsbConnected   = 4; /// $SUPPORTEDBY[MXT180]
+   optional uint32 intervalBTConnected    = 5; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX]
+   optional uint32 maxTemperature         = 6; /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX]
+   optional uint32 meanTemperature        = 7; /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX]
+   optional uint32 lifeInterval           = 8; /// $SUPPORTEDBY[MXT13X, MXT16X]
+   optional uint32 uptimeInterval         = 9; /// $SUPPORTEDBY[]
+}
+///@exclude
+message DiagnosticMemory {
+   optional MemoryType type   = 1; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 size       = 2; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 free       = 3; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 healthy    = 4; /// $SUPPORTEDBY[MXT180, A6X]
+}
+///@exclude
+message DiagnosticLora {
+   optional uint32 txP2pPackets     = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 txWanPackets     = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 rxWanAckPackets  = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 txInterval       = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 rxInterval       = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 rxP2pPackets     = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional int32 rssiLevel         = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional int32 rssiLevelDevice   = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 lastTransmission = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 txHelpPackets    = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 offlineCounter   = 11; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 offlineTotalTime = 12; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+}
+///@exclude
+message DiagnosticZigbee {
+   optional uint32 txPackets              = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX]
+   optional uint32 rxPackets              = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX]
+   optional uint32 txInterval             = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX]
+   optional uint32 rxInterval             = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX]
+   optional int32 rssiLevel               = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX]
+   optional int32 rssiLevelDevice         = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX]
+   optional uint32 lastTransmission       = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX]
+   optional uint32 keepAliveFailCounter   = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX]
+   optional uint32 joinFailCounter        = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX]
+   optional uint32 offlineCounter         = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX]
+   optional uint32 offlineTotalTime       = 11; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX]
+}
+///@exclude
+message DiagnosticBattery {
+   optional uint32 cyclesQty                 = 1; /// $SUPPORTEDBY[MXT180, A6X]
+   optional uint32 intervalUseFromLastCharge = 2; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 intervalTotalUse          = 3; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 intervalCharging          = 4; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX]
+   optional uint32 intervalFull              = 5; /// $SUPPORTEDBY[]
+   optional uint32 intervalFail              = 6; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX]
+   optional uint32 intervalConsumption       = 7; /// $SUPPORTEDBY[]
+}
+///@exclude
+message DiagnosticTelemetry
+{
+   optional uint32 intervalMoving   = 1; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 intervalStopped  = 2; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 moveToStopQty    = 3; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 stopToMoveQty    = 4; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+}
+///@exclude
+message DiagnosticReset {
+   optional uint32 resetQty               = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional ResetReason lastResetReason   = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint64 lastResetStamp         = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 lastResetID            = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional uint32 lastResetFileNumber    = 5;  /// $SUPPORTEDBY[MXT180, A6X]
+   optional string lastResetFileName      = 6;  /// $SUPPORTEDBY[]
+   optional uint32 lastResetLineNumber    = 7;  /// $SUPPORTEDBY[MXT180, A6X]
+   optional bytes  lastResetDetails       = 8;  /// $SUPPORTEDBY[MXT180, A6X]
+}
+///@exclude
+message DiagnosticGsensor {
+   optional uint32 failQty = 1; /// $SUPPORTEDBY[MXT180, A6X]
+}
+///@exclude
+message DiagnosticPacket {
+   optional DiagnosticGsm gsm             = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional DiagnosticGps gps             = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional DiagnosticLora lora           = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional DiagnosticBattery battery     = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional DiagnosticCore core           = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional DiagnosticTelemetry telemetry = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   optional DiagnosticReset reset         = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX]
+   repeated DiagnosticMemory memory       = 8;  /// $SUPPORTEDBY[MXT180, A6X]
+   optional DiagnosticGsensor gsensor     = 9;  /// $SUPPORTEDBY[MXT180, A6X]
+   repeated uint32 troubleCodes           = 10; /// $SUPPORTEDBY[MXT180]
+   optional DiagnosticZigbee zigbee       = 11; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX]
+}
+message DebugConfig {
+   optional TraceConfig trace = 1; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, FINDER] $DESCRIPTION[Trace] $DESCRIPTION_ENGLISH[Trace]
+   optional bool debugActive  = 3; ///@exclude $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, FINDER] $DESCRIPTION[Debug Ativo] $DESCRIPTION_ENGLISH[Debug activated.] $VALIDATOR[^(0|1)$]
+}

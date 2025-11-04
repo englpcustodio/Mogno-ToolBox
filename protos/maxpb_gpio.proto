@@ -1,0 +1,360 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_accessories.proto"; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR]
+enum InputState {
+   IST_NONE                = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, MTC8XX_MCU, TD80, A90, MAXIO2, MAXIO2_MCU]
+   IST_DIGITAL_HIGH        = 1;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, MTC8XX_MCU, TD80, A90, MAXIO2, MAXIO2_MCU]
+   IST_DIGITAL_LOW         = 2;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, MTC8XX_MCU, TD80, A90, MAXIO2, MAXIO2_MCU]
+   IST_DIGITAL_OPEN        = 3;  /// $SUPPORTEDBY[MXT142, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   IST_RFU_04              = 4; /// $SUPPORTEDBY[]
+   IST_RFU_05              = 5; /// $SUPPORTEDBY[]
+   IST_RFU_06              = 6; /// $SUPPORTEDBY[]
+   IST_ANALOG              = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Milivolts] $DESCRIPTION_ENGLISH[Milivolts]
+   IST_ANALOG_OPEN         = 8;  /// $SUPPORTEDBY[]
+   IST_COUNTER             = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Unidade] $DESCRIPTION_ENGLISH[Unity]
+   IST_FREQUENCY           = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Hertz] $DESCRIPTION_ENGLISH[Hertz]
+   IST_RPM                 = 11; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, MAXIO2, MAXIO2_MCU]
+   IST_IGNITION            = 12; /// $SUPPORTEDBY[]
+   IST_PANIC               = 13; /// $SUPPORTEDBY[]
+   IST_ODOMETER            = 14; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Metros] $DESCRIPTION_ENGLISH[Meters]
+   IST_WINDSHIELD_WIPERS   = 15; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, MAXIO2, MAXIO2_MCU]
+   IST_FUEL_CONSUMPTION    = 16; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, MAXIO2, MAXIO2_MCU]
+   IST_INTERVAL_ON         = 17; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, MAXIO2, MAXIO2_MCU]
+   IST_INTERVAL_OFF        = 18; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, MAXIO2, MAXIO2_MCU]
+   IST_RFU_19              = 19; /// $SUPPORTEDBY[]
+   IST_RFU_20              = 20; /// $SUPPORTEDBY[]
+   IST_RFU_21              = 21; /// $SUPPORTEDBY[]
+   IST_RFU_22              = 22; /// $SUPPORTEDBY[]
+   IST_RFU_23              = 23; /// $SUPPORTEDBY[]
+}
+enum InputSource {
+   ISRC_NONE    = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE] $DESCRIPTION[Nenhuma] $DECRIPTION_ENGLISH[None input.]
+   ISRC_INPUT1  = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Entrada 1]  $DECRIPTION_ENGLISH[Input 1]
+   ISRC_INPUT2  = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Entrada 2] $DECRIPTION_ENGLISH[Input 2]
+   ISRC_INPUT3  = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Entrada 3] $DECRIPTION_ENGLISH[Input 3]
+   ISRC_INPUT4  = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Entrada 4] $DECRIPTION_ENGLISH[Input 4]
+   ISRC_INPUT5  = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Entrada 5] $DECRIPTION_ENGLISH[Input 5]
+   ISRC_INPUT6  = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Entrada 6] $DECRIPTION_ENGLISH[Input 6]
+   ISRC_INPUT7  = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Entrada 7] $DECRIPTION_ENGLISH[Input 7]
+   ISRC_INPUT8  = 8;  /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Entrada 8]
+   ISRC_INPUT9  = 9;  /// $SUPPORTEDBY[] $DESCRIPTION[Entrada 9]
+   ISRC_INPUT10 = 10; /// $SUPPORTEDBY[] $DESCRIPTION[Entrada 10]
+   ISRC_INPUT11 = 11; /// $SUPPORTEDBY[] $DESCRIPTION[Entrada 11]
+   ISRC_INPUT12 = 12; /// $SUPPORTEDBY[] $DESCRIPTION[Entrada 12]
+   ISRC_INPUT13 = 13; /// $SUPPORTEDBY[] $DESCRIPTION[Entrada 13]
+   ISRC_INPUT14 = 14; /// $SUPPORTEDBY[] $DESCRIPTION[Entrada 14]
+   ISRC_INPUT15 = 15; /// $SUPPORTEDBY[] $DESCRIPTION[Entrada 15]
+   ISRC_INPUT16 = 16; /// $SUPPORTEDBY[] $DESCRIPTION[Entrada 16]
+   ISRC_RFU_17  = 17; /// $SUPPORTEDBY[] $DESCRIPTION[ISRC_RFU_01]
+   ISRC_RFU_18  = 18; /// $SUPPORTEDBY[] $DESCRIPTION[ISRC_RFU_02]
+   ISRC_RFU_19  = 19; /// $SUPPORTEDBY[] $DESCRIPTION[ISRC_RFU_03]
+   ISRC_RFU_20  = 20; /// $SUPPORTEDBY[] $DESCRIPTION[ISRC_RFU_04]
+   ISRC_RFU_21  = 21; /// $SUPPORTEDBY[] $DESCRIPTION[ISRC_RFU_05]
+}
+/// This enum will be used as bitmask
+enum ReportInputMask { 
+   RIC_STATE      = 0;  /// $SUPPORTEDBY[] $COMMENT[Bit 0] $DESCRIPTION[Estado] $DESCRIPTION_ENGLISH[Bit 0]
+   RIC_VALUE_     = 1;  /// $SUPPORTEDBY[] $COMMENT[Bit 1] $DESCRIPTION[Valor] $DESCRIPTION_ENGLISH[Bit 1]
+   RIC_PERIPHERAL = 2;  /// $SUPPORTEDBY[] $COMMENT[Bit 2] $DESCRIPTION[Periférico] $DESCRIPTION_ENGLISH[Bit 2]
+   RIC_RFU_03     = 3;  /// $SUPPORTEDBY[] $DESCRIPTION[RIC_RFU_01]
+   RIC_RFU_04     = 4;  /// $SUPPORTEDBY[] $DESCRIPTION[RIC_RFU_02]
+   RIC_RFU_05     = 5;  /// $SUPPORTEDBY[] $DESCRIPTION[RIC_RFU_03]
+   RIC_RFU_06     = 6;  /// $SUPPORTEDBY[] $DESCRIPTION[RIC_RFU_04]
+   RIC_RFU_07     = 7;  /// $SUPPORTEDBY[] $DESCRIPTION[RIC_RFU_05]
+}
+enum OutputSource {
+   OSRC_NONE      = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, A40, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE] $DESCRIPTION[Nenhum] $DECRIPTION_ENGLISH[None output.]
+   OSRC_OUTPUT1   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, A40, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Saída 1] $DECRIPTION_ENGLISH[Output 1]
+   OSRC_OUTPUT2   = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Saída 2] $DECRIPTION_ENGLISH[Output 2]
+   OSRC_OUTPUT3   = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Saída 3]
+   OSRC_OUTPUT4   = 4;  /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Saída 4]
+   OSRC_OUTPUT5   = 5;  /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Saída 5]
+   OSRC_OUTPUT6   = 6;  /// $SUPPORTEDBY[] $DESCRIPTION[Saída 6]
+   OSRC_OUTPUT7   = 7;  /// $SUPPORTEDBY[] $DESCRIPTION[Saída 7]
+   OSRC_OUTPUT8   = 8;  /// $SUPPORTEDBY[] $DESCRIPTION[Saída 8]
+   OSRC_RFU_09    = 9;  /// $SUPPORTEDBY[] $DESCRIPTION[OSRC_RFU_01]
+   OSRC_RFU_10    = 10; /// $SUPPORTEDBY[] $DESCRIPTION[OSRC_RFU_02]
+   OSRC_RFU_11    = 11; /// $SUPPORTEDBY[] $DESCRIPTION[OSRC_RFU_03]
+   OSRC_RFU_12    = 12; /// $SUPPORTEDBY[] $DESCRIPTION[OSRC_RFU_04]
+   OSRC_RFU_13    = 13; /// $SUPPORTEDBY[] $DESCRIPTION[OSRC_RFU_05]
+}
+/// This enum will be used as bitmask
+enum ReportOutputMask {
+   ROC_STATE      = 0;  /// $SUPPORTEDBY[] $COMMENT[Bit 0] $DESCRIPTION[Estado] $DESCRIPTION_ENGLISH[Bit 0]
+   ROC_PERIPHERAL = 1;  /// $SUPPORTEDBY[] $COMMENT[Bit 1] $DESCRIPTION[Periférico] $DESCRIPTION_ENGLISH[Bit 1]
+   ROC_RFU_02     = 2;  /// $SUPPORTEDBY[] $DESCRIPTION[ROC_RFU_01]
+   ROC_RFU_03     = 3;  /// $SUPPORTEDBY[] $DESCRIPTION[ROC_RFU_01]
+   ROC_RFU_04     = 4;  /// $SUPPORTEDBY[] $DESCRIPTION[ROC_RFU_01]
+   ROC_RFU_05     = 5;  /// $SUPPORTEDBY[] $DESCRIPTION[ROC_RFU_01]
+   ROC_RFU_06     = 6;  /// $SUPPORTEDBY[] $DESCRIPTION[ROC_RFU_01]
+}
+enum InputMode {
+   IMD_DISABLED            = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Desabilitado] $DECRIPTION_ENGLISH[Disabled]
+   IMD_INPUT_DIGITAL       = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Entrada digital] $DECRIPTION_ENGLISH[Digital input.]
+   IMD_INPUT_ANALOG        = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Entrada analógica] $DECRIPTION_ENGLISH[Analogic input.]
+   IMD_INPUT_INTERRUPT     = 3;  /// $SUPPORTEDBY[] $DESCRIPTION[Entrada interrompida] $DECRIPTION_ENGLISH[Interrupted input.]
+   IMD_COUNTER             = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Contador] $DECRIPTION_ENGLISH[Counter]
+   IMD_RPM                 = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[RPM] $DECRIPTION_ENGLISH[RPM]
+   IMD_FREQUENCY           = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Frequência] $DECRIPTION_ENGLISH[Frequency]
+   
+   
+   IMD_ODOMETER            = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Odômetro] $DECRIPTION_ENGLISH[Odometer]
+   IMD_WINDSHIELD_WIPERS   = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Limpador de pára-brisas] $DECRIPTION_ENGLISH[Windshield wipers.]
+   
+   IMD_FUEL_CONSUMPTION    = 11; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[] $DECRIPTION_ENGLISH[]
+   
+   IMD_RFU_12              = 12; /// $SUPPORTEDBY[] $DESCRIPTION[IMD_RFU_12]
+   IMD_RFU_13              = 13; /// $SUPPORTEDBY[] $DESCRIPTION[IMD_RFU_13]
+   IMD_RFU_14              = 14; /// $SUPPORTEDBY[] $DESCRIPTION[IMD_RFU_14]
+   IMD_RFU_15              = 15; /// $SUPPORTEDBY[] $DESCRIPTION[IMD_RFU_15]
+   IMD_RFU_16              = 16; /// $SUPPORTEDBY[] $DESCRIPTION[IMD_RFU_16]
+}
+enum IgnitionMode {
+   IGNMD_DISABLED       = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Desabilitado] $DECRIPTION_ENGLISH[Disabled]
+   IGNMD_INPUT_SOURCE   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Fonte de entrada]  $DECRIPTION_ENGLISH[Detected by input source.]
+   IGNMD_VIRTUAL        = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Virtual] $DECRIPTION_ENGLISH[Detected by virtual ignition.]
+   IGNMD_NOISE          = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Ruído] $DECRIPTION_ENGLISH[Detected by noise.]
+   IGNMD_MOTION         = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Movimento] $DECRIPTION_ENGLISH[Detected by motion.]
+   IGNMD_ALWAYS_ON      = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X] $DESCRIPTION[Sempre ligado] $DESCRIPTION_ENGLISH[Always on.]
+   IGNMD_RFU_06         = 6;  /// $SUPPORTEDBY[] $DESCRIPTION[IGNMD_RFU_01]
+   IGNMD_RFU_07         = 7;  /// $SUPPORTEDBY[] $DESCRIPTION[IGNMD_RFU_02]
+   IGNMD_RFU_08         = 8;  /// $SUPPORTEDBY[] $DESCRIPTION[IGNMD_RFU_03]
+   IGNMD_RFU_09         = 9;  /// $SUPPORTEDBY[] $DESCRIPTION[IGNMD_RFU_04]
+   IGNMD_RFU_10         = 10; /// $SUPPORTEDBY[] $DESCRIPTION[IGNMD_RFU_05]
+}
+enum OutputState {
+   OS_NONE              = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, A40, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE] $DESCRIPTION[Nenhum]  $DESCRIPTION_ENGLISH[None]
+   OS_HIGH              = 1;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MXT180, MAXIO, A40, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Alto] $DESCRIPTION_ENGLISH[On OutputControl it activates the output logical state. On OutputInfo is reported when output logical state is activated]
+   OS_LOW               = 2;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MXT180, MAXIO, A40, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Baixo] $DESCRIPTION_ENGLISH[On OutputControl it deactivates the output logical state. On OutputInfo is reported when output logical state is deactivated]
+   OS_OPEN              = 3;  /// $SUPPORTEDBY[MXT142] $DESCRIPTION[Aberto]
+   OS_SHORT             = 4;  /// $SUPPORTEDBY[] $DESCRIPTION[Curto]
+   OS_BLOCKING          = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Processo de bloqueio em andamento] $DESCRIPTION_ENGLISH[On OutputControl it starts the blocking process. On OutputInfo it is reported when the blocking process is running]
+   OS_BLOCKED           = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Processo de bloqueio terminado] $DESCRIPTION_ENGLISH[Only works on OutputInfo, reported when blocking process is finished]
+   OS_PWM               = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[PWM]
+   OS_TIMER_ACTIVE_HIGH = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Temporizador ativo alto] $DESCRIPTION_ENGLISH[OutputControl will finish logically activated]
+   OS_TIMER_ACTIVE_LOW  = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Temporizador ativo baixo] $DESCRIPTION_ENGLISH[OutputControl will finish logically deactivated]
+   OS_TIMER             = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Temporizador] $DESCRIPTION_ENGLISH[OutputControl will finish as it started]
+   OS_RFU_11            = 11; /// $SUPPORTEDBY[] $DESCRIPTION[OS_RFU_01]
+   OS_RFU_12            = 12; /// $SUPPORTEDBY[] $DESCRIPTION[OS_RFU_02]
+   OS_RFU_13            = 13; /// $SUPPORTEDBY[] $DESCRIPTION[OS_RFU_03]
+   OS_RFU_14            = 14; /// $SUPPORTEDBY[] $DESCRIPTION[OS_RFU_04]
+   OS_RFU_15            = 15; /// $SUPPORTEDBY[] $DESCRIPTION[OS_RFU_05]
+}
+enum PanicMode {
+   PMD_DISABLED      = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR] $DESCRIPTION[Desabilitado] $DESCRIPTION_ENGLISH[Disabled.]
+   PMD_RELEASED      = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR] $DESCRIPTION[Released] $DESCRIPTION_ENGLISH[Released.]
+   PMD_LONG_PRESSED  = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR] $DESCRIPTION[Pressionado] $DESCRIPTION_ENGLISH[Long pressed.]
+   PMD_RFU_03        = 3;  /// $SUPPORTEDBY[] $DESCRIPTION[PMD_RFU_01]
+   PMD_RFU_04        = 4;  /// $SUPPORTEDBY[] $DESCRIPTION[PMD_RFU_02]
+   PMD_RFU_05        = 5;  /// $SUPPORTEDBY[] $DESCRIPTION[PMD_RFU_03]
+   PMD_RFU_06        = 6;  /// $SUPPORTEDBY[] $DESCRIPTION[PMD_RFU_04]
+   PMD_RFU_07        = 7;  /// $SUPPORTEDBY[] $DESCRIPTION[PMD_RFU_05]
+}
+enum CalibrationSource {
+   CS_USER     = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Configurada pelo usuário] $DESCRIPTION_ENGLISH[Configured by command]
+   CS_AUTO     = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Automática] $DESCRIPTION_ENGLISH[Auto calibration]
+   CS_RFU_02   = 2;  /// $SUPPORTEDBY[] $DESCRIPTION[CS_RFU_01]
+   CS_RFU_03   = 3;  /// $SUPPORTEDBY[] $DESCRIPTION[CS_RFU_01]
+   CS_RFU_04   = 4;  /// $SUPPORTEDBY[] $DESCRIPTION[CS_RFU_01]
+   CS_RFU_05   = 5;  /// $SUPPORTEDBY[] $DESCRIPTION[CS_RFU_01]
+   CS_RFU_06   = 6;  /// $SUPPORTEDBY[] $DESCRIPTION[CS_RFU_01]
+}
+/// This enum presents all possible device operations when button is pressed. 
+enum ButtonOperation {
+   LPBM_NOACTION                     = 0;  /// $SUPPORTEDBY[MXT180, A40, A6X, TD80, A90, MAXIO2] $DESCRIPTION[Sem ação] $DESCRIPTION_ENGLISH[Button has no actions.]
+   LPBM_POSITION                     = 1;  /// $SUPPORTEDBY[MXT180, A40, A6X, A90, MAXIO2] $DESCRIPTION[Posição]  $DESCRIPTION_ENGLISH[Sends a position.]
+   LPBM_PANIC                        = 2;  /// $SUPPORTEDBY[MXT180, A40, A6X, A90, MAXIO2] $DESCRIPTION[Pânico]   $DESCRIPTION_ENGLISH[Enables device panic state.]
+   LPBM_STOCKMODE                    = 3;  /// $SUPPORTEDBY[MXT180, A40, A6X, A90, MAXIO2] $DESCRIPTION[Modo de estocagem] $DESCRIPTION_ENGLISH[Puts device on stock state.]
+   LPBM_ACCELEROMETER_RECALIBRATION  = 4;  /// $SUPPORTEDBY[MXT180, A40, A6X, A90, MAXIO2] $DESCRIPTION[Recalibração do acelerômetro] $DESCRIPTION_ENGLISH[Requests accelerometer recalibration.]
+   LPBM_LORA_DEFAULT_CHANNEL         = 5;  /// $SUPPORTEDBY[MXT180, A40, A6X, A90, MAXIO2] $DESCRIPTION[Canal padrão]  $DESCRIPTION_ENGLISH[Sets lora default channel.]
+   LPBM_ZIGBEE_PAIRING               = 6;  /// $SUPPORTEDBY[A40] $DESCRIPTION[Emparelhamento Zigbee] $DESCRIPTION_ENGLISH[Activates zigbee pairing.]
+   LPBM_ENABLE_UART                  = 7;  /// $SUPPORTEDBY[A6X, A90, MAXIO2] $DESCRIPTION[Habilita UART] $DESCRIPTION_ENGLISH[Enables UART]
+   LPBM_GET_GPS_FIX                  = 8;  /// $SUPPORTEDBY[A6X, A90, MAXIO2] $DESCRIPTION[Adquire GPS fix] $DESCRIPTION_ENGLISH[Turns GPS on until get fix, with 2 minutes maximum time.]
+   LPBM_ENABLE_BLUETOOTH             = 9;  /// $SUPPORTEDBY[A6X, A90, MAXIO2] $DESCRIPTION[Habilita bluetooth] $DESCRIPTION_ENGLISH[Enables bluetooth.]
+   LPBM_DEMO                         = 10; /// $SUPPORTEDBY[A90] $DESCRIPTION[LPBM_RFU_01]
+   LPBM_BATTERY_LEVEL                = 11; /// $SUPPORTEDBY[A90] $DESCRIPTION[Show battery level]
+   LPBM_RFU_12                       = 12; /// $SUPPORTEDBY[] $DESCRIPTION[LPBM_RFU_03]
+   LPBM_RFU_13                       = 13; /// $SUPPORTEDBY[] $DESCRIPTION[LPBM_RFU_04]
+   LPBM_RFU_14                       = 14; /// $SUPPORTEDBY[] $DESCRIPTION[LPBM_RFU_05]
+}
+/// Used to set different actions when button is pressed for a specified time
+message ButtonAction {
+   optional ButtonOperation buttonOperation  = 1; /// $SUPPORTEDBY[MXT180, A40, A6X, TD80, A90, MAXIO2] $DESCRIPTION[Operação do botão] $DESCRIPTION_ENGLISH[Which action would be configured.]
+   optional uint32          timePressed      = 2; /// $SUPPORTEDBY[MXT180, A40, A6X, TD80, A90, MAXIO2] $DESCRIPTION[Tempo pressionado] $DESCRIPTION_ENGLISH[How long button was pressed.]
+   optional uint32          presses          = 3; /// $SUPPORTEDBY[MXT180, A40, A6X, TD80, A90, MAXIO2] $DESCRIPTION[Pressionado]       $DESCRIPTION_ENGLISH[How many times button was pressed.]
+}
+message InputConfig {
+   optional InputMode mode          = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $COMMENT[(0: desabilita; 1:Digital; 2: Analogica; 4: Contador; 5: RPM; 6: Frequencia)] $DESCRIPTION[Tipo de uso da entrada] $DESCRIPTION_ENGLISH[Input usage mode.] $DEFAULTVALUE[1] $VALIDATOR[^(0|1|2|5|4|6)$]
+   optional uint32 inputPeripheral  = 2;  /// $SUPPORTEDBY[] $DESCRIPTION[Entrada periférico] $DESCRIPTION_ENGLISH[Peripheral input]
+   optional uint32 debounceOn       = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $UNIT[Milissegundos] $DESCRIPTION[Tempo de tolerância da entrada acionada] $DEFAULTVALUE[0] $DESCRIPTION_ENGLISH[Activated input tolerance time. Miliseconds]
+   optional uint32 debounceOff      = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $UNIT[Milissegundos] $DESCRIPTION[Tempo de tolerância da entrada não acionada] $DEFAULTVALUE[0] $DESCRIPTION_ENGLISH[Not-activated input tolerance time. Miliseconds]
+   optional bool inverted           = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $COMMENT[(0: normal; 1:invertida)] $DESCRIPTION[Inverter status lógico da entrada] $DEFAULTVALUE[0] $DESCRIPTION_ENGLISH[Input logic state. 0 - Normal, 1 - Inverted] $VALIDATOR[^(0|1)$]
+   optional uint32 inputInfoMask    = 6;  /// $SUPPORTEDBY[] $COMMENT[Use ReportInputMask como bitmask] $DESCRIPTION[Máscara de informação de entrada]   $BITMASK[ReportInputMask] $DESCRIPTION_ENGLISH[Input info mask. Use ReportInputMask as bitmask]
+}
+/// config how each input should work
+message InputsConfig {
+   optional InputConfig input1   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Entrada 1] $DESCRIPTION_ENGLISH[Input 1]
+   optional InputConfig input2   = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Entrada 2] $DESCRIPTION_ENGLISH[Input 2]
+   optional InputConfig input3   = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Entrada 3] $DESCRIPTION_ENGLISH[Input 3]
+   optional InputConfig input4   = 4;  /// $SUPPORTEDBY[MAXIO, MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Entrada 4] $DESCRIPTION_ENGLISH[Input 4]
+   optional InputConfig input5   = 5;  /// $SUPPORTEDBY[MAXIO, MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Entrada 5] $DESCRIPTION_ENGLISH[Input 5]
+   optional InputConfig input6   = 6;  /// $SUPPORTEDBY[MAXIO, MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Entrada 6] $DESCRIPTION_ENGLISH[Input 6]
+   optional InputConfig input7   = 7;  /// $SUPPORTEDBY[MAXIO, MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Entrada 7] $DESCRIPTION_ENGLISH[Input 7]
+   optional InputConfig input8   = 8;  /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Entrada 8]      $DESCRIPTION_ENGLISH[Input 8]
+   optional InputConfig input9   = 9;  /// $SUPPORTEDBY[] $DESCRIPTION[Entrada 9]      $DESCRIPTION_ENGLISH[Input 9]
+   optional InputConfig input10  = 10; /// $SUPPORTEDBY[] $DESCRIPTION[Entrada 10]     $DESCRIPTION_ENGLISH[Input 10]
+   optional InputConfig input11  = 11; /// $SUPPORTEDBY[] $DESCRIPTION[Entrada 11]     $DESCRIPTION_ENGLISH[Input 11]
+   optional InputConfig input12  = 12; /// $SUPPORTEDBY[] $DESCRIPTION[Entrada 12]     $DESCRIPTION_ENGLISH[Input 12]
+   optional InputConfig input13  = 13; /// $SUPPORTEDBY[] $DESCRIPTION[Entrada 13]     $DESCRIPTION_ENGLISH[Input 13]
+   optional InputConfig input14  = 14; /// $SUPPORTEDBY[] $DESCRIPTION[Entrada 14]     $DESCRIPTION_ENGLISH[Input 14]
+   optional InputConfig input15  = 15; /// $SUPPORTEDBY[] $DESCRIPTION[Entrada 15]     $DESCRIPTION_ENGLISH[Input 15]
+   optional InputConfig input16  = 16; /// $SUPPORTEDBY[] $DESCRIPTION[Entrada 16]     $DESCRIPTION_ENGLISH[Input 16]
+}
+message OutputConfig {
+   optional bool inverted                          = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $COMMENT[(0: normal; 1:invertida)] $DESCRIPTION[Inverter o estado fisico da saida] $DESCRIPTION_ENGLISH[Output physic state. 0 - Normal, 1 - Inverted.] $DEFAULTVALUE[0] $VALIDATOR[^(1|0)$]
+   optional uint32 peripheral                      = 2;  /// $SUPPORTEDBY[] $DESCRIPTION[Periférico] $DESCRIPTION_ENGLISH[Peripheral]
+   optional uint32 outputInfoMask                  = 3;  /// $SUPPORTEDBY[] $DESCRIPTION[Máscara de informação de saída]   $BITMASK[ReportOutputMask] $DESCRIPTION_ENGLISH[Output info mask. Use ReportOutputMask as bitmask]
+   optional uint32 minimalTimeBetweenActivations   = 4;  /// $SUPPORTEDBY[A40] $DESCRIPTION[(Segundos)] $DESCRIPTION_ENGLISH[Seconds]
+}
+/// config how each output should work
+message OutputsConfig {
+   optional OutputConfig output1 = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Saída 1] $DESCRIPTION_ENGLISH[Output 1]
+   optional OutputConfig output2 = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Saída 2] $DESCRIPTION_ENGLISH[Output 2]
+   optional OutputConfig output3 = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Saída 3]  $DESCRIPTION_ENGLISH[Output 3]
+   optional OutputConfig output4 = 4;  /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Saída 4]  $DESCRIPTION_ENGLISH[Output 4]
+   optional OutputConfig output5 = 5;  /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Saída 5]  $DESCRIPTION_ENGLISH[Output 5]
+   optional OutputConfig output6 = 6;  /// $SUPPORTEDBY[] $DESCRIPTION[Saída 6]  $DESCRIPTION_ENGLISH[Output 6]
+   optional OutputConfig output7 = 7;  /// $SUPPORTEDBY[] $DESCRIPTION[Saída 7]  $DESCRIPTION_ENGLISH[Output 7]
+   optional OutputConfig output8 = 8;  /// $SUPPORTEDBY[] $DESCRIPTION[Saída 8]  $DESCRIPTION_ENGLISH[Output 8]
+}
+/// to be used in output control command
+message OutputControl {
+   required OutputSource output  = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Saída]
+   required OutputState  state   = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Estado]
+   optional uint32 timerOn       = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $UNIT[Milissegundos] $COMMENT[Deve ser maior que 10 milissegundos]    $VALIDATOR[^([2-9][0-9]|1[1-9]|\d{3,})$] $DESCRIPTION_ENGLISH[Miliseconds, must be greater than 10 ms]
+   optional uint32 timerOff      = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $UNIT[Milissegundos] $MINVALUE[11] $DESCRIPTION[Milisegundos, deve ser maior que 10ms.] $DESCRIPTION_ENGLISH[Miliseconds, must be greater than 10 ms]
+   optional uint32 cycles        = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $MAXVALUE[127] $DESCRIPTION[Ciclos] $VALIDATOR[^([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-7])$] $DESCRIPTION[Ciclos - Valor máximo é 127.] $DESCRIPTION_ENGLISH[Maximun value is 127]
+}
+message InputCounter {
+   required InputSource input = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   required uint32 value      = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]  $DESCRIPTION[Define qual o valor inicial do contador da entrada] $DESCRIPTION_ENGLISH[Sets input initial counter]
+}
+///
+message PanicConfig {
+   optional PanicMode mode       = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR] $COMMENT[(0: Desabilita; 1: Pressionamento imediato; 2:Pressionamento 3 segundos)] $DESCRIPTION[Modo de acionamento do pânico] $DEFAULTVALUE[0] $VALIDATOR[^(0|1|2)$]
+   optional InputSource source   = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR] $COMMENT[(0: desabilita; 1: Entrada 1; 2:Entrada 2; 3: Entrada 3)] $DESCRIPTION[Escolha o numero da entrada de Pânico] $DESCRIPTION_ENGLISH[Choose panic input source. (0 - Disable, 1:Input 1, 2:Input 2, 3:Input 3)] $DEFAULTVALUE[0] $VALIDATOR[^(0|1|2|3)$]
+}
+///
+message IgnitionConfig {
+   optional IgnitionMode mode                      = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $COMMENT[(0: desabilita; 1: Fisica; 2:Virtual)] $DESCRIPTION[Modo de funcionamento da ignição] $DESCRIPTION_ENGLISH[Ignition working mode. 0 - Disabled, 1 - Physical, 2 - Virtual] $DEFAULTVALUE[1] $VALIDATOR[^(0|1|2)$]
+   optional InputSource source                     = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90, MAXIO2, MAXIO2_MCU] $COMMENT[(0: desabilita; 1: Entrada 1; 2:Entrada 2; 3: Entrada 3;)] $DESCRIPTION[Entrada para uso da ignição] $DEFAULTVALUE[1] $VALIDATOR[^(0|1|2|3)$] $DESCRIPTION_ENGLISH[Virtual ignition source. If source and virtual ignition is configured, the ignition config will change to use this pin, if the pin state changes]
+   optional uint32 debounceOn                      = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $UNIT[Milissegundos] $DESCRIPTION[Tempo de tolerância para ignição ligada] $DEFAULTVALUE[1000] $DESCRIPTION_ENGLISH[Miliseconds. Not used on virtual ignition]
+   optional uint32 debounceOff                     = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $UNIT[Milissegundos] $DESCRIPTION[Tempo de tolerância para ignição desligada] $DEFAULTVALUE[1000] $DESCRIPTION_ENGLISH[Miliseconds]
+   optional uint32 calibration                     = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $UNIT[Milivolts] $DESCRIPTION[Calibração]  $DESCRIPTION_ENGLISH[Milivolts - Virtual Ignition voltage limit]
+   optional CalibrationSource calibrationSource    = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $COMMENT[(0: manual;  1: automatica)] $DESCRIPTION[Tipo de calibracao] $DEFAULTVALUE[1] $VALIDATOR[^(0|1)$]
+   optional uint32 thresholdFactor                 = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $MINVALUE[40] $MAXVALUE[80] $COMMENT[Configura um valor em porcentagem para ajuste da ignicao virtual (40% a 80%)] $DESCRIPTION[Limite de tensão de ignição virtual] $DEFAULTVALUE[52] $VALIDATOR[^([4-7][0-9]|80)$] $DESCRIPTION_ENGLISH[Percentual (40 to 100%) - Virtual Ignition voltage limit]
+   optional IgnitionMode extPowerFailureMode       = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $COMMENT[(0: desabilita; 1: Fisica; 2:Virtual)] $DESCRIPTION[Configura para qual modo a ignição voltará após falha de alimentação externa] $DEFAULTVALUE[0] $VALIDATOR[^(0|1|2)$] $DESCRIPTION_ENGLISH[Change ignition mode when external power is removed, if virtual ignition is selected, it will start a new calibration]
+   optional uint32 noiseThresholdLimit             = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $UNIT[Milivolts] $COMMENT[Limite de tensão do ruído de ignição virtual] $DESCRIPTION[Limite de tensão do ruído da ignição virtual]  $DESCRIPTION_ENGLISH[Milivolts - Noise Virtual Ignition voltage limit]
+   optional uint32 noiseVarianceWindowSize         = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $UNIT[Milivolts] $MINVALUE[1] $MAXVALUE[100] $COMMENT[Valor deve ser 20, 40, 60, 80 ou 100] $DESCRIPTION[Tamanha da janela de variância do ruído]  $VALIDATOR[^(20|40|60|80|100)$] $DESCRIPTION_ENGLISH[Noise variance window size. Multiple of 20ms - Value must be between 1 and 100]
+}
+/// config how virtual and phisical inputs and outputs should work
+message IOsConfig {
+   optional IgnitionConfig ignition       = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Configuração de ignição] $DESCRIPTION_ENGLISH[Ignition configuration.]
+   optional PanicConfig panic             = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR] $DESCRIPTION[Configuração de pânico] $DESCRIPTION_ENGLISH[Panic state configuration.]
+   optional InputsConfig inputs           = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Configuração de entradas] $DESCRIPTION_ENGLISH[Input configuration.]
+   optional OutputsConfig outputs         = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A40, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Configuração de saídas] $DESCRIPTIO_ENGLISH[Output configuration.]
+}
+/// report input information at position packet
+message InputInfo {
+   optional InputState input1State     = 1;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, MTC8XX_MCU, TD80, A90, MAXIO2, MAXIO2_MCU]
+   optional int32 input1Value          = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A6X, MTC8XX, DLR, MTC8XX_MCU, TD80, A90, MAXIO2, MAXIO2_MCU]
+   optional uint32 input1Peripheral    = 3;  /// $SUPPORTEDBY[]
+   optional InputState input2State     = 4;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MAXIO, MXT180, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   optional int32 input2Value          = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   optional uint32 input2Peripheral    = 6;  /// $SUPPORTEDBY[]
+   optional InputState input3State     = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   optional int32 input3Value          = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   optional uint32 input3Peripheral    = 9;  /// $SUPPORTEDBY[]
+   optional InputState input4State     = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU]
+   optional int32 input4Value          = 11; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU]
+   optional uint32 input4Peripheral    = 12; /// $SUPPORTEDBY[]
+   optional InputState input5State     = 13; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU]
+   optional int32 input5Value          = 14; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU]
+   optional uint32 input5Peripheral    = 15; /// $SUPPORTEDBY[]
+   optional InputState input6State     = 16; /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU]
+   optional int32 input6Value          = 17; /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU]
+   optional uint32 input6Peripheral    = 18; /// $SUPPORTEDBY[]
+   optional InputState input7State     = 19; /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU]
+   optional int32 input7Value          = 20; /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU]
+   optional uint32 input7Peripheral    = 21; /// $SUPPORTEDBY[]
+   optional InputState input8State     = 22; /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU]
+   optional int32 input8Value          = 23; /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU]
+   optional uint32 input8Peripheral    = 24; /// $SUPPORTEDBY[]
+   optional InputState input9State     = 25; /// $SUPPORTEDBY[]
+   optional int32 input9Value          = 26; /// $SUPPORTEDBY[]
+   optional uint32 input9Peripheral    = 27; /// $SUPPORTEDBY[]
+   optional InputState input10State    = 28; /// $SUPPORTEDBY[]
+   optional int32 input10Value         = 29; /// $SUPPORTEDBY[]
+   optional uint32 input10Peripheral   = 30; /// $SUPPORTEDBY[]
+   optional InputState input11State    = 31; /// $SUPPORTEDBY[]
+   optional int32 input11Value         = 32; /// $SUPPORTEDBY[]
+   optional uint32 input11Peripheral   = 33; /// $SUPPORTEDBY[]
+   optional InputState input12State    = 34; /// $SUPPORTEDBY[]
+   optional int32 input12Value         = 35; /// $SUPPORTEDBY[]
+   optional uint32 input12Peripheral   = 36; /// $SUPPORTEDBY[]
+   optional InputState input13State    = 37; /// $SUPPORTEDBY[]
+   optional int32 input13Value         = 38; /// $SUPPORTEDBY[]
+   optional uint32 input13Peripheral   = 39; /// $SUPPORTEDBY[]
+   optional InputState input14State    = 40; /// $SUPPORTEDBY[]
+   optional int32 input14Value         = 41; /// $SUPPORTEDBY[]
+   optional uint32 input14Peripheral   = 42; /// $SUPPORTEDBY[]
+   optional InputState input15State    = 43; /// $SUPPORTEDBY[]
+   optional int32 input15Value         = 44; /// $SUPPORTEDBY[]
+   optional uint32 input15Peripheral   = 45; /// $SUPPORTEDBY[]
+   optional InputState input16State    = 46; /// $SUPPORTEDBY[]
+   optional int32 input16Value         = 47; /// $SUPPORTEDBY[]
+   optional uint32 input16Peripheral   = 48; /// $SUPPORTEDBY[]
+}
+/// report output information at position pack
+message OutputInfo {
+   optional OutputState output1State   = 1;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MAXIO, MXT180, A40, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   optional uint32 output1Peripheral   = 2;  /// $SUPPORTEDBY[]
+   optional OutputState output2State   = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   optional uint32 output2Peripheral   = 4;  /// $SUPPORTEDBY[]
+   optional OutputState output3State   = 5;  /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   optional uint32 output3Peripheral   = 6;  /// $SUPPORTEDBY[]
+   optional OutputState output4State   = 7;  /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   optional uint32 output4Peripheral   = 8;  /// $SUPPORTEDBY[]
+   optional OutputState output5State   = 9;  /// $SUPPORTEDBY[MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   optional uint32 output5Peripheral   = 10; /// $SUPPORTEDBY[]
+   optional OutputState output6State   = 11; /// $SUPPORTEDBY[]
+   optional uint32 output6Peripheral   = 12; /// $SUPPORTEDBY[]
+   optional OutputState output7State   = 13; /// $SUPPORTEDBY[]
+   optional uint32 output7Peripheral   = 14; /// $SUPPORTEDBY[]
+   optional OutputState output8State   = 15; /// $SUPPORTEDBY[]
+   optional uint32 output8Peripheral   = 16; /// $SUPPORTEDBY[]
+}
+/// report virtual ignition configuration at status pack
+message VirtualIgnitionInfo {
+   required uint32 minimum                      = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Valor mímimo lido desde a última reinicialização (mV)] $DESCRIPTION_ENGLISH[Minimum value read since reset (mV)]
+   required uint32 maximum                      = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Valor máximo lido desde a ultima reinicialização (mV)] $DESCRIPTION_ENGLISH[Maximum value read since reset (mV)]
+   required uint32 calibration                  = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU]
+   required CalibrationSource calibrationSource = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU]
+   required uint64 calibrationTimeStamp         = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU]
+   optional uint32 calibrationMinimum           = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Valor mínimo usado para calcular a calibração (mV)] $DESCRIPTION_ENGLISH[Minimum value used to calculate calibration (mV)]
+   optional uint32 calibrationMaximum           = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, MTC8XX_MCU] $DESCRIPTION[Valor máximo usado para calcular a calibração (mV)] $DESCRIPTION_ENGLISH[Maximum value used to calculate calibration (mV)]
+}
+message AccessoriesIOsInfo {
+   optional ProductModel product          = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR]
+   optional uint64 deviceID               = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR]
+   optional InputState ignitionState      = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR]
+   optional InputInfo inputInfo           = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR]
+   optional OutputInfo outputInfo         = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR]
+}
+/// report all virtual and phisical inputs and outputs at position pack
+message IOsInfo {
+   optional InputState ignitionState                  = 1;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   optional InputInfo inputInfo                       = 2;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, MTC8XX_MCU, TD80, A90, MAXIO2, MAXIO2_MCU]
+   optional OutputInfo outputInfo                     = 3;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MAXIO, MXT180, A40, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   repeated AccessoriesIOsInfo accessoriesIOsInfo     = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR]
+}

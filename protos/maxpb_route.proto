@@ -1,0 +1,169 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_multimedia.proto"; /// $SUPPORTEDBY[MTC8XX, DLR]
+import "maxpb_geographic.proto"; /// $SUPPORTEDBY[MTC8XX, DLR]
+enum RouteType {
+    RT_NONE                         = 0;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    RT_TRAM_STREETCAR_LIGHTRAIL     = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    RT_SUBWAY_METRO                 = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    RT_RAIL                         = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    RT_BUS                          = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    RT_FERRY                        = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    RT_CABLECAR                     = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    RT_GONDOLA                      = 7;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    RT_FUNICULAR                    = 8;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    RT_RFU_09                       = 9;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    RT_RFU_10                       = 10; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    RT_RFU_11                       = 11; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    RT_RFU_12                       = 12; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    RT_RFU_13                       = 13; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+enum TimePoint {
+    TP_APROXIMATE                   = 0;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    TP_EXACT                        = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    TP_RFU_02                       = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    TP_RFU_03                       = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    TP_RFU_04                       = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    TP_RFU_05                       = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    TP_RFU_06                       = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message Calendar {
+    optional uint64 serviceID                   = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional bool monday                        = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional bool tuesday                       = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional bool wednesday                     = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional bool thursday                      = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional bool friday                        = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional bool saturday                      = 7;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional bool sunday                        = 8;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 startDateTime               = 9;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 endDateTime                 = 10; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message Direction {
+    optional uint32 directionID                 = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string description                 = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message Route {
+    optional uint64 routeID                     = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string shortName                   = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string longName                    = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string description                 = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional RouteType type                     = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 color                       = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 routeMultimediaID           = 7;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message RouteMultimedia {
+    optional uint64 routeMultimediaID           = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional Playlist defaultPlaylist           = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional Playlist beginPlaylist             = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message Shape {
+    optional uint64 shapeID                     = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional GeoLocation location               = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 sequence                    = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 distanceFromBegin           = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 color                       = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message Stop {
+    optional uint64 stopID                      = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string code                        = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string name                        = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string description                 = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 geoObjectID                 = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 stopMultimediaID            = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional GeoLocation location               = 7;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message StopMultimedia {
+    optional uint64 stopMultimediaID            = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional Playlist enterPlaylist             = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional Playlist insidePlaylist            = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional Playlist leavePlaylist             = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message StopTime {
+    optional uint64 tripID                      = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 arrivalTime                 = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 departureTime               = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 stopID                      = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 sequence                    = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string headSign                    = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional float distanceTravelled            = 7;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional TimePoint timepoint                = 8;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 stopMultimediaID            = 9;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    ///pickup type
+    ///drop type
+    ///headsign
+}
+message Trip {
+    optional uint64 tripID                      = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 routeID                     = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 serviceID                   = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string headSign                    = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional string shortName                   = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 directionID                 = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 shapeID                     = 7;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 routeMultimediaID           = 8;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message CalendarLibrary {
+    repeated Calendar calendars                 = 1;
+}
+message RouteLibrary {
+    repeated Route routes                       = 1;
+    repeated Direction directions               = 2;
+}
+message RouteMultimediaLibrary {
+    repeated RouteMultimedia routesMultimedia   = 1;
+}
+message ShapeLibrary {
+    repeated Shape shapes                       = 1;
+}
+message StopLibrary {
+    repeated Stop stops                         = 1;
+}
+message StopTimeLibrary {
+    repeated StopTime stopsTime                 = 1;
+}
+message StopMultimediaLibrary {
+    repeated StopMultimedia stopsMultimedia     = 1;
+}
+message TripLibrary {
+    repeated Trip trips                         = 1;
+}
+enum StopState {
+    SST_NONE                                    = 0;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SST_NOT_EXECUTED                            = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SST_INSIDE                                  = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SST_NEXT_STOP                               = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SST_RFU_04                                  = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SST_RFU_05                                  = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SST_RFU_06                                  = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SST_RFU_07                                  = 7;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SST_RFU_08                                  = 8;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    SST_RFU_09                                  = 9;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message StopInfo {
+    optional uint64 stopID                      = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 timestamp                   = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 distance                    = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional StopState state                    = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 estimatedTimestamp          = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 sequence                    = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message RouteVehicleInfo {
+    optional uint32 distance                    = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional int32 interval                     = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message RouteInfo {
+    optional uint64 tripID                          = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 serviceID                       = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional StopInfo actualStop                    = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    repeated StopInfo nextStops                     = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional RouteVehicleInfo previousVehicleInfo   = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional RouteVehicleInfo nextVehicleInfo       = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+// Headway...
+// Autonomia de jornada...
+// Autonomia de distancia...
+// Veiculo anterior / Veiculo posterior ... 
+// Entregas / passageiros por pontos
+message RouteEvents {
+}

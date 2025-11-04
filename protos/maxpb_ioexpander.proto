@@ -1,0 +1,9 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_interfaces.proto";
+
+/// This messaged is used to report the vehicle signature and ask a library that fits
+message VehicleSignature {
+   optional CanBitRate bitRate   = 1;  /// SupportedBy: MXT162, MAXIO
+   optional bytes vehicleKey     = 2;  /// SupportedBy: MXT162, MAXIO
+}

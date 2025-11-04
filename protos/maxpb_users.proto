@@ -1,0 +1,106 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+enum LoginType {
+   LT_NONE           = 0;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MTC8XX, DLR]
+   LT_ZIGBEE         = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR]
+   LT_RFID           = 2;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MAXIO, MTC8XX, DLR, TD80]
+   LT_IBUTTON        = 3;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU]
+   LT_BLUETOOTH      = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR]
+   LT_DATA_TERMINAL  = 5;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   LT_FACE_ID        = 6;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   LT_RFU_01         = 7;  /// $SUPPORTEDBY[]
+   LT_RFU_02         = 8;  /// $SUPPORTEDBY[]
+   LT_RFU_03         = 9;  /// $SUPPORTEDBY[]
+   LT_RFU_04         = 10; /// $SUPPORTEDBY[]
+   LT_RFU_05         = 11; /// $SUPPORTEDBY[]
+}
+enum LoginEvent {
+   LE_LOGIN                   = 0;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MAXIO, MTC8XX, DLR, TD80, MTC8XX_MCU]
+   LE_LOGOFF                  = 1;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MAXIO, MTC8XX, DLR, TD80, MTC8XX_MCU]
+   LE_LOGOFF_IGNITION         = 2;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MTC8XX, DLR]
+   LE_NOT_FOUND               = 4;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MTC8XX, DLR]
+   LE_LOGOFF_EMBEDDED_ACTION  = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR]
+   LE_LOGOFF_OTHER_USER       = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR]
+   LE_RELOGIN                 = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR]
+   LE_LOGIN_TIMEOUT           = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR]
+   LE_DIFFERENT_FACE_ID       = 9;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   LE_RFU_01                  = 10;  /// $SUPPORTEDBY[]
+   LE_RFU_02                  = 11; /// $SUPPORTEDBY[]
+   LE_RFU_03                  = 12; /// $SUPPORTEDBY[]
+   LE_RFU_04                  = 13; /// $SUPPORTEDBY[]
+   LE_RFU_05                  = 14; /// $SUPPORTEDBY[]
+}
+enum UserType {
+   UT_DRIVER      = 0;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MTC8XX, DLR]
+   UT_2ND_DRIVER  = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR]
+   UT_PASSENGER   = 2;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MTC8XX, DLR]
+   UT_MANAGER     = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR]
+   UT_MANEUVER    = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR]
+   UT_COERCION    = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR]
+   UT_RFU_01      = 6;  /// $SUPPORTEDBY[]
+   UT_RFU_02      = 7;  /// $SUPPORTEDBY[]
+   UT_RFU_03      = 8;  /// $SUPPORTEDBY[]
+   UT_RFU_04      = 9;  /// $SUPPORTEDBY[]
+   UT_RFU_05      = 10; /// $SUPPORTEDBY[]
+}
+enum DaysOfWeekMask {
+   DW_NONE        = 0;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   DW_MONDAY      = 1;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   DW_TUESDAY     = 2;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   DW_WEDNESDAY   = 4;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   DW_THURSDAY    = 8;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   DW_FRIDAY      = 16; /// $SUPPORTEDBY[MTC8XX, DLR]
+   DW_SATURDAY    = 32; /// $SUPPORTEDBY[MTC8XX, DLR]
+   DW_SUNDAY      = 64; /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+message UserEvents {
+   required LoginEvent eventID   = 1;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MTC8XX, DLR]
+   required uint64 userID        = 2;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MTC8XX, DLR]
+   optional LoginType loginType  = 3;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MTC8XX, DLR]
+   optional uint32 duration      = 4;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MTC8XX, DLR] $DESCRIPTION[(Minutos)] $DESCRIPTION_ENGLISH[(Minutes)]
+   optional UserType userType    = 5;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MTC8XX, DLR]
+   optional uint32 rfidDevice    = 6;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MTC8XX, DLR]
+   optional bytes userCode       = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR] $DESCRIPTION_ENGLISH[iButton, RFID] 
+   optional uint32 timeout       = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR] $DESCRIPTION[Utilizado para LE_LOGIN_TIMEOUT (Segundos)] $DESCRIPTION_ENGLISH[Used for LE_LOGIN_TIMEOUT (Seconds)]
+   optional int64 tempID         = 9;  /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+message UserInfo {
+   required uint64 userID        = 1;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MTC8XX, DLR]
+   optional LoginType loginType  = 2;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MTC8XX, DLR]
+   optional uint32 duration      = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR] $DESCRIPTION[(Minutos)] $DESCRIPTION_ENGLISH[(Minutes)]
+   optional UserType userType    = 4;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MTC8XX, DLR]
+   optional string userName      = 5;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional int64 tempID         = 6;  /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+message UserTimeControl {
+   optional uint32 beginTime           = 1; /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional uint32 endTime             = 2; /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional DaysOfWeekMask daysMask    = 3; /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+message UserEntry {
+   required uint64 userID                 = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR]
+   optional UserType userType             = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR]
+   optional bytes userCode                = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR] $DESCRIPTION[iButton, RFID] $DESCRIPTION_ENGLISH[iButton, RFID]
+   optional bytes password                = 4;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional LoginType loginType           = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR]
+   optional string userName               = 6;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional UserTimeControl timeControl   = 7;  /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+message UserLibrary {
+   repeated UserEntry user = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR]
+}
+message UserCommand {
+   required uint64 deviceID      = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, TD80, MTC8XX_MCU]
+   required uint64 commandID     = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, TD80, MTC8XX_MCU]
+   required LoginEvent event     = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, TD80, MTC8XX_MCU]
+   required LoginType loginType  = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, TD80, MTC8XX_MCU]
+   required bytes userCode       = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, TD80, MTC8XX_MCU] $DESCRIPTION[iButton, RFID] $DESCRIPTION_ENGLISH[iButton, RFID]
+   optional bytes password       = 6;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional uint32 rfidDevice    = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, TD80, MTC8XX_MCU]
+   optional uint32 timeout       = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, TD80, MTC8XX_MCU] $DESCRIPTION[Utilizado para LE_LOGIN_TIMEOUT] $DESCRIPTION_ENGLISH[Used for LE_LOGIN_TIMEOUT (Seconds)]
+}
+message UserLibrayEdit {
+   repeated UserEntry userAdd       = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X]
+   repeated UserEntry userReplace   = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X]
+   repeated UserEntry userDelete    = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X]
+}

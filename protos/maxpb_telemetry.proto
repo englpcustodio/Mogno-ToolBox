@@ -1,0 +1,772 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_customer_data.proto";     
+import "maxpb_interfaces.proto";        
+import "maxpb_telemetry_delta.proto";   
+import "maxpb_dvr.proto";               
+import "maxpb_gpio.proto";              
+enum TelemetryEvent {
+   TE_NONE                                         = 0;  
+   TE_ACCELERATION                                 = 1;  
+   TE_BRAKE                                        = 2;  
+   TE_BUMP                                         = 3;  
+   TE_CURVE                                        = 4;  
+   TE_CRASH                                        = 5;  
+   TE_CALIBRATION_DONE                             = 6;  
+   TE_CALIBRATION_RESETED                          = 7;  
+   TE_STOPPED_EXCESS                               = 8;  
+   TE_STOP_TO_MOVING                               = 9;  
+   TE_MOVING_TO_STOP                               = 10; 
+   TE_MAX_SPEED_START                              = 11; 
+   TE_MAX_SPEED_END                                = 12; 
+   TE_MAX_SPEED_CANCELED                           = 13; 
+   TE_MAX_RAINY_SPEED_START                        = 14; 
+   TE_MAX_RAINY_SPEED_END                          = 15; 
+   TE_MAX_RAINY_SPEED_CANCELED                     = 16; 
+   TE_PITCHING                                     = 17; 
+   TE_ROLLING                                      = 18; 
+   TE_DELTAS                                       = 19; 
+   TE_ACCELEROMETER_EVENT_DETAIL                   = 20; 
+   TE_MODULE_REMOVED                               = 21; 
+   TE_CALIBRATION_REQUESTED                        = 22; 
+   TE_IMPROPER_MOVEMENT                            = 23; 
+   TE_RED_RANGE_EXCESS                             = 24; 
+   TE_BLUE_RANGE_EXCESS                            = 25; 
+   TE_SPEED_ON_NEUTRAL_EXCESS                      = 26; 
+   TE_STOPPED_EXCESS_END_BY_MOTION                 = 27; 
+   TE_STOPPED_EXCESS_END_BY_IGN_OFF                = 28; 
+   TE_STOPPED_EXCESS_WITH_ENGINE_ON_START          = 29; 
+   TE_STOPPED_EXCESS_WITH_ENGINE_ON_END_BY_MOTION  = 30; 
+   TE_STOPPED_EXCESS_WITH_ENGINE_ON_END_BY_ENG_OFF = 31; 
+   TE_RED_RANGE_EXCESS_END                         = 32; 
+   TE_SPEED_ON_NEUTRAL_EXCESS_END                  = 33; 
+   TE_VIN_FOUND                                    = 34; 
+   TE_VIN_CHANGED                                  = 35; 
+   TE_VIN_MISSING                                  = 36; 
+   TE_DRIVER_BEHAVIOR                              = 37; 
+   TE_ACCELERATION_SPEED_BASE                      = 38; 
+   TE_BRAKE_SPEED_BASE                             = 39; 
+   TE_MAX_SPEED_OFFSET_LIMIT1_START                = 40; 
+   TE_MAX_SPEED_OFFSET_LIMIT1_END                  = 41; 
+   TE_MAX_SPEED_OFFSET_LIMIT1_CANCELED             = 42; 
+   TE_MAX_RAINY_SPEED_OFFSET_LIMIT1_START          = 43; 
+   TE_MAX_RAINY_SPEED_OFFSET_LIMIT1_END            = 44; 
+   TE_MAX_RAINY_SPEED_OFFSET_LIMIT1_CANCELED       = 45; 
+   TE_MAX_SPEED_OFFSET_LIMIT2_START                = 46; 
+   TE_MAX_SPEED_OFFSET_LIMIT2_END                  = 47; 
+   TE_MAX_SPEED_OFFSET_LIMIT2_CANCELED             = 48; 
+   TE_MAX_RAINY_SPEED_OFFSET_LIMIT2_START          = 49; 
+   TE_MAX_RAINY_SPEED_OFFSET_LIMIT2_END            = 50; 
+   TE_MAX_RAINY_SPEED_OFFSET_LIMIT2_CANCELED       = 51; 
+   TE_RFU_52                                       = 52; 
+   TE_RFU_53                                       = 53; 
+   TE_RFU_54                                       = 54; 
+   TE_RFU_55                                       = 55; 
+   TE_RFU_56                                       = 56; 
+   TE_RFU_57                                       = 57; 
+   TE_RFU_58                                       = 58; 
+   TE_RFU_59                                       = 59; 
+   TE_RFU_60                                       = 60; 
+}
+enum AccelerometerState {
+   AST_NONE             = 0;  
+   AST_IN_CALIBRATION   = 1;  
+   AST_READY            = 2;  
+   AST_RFU_01           = 3;  
+   AST_RFU_02           = 4;  
+   AST_RFU_03           = 5;  
+   AST_RFU_04           = 6;  
+   AST_RFU_05           = 7;  
+}
+enum AccelerometerSamplesFrequency {
+   ASF_4HZ      = 0;  
+   ASF_2HZ      = 1;  
+   ASF_1_33HZ   = 2;  
+   ASF_1HZ      = 3;  
+   ASF_RFU_01   = 4;  
+   ASF_RFU_02   = 5;  
+   ASF_RFU_03   = 6;  
+   ASF_RFU_04   = 7;  
+   ASF_RFU_05   = 8;  
+}
+enum TelemetryDataSource {
+   TDS_GPS     = 0;  
+   TDS_CAN     = 1;  
+   TDS_PULSE   = 2;  
+   TDS_GSENSOR = 3;  
+   TDS_RFU_01  = 4;  
+   TDS_RFU_02  = 5;  
+   TDS_RFU_03  = 6;  
+   TDS_RFU_04  = 7;  
+   TDS_RFU_05  = 8;  
+}
+enum TelemetryOilPressure {
+   TOP_OFF     	= 0;  
+   TOP_RED     	= 1;  
+   TOP_YELLOW   = 2;  
+   TOP_INFO 	= 3;  
+}
+enum TelemetryParameterSource {
+   TPS_CONFIG                 = 0; 
+   TPS_GEOREFERENCE           = 1; 
+   TPS_EMBEDDED_ACTIONS       = 2; 
+   TPS_DYNAMIC_GEOREFERENCE   = 3; 
+   TPS_DYNAMIC_CONFIG         = 4; 
+   TPS_RFU_01                 = 5; 
+   TPS_RFU_02                 = 6; 
+   TPS_RFU_03                 = 7; 
+   TPS_RFU_04                 = 8; 
+   TPS_RFU_05                 = 9; 
+}
+
+enum AccelerometerEventsMask {
+   AEM_NONE          = 0;  
+   AEM_CRASH         = 1;  
+   AEM_ACCELERATION  = 2;  
+   AEM_BRAKE         = 4;  
+   AEM_CURVE         = 8;  
+}
+enum ExternalPowerType {
+   EPT_NONE          = 0;  
+   EPT_AUTO          = 1;  
+   EPT_LEAD_ACID_12V = 2;  
+   EPT_LEAD_ACID_24V = 3;  
+   EPT_RFU_01        = 4;  
+   EPT_RFU_02        = 5;  
+   EPT_RFU_03        = 6;  
+   EPT_RFU_04        = 7;  
+   EPT_RFU_05        = 8;  
+}
+enum TractionState {
+   TS_4X2         = 0;  
+   TS_4X4_MANUAL  = 1;  
+   TS_4X4_AUTO    = 2;  
+   TS_RFU_01      = 3;  
+   TS_RFU_02      = 4;  
+   TS_RFU_03      = 5;  
+   TS_RFU_04      = 6;  
+   TS_RFU_05      = 7;  
+}
+enum TelemetryFunctionRunningCondition {
+   TFRC_DEVICE_MOVING = 0;  
+   TFRC_ANY_STATE     = 1;  
+}
+enum BlackBoxDataType {
+   BBDT_NONE                  = 0;  
+   BBDT_ROTATED_WITH_G_FILTER = 1;  
+   BBDT_ROTATED               = 2;  
+   BBDT_RFU_01                = 3;  
+   BBDT_RFU_02                = 4;  
+   BBDT_RFU_03                = 5;  
+   BBDT_RFU_04                = 6;  
+   BBDT_RFU_05                = 7;  
+}
+
+enum BlackBoxComputerVisionType {
+   BBCVT_NONE            = 0;   
+   BBCVT_NO_FACE         = 1;   
+   BBCVT_EYES_CLOSED     = 2;   
+   BBCVT_YAWN            = 4;   
+   BBCVT_DIRECTION       = 8;   
+   BBCVT_DIRECTION_DOWN  = 16;  
+   BBCVT_DIRECTION_SIDE  = 32;  
+   BBCVT_FACE_MASK       = 64;  
+   BBCVT_GLASSES         = 128; 
+   BBCVT_NOSEATBELT      = 256; 
+}
+message AccelerometerData {
+   optional uint32 maxRollingAxisFront    = 1;  
+   optional uint32 maxRollingAxisBack     = 2;  
+   optional uint32 maxPitchingAxis        = 3;  
+   optional uint32 meanRollingAxisFront   = 4;  
+   optional uint32 meanRollingAxisBack    = 5;  
+   optional uint32 meanPitchingAxis       = 6;  
+}
+
+message TelemetryEventsTransmissionMask {
+   optional uint32 acceleration              = 1;  
+   optional uint32 brake                     = 2;  
+   optional uint32 bump                      = 3;  
+   optional uint32 curve                     = 4;  
+   optional uint32 crash                     = 5;  
+   optional uint32 calibration               = 6;  
+   optional uint32 stoppedExcess             = 7;  
+   optional uint32 movingAndStopped          = 8;  
+   optional uint32 maxSpeed                  = 9;  
+   optional uint32 maxRainySpeed             = 10; 
+   optional uint32 angles                    = 11; 
+   optional uint32 accelerometerEventDetail  = 12; 
+   optional uint32 improperMovement          = 13; 
+   optional uint32 calibrationRequested      = 14; 
+   optional uint32 moduleRemoved             = 15; 
+   optional uint32 rpm                       = 16; 
+   optional uint32 stopped                   = 17; 
+   optional uint32 VIN                       = 18; 
+   optional uint32 driverBehavior            = 19; 
+   optional uint32 accelerationSpeedBase     = 20; 
+   optional uint32 brakeSpeedBase            = 21; 
+   optional uint32 maxSpeedOffsetLimit1      = 22; 
+   optional uint32 maxRainySpeedOffsetLimit1 = 23; 
+   optional uint32 maxSpeedOffsetLimit2      = 24; 
+   optional uint32 maxRainySpeedOffsetLimit2 = 25; 
+}
+message TelemetryEventsDvrRequests {
+   optional DvrRequests acceleration              = 1;  
+   optional DvrRequests brake                     = 2;  
+   optional DvrRequests bump                      = 3;  
+   optional DvrRequests curve                     = 4;  
+   optional DvrRequests crash                     = 5;  
+   optional DvrRequests calibration               = 6;  
+   optional DvrRequests stoppedExcess             = 7;  
+   optional DvrRequests movingAndStopped          = 8;  
+   optional DvrRequests maxSpeed                  = 9;  
+   optional DvrRequests maxRainySpeed             = 10; 
+   optional DvrRequests angles                    = 11; 
+   optional DvrRequests accelerometerEventDetail  = 12; 
+   optional DvrRequests improperMovement          = 13; 
+   optional DvrRequests calibrationRequested      = 14; 
+   optional DvrRequests moduleRemoved             = 15; 
+   optional DvrRequests rpm                       = 16; 
+   optional DvrRequests stopped                   = 17; 
+   optional DvrRequests VIN                       = 18; 
+   optional DvrRequests driverBehavior            = 19; 
+   optional DvrRequests accelerationSpeedBase     = 20; 
+   optional DvrRequests brakeSpeedBase            = 21; 
+   optional DvrRequests maxSpeedOffsetLimit1      = 22; 
+   optional DvrRequests maxRainySpeedOffsetLimit1 = 23; 
+   optional DvrRequests maxSpeedOffsetLimit2      = 24; 
+   optional DvrRequests maxRainySpeedOffsetLimit2 = 25; 
+}
+enum AngleProcessPreconditionMask {
+   APM_NONE             = 0;  
+   APM_POSSIBLY_MOVING  = 1;  
+   APM_POSSIBLY_STOPPED = 2;  
+}
+message TelemetryEvents {
+   required TelemetryEvent eventID                    = 1;  
+   optional uint32 duration                           = 2;  
+   optional int32 maximumValue                        = 3;  
+   optional int32 meanValue                           = 4;  
+   optional int32 minimumValue                        = 5;  
+   optional int32 parameterConfigured                 = 6;  
+   optional TelemetryParameterSource parameterSource  = 7;  
+   optional TelemetryDataSource valueSource           = 8;  
+   optional int32 initialSpeed                        = 9;  
+   optional int32 finalSpeed                          = 10; 
+   optional uint32 timeToMax                          = 11; 
+   optional AccelerometerData accelerometer           = 13; 
+   optional sfixed32 beginLatitude                    = 14; 
+   optional sfixed32 beginLongitude                   = 15; 
+   optional sfixed32 endLatitude                      = 16; 
+   optional sfixed32 endLongitude                     = 17; 
+   optional uint32 travelledDistance                  = 18; 
+   optional DriverHistogram driverHistogramAxisX      = 19; 
+   optional DriverHistogram driverHistogramAxisY      = 20; 
+   optional DvrRequestsInfo dvrRequestsInfo           = 21; 
+}
+message TelemetryFlags {
+   optional bool overSpeed                         = 1;  
+   optional bool stoppedExcess                     = 2;  
+   optional bool moving                            = 3;  
+   optional AccelerometerState accelerometerState  = 4;  
+   optional uint32 vehicleOperationTime            = 5;  
+   optional bool clutch                            = 6;  
+   optional bool brake                             = 7;  
+   optional bool parkingBrake                      = 8;  
+   optional bool motorBrake                        = 9;  
+   optional bool windShieldWipers                  = 10; 
+   optional bool doorClosed                        = 11; 
+   optional bool doorLocked                        = 12; 
+   optional bool trunk                             = 13; 
+   optional bool seatBelt                          = 14; 
+   optional bool headlights                        = 15; 
+   optional TractionState tractionState            = 16; 
+   optional bool moduleRemoved                     = 17; 
+   optional bool engineOn                          = 18; 
+   optional bool blueRangeExcess                   = 19; 
+   optional bool redRangeExcess                    = 20; 
+   optional bool speedOnNeutralExcess              = 21; 
+   optional bool raining                           = 22; 
+   optional bool stoppedExcessEngineOn             = 23; 
+   optional uint32 movingTime                      = 24; 
+   optional uint32 vehicleHourmeter                = 25; 
+   optional bool overSpeedLimit1                   = 26; 
+   optional bool overSpeedLimit2                   = 27; 
+}
+
+message OdometerInfo {
+   required TelemetryDataSource main   = 1;  
+   optional uint64 gps                 = 2;  
+   optional uint64 pulse               = 3;  
+   optional uint64 can                 = 4;  
+}
+
+message SpeedInfo {
+   required TelemetryDataSource main   = 1;  
+   optional uint32 gps                 = 2;  
+   optional uint32 pulse               = 3;  
+   optional uint32 can                 = 4;  
+}
+message RpmInfo {
+   required TelemetryDataSource main   = 1;  
+   optional uint32 pulse               = 2;  
+   optional uint32 can                 = 3;  
+}
+message AngleInfo {
+   optional int32 pitchingAngle  = 1;  
+   optional int32 rollingAngle   = 2;  
+}
+message AccelerometerInfo {
+   optional uint32 fakeMovementCount  = 1;  
+   optional uint32 fakeRotationCount  = 2;  
+   optional uint32 trueMovementCount  = 3;  
+   optional uint32 trueRotationCount  = 4;  
+   optional uint32 totalMovingTime    = 5;  
+}
+message FuelInfo {
+   optional uint32 fuelLevelTank1            = 1;  
+   optional uint32 fuelLevelTank2            = 2;  
+   optional uint32 fuelConsumption           = 3;  
+   optional uint32 ethanolRatio              = 5;  
+   optional uint32 engineFuelRate            = 6;  
+   optional uint32 totalityfuelConsumption   = 7;  
+   optional uint32 averageDistanceAutonomy   = 8;  
+}
+message StabilityControlInfo{
+   optional int32 SteeringWheelAngle	     = 1;  
+}	
+message EngineInfo {
+   optional int32 intakeAirTemperature       = 1;  
+   optional uint32 intakeAirFlow             = 2;  
+   optional int32 oilTemperature             = 3;  
+   optional uint32 engineRefTorque           = 4;  
+   optional int32 engineTemperature          = 5;  
+   optional int32 currentGear                = 6;  
+   optional uint32 throttlePosition          = 7;  
+   optional TelemetryOilPressure oilPressure = 8;  
+   optional int32 particulateMatter    	   = 9;  
+}
+message EnvironmentInfo {
+   optional uint32 barometricPressure  = 1;  
+   optional int32 airTemperature       = 2;  
+   optional int32 internalTemperature  = 3;  
+   optional int32 tirePressure         = 4;  
+   optional bool  internalairState     = 5;  
+   optional int32 Weight               = 6;  
+   optional int32 relativeHumidity     = 7;  
+   optional int32 internalNoiseLevel   = 8;  
+}
+message ECUInfo {
+   optional uint32 controlModuleVoltage            = 1;  
+   optional string VIN                             = 2;  
+   optional bool malFunctionIndLamp                = 3;  
+   repeated uint32 dtcCodes                        = 4;  
+   optional CanBitRate canBitRate                  = 5;  
+   optional bool isCanExtended                     = 6;  
+   optional bool avaiableObdInfoReady              = 7;  
+   optional uint32 distanceSinceMILCleared         = 8;  
+   optional uint32 distanceSinceMILActivated       = 9;  
+   optional uint32 engineRunTimeSinceMILActivated  = 10; 
+   optional uint32 engineRunTimeSinceMILCleared    = 11; 
+   repeated uint32 pendingDtcCodes                 = 12; 
+   optional bool detectingCanBitrate               = 13; 
+}
+message AccelerometerEventSample {
+   optional sfixed32 latitude             = 1;  
+   optional sfixed32 longitude            = 2;  
+   optional uint32 speed                  = 3;  
+   optional uint32 rpm                    = 4;  
+   optional uint32 axisFront              = 5;  
+   optional uint32 axisBack               = 6;  
+   optional uint32 axisRight              = 7;  
+   optional uint32 axisLeft               = 8;  
+   optional uint32 axisUp                 = 10; 
+   optional uint32 axisDown               = 11; 
+   optional uint64 dateTime               = 12; 
+   optional uint64 direction              = 13; 
+   optional bytes encodedAxisSamples      = 14; 
+   optional uint32 axisFrontWithGFilter   = 15;  
+   optional uint32 axisBackWithGFilter    = 16;  
+   optional uint32 axisRightWithGFilter   = 17;  
+   optional uint32 axisLeftWithGFilter    = 18;  
+   optional uint32 axisUpWithGFilter      = 19;  
+   optional uint32 axisDownWithGFilter    = 20;  
+}
+message AccelerometerEventDetail {
+   required uint32 sequenceNumberLink                                   = 1; 
+   required uint64 firstSampleDateTime                                  = 2; 
+   required AccelerometerEventsMask event                               = 3; 
+   repeated AccelerometerEventSample samples                            = 5; 
+   optional AccelerometerState accelerometerState                       = 6; 
+   optional uint32 accelerometerSamplesRate                             = 7; 
+}
+message ReportAccelerometerEventDetail {
+   required uint64 deviceID                                    = 1; 
+   required uint64 packetID                                    = 2; 
+   optional AccelerometerEventDetail accelerometerEventDetail  = 3; 
+   optional AccelerometerEventDetail gyroscopeEventDetail      = 4; 
+   optional AccelerometerEventDetail magnetEventDetail         = 5; 
+   optional CustomerData customerData                          = 128;   
+}
+message TelemetryInfo {
+   optional TelemetryFlags flags                            = 1;  
+   optional OdometerInfo odometer                           = 2;  
+   optional SpeedInfo speed                                 = 3;  
+   optional RpmInfo rpm                                     = 4;  
+   optional AngleInfo angles                                = 5;  
+   optional FuelInfo fuel                                   = 6;  
+   optional EngineInfo engine                               = 7;  
+   optional EnvironmentInfo environment                     = 8;  
+   optional ECUInfo ecu                                     = 9;  
+   repeated TelemetryDelta delta                            = 10; 
+   optional AccelerometerInfo accelerometer                 = 11; 
+   optional DriverHistogram driverHistogramAxisX            = 12; 
+   optional DriverHistogram driverHistogramAxisY            = 13; 
+   optional uint32 curveBehavior                            = 14; 
+   optional DriverHistogram driverHistogramAfterMovingAxisX = 15; 
+   optional DriverHistogram driverHistogramAfterMovingAxisY = 16; 
+   optional StabilityControlInfo StabilityControl	    = 17; 
+}
+
+message SpeedsConfig {
+   optional uint32 maxSpeed                 = 1;  
+   optional uint32 maxRainySpeed            = 2;  
+   optional uint32 minSpeedOnNeutral        = 3;  
+   optional uint32 histogramSlotsQty        = 4;  
+   optional uint32 histogramSlotsSize       = 5;  
+   optional int32 speedOffsetLimit1         = 6;  
+   optional int32 speedOffsetLimit2         = 7;  
+   optional int32 rainySpeedOffsetLimit1    = 8;  
+   optional int32 rainySpeedOffsetLimit2    = 9;  
+   optional int32 speedDiffAccelerationCheck= 10; 
+   optional uint32 minSpeedForBrakeCheck    = 11; 
+   optional int32 speedDiffBrakeCheck       = 12; 
+   optional bool speedDiffBrakeUseBrakePedal= 13; 
+}
+
+message TimersConfig {
+   optional uint32 stoppedExcess                = 1;  
+   optional uint32 maxSpeedDebounce             = 2;  
+   optional uint32 maxRainySpeedDebounce        = 3;  
+   optional uint32 blueRangeExcess              = 4;  
+   optional uint32 redRangeExcess               = 5;  
+   optional uint32 speedOnNeutralExcess         = 6;  
+   optional uint32 rainyWeather                 = 7;  
+   optional uint32 dryWeather                   = 8;  
+   optional uint32 stoppedExcessWithEngineOn    = 9;  
+   optional uint32 maxSpeedDebounceLimit1       = 10; 
+   optional uint32 maxSpeedDebounceLimit2       = 11; 
+   optional uint32 maxRainySpeedDebounceLimit1  = 12; 
+   optional uint32 maxRainySpeedDebounceLimit2  = 13; 
+}
+message GSensorAlarmConfig {
+   optional uint32 trigger    = 1;  
+   optional uint32 debounce   = 2;  
+}
+message RpmConfig {
+   optional uint32 minBlueRpm          = 1;  
+   optional uint32 maxBlueRpm          = 2;  
+   optional uint32 minGreenRpm         = 3;  
+   optional uint32 maxGreenRpm         = 4;  
+   optional uint32 minRedRpm           = 5;  
+   optional uint32 histogramSlotsQty   = 6;  
+   optional uint32 histogramSlotsSize  = 7;  
+}
+
+message DeltaConfig {
+   optional bool ignitionOn   = 1;  
+   optional bool stopped      = 3;  
+   optional bool moving       = 4;  
+   optional bool hourly       = 6;  
+   optional bool position     = 7;  
+}
+message ExternalPowerConfig {
+   optional ExternalPowerType powerType               = 1;  
+   optional uint32 veryLowVoltageFor12V               = 2;  
+   optional uint32 lowVoltageFor12V                   = 3;  
+   optional uint32 overloadFor12V                     = 4;  
+   optional uint32 veryLowVoltageFor24V               = 5;  
+   optional uint32 lowVoltageFor24V                   = 6;  
+   optional uint32 overloadFor24V                     = 7;  
+   optional uint32 shortTripInterval                  = 8;  
+   optional uint32 maxOverloadRatio                   = 9;  
+   optional uint32 checkShortTripInterval             = 10; 
+   optional uint32 checkLowVoltageInterval            = 11; 
+   optional uint32 checkVeryLowVoltageInterval        = 12; 
+   optional uint32 checkVeryLowVoltageDebounce        = 13; 
+   optional uint32 checkLowVoltageDebounce            = 14; 
+   optional uint32 checkOverloadDebounce              = 15; 
+   optional bool txAlways                             = 16; 
+   optional bool txVeryLowVoltage                     = 17; 
+   optional bool txShortTripLowVoltage                = 18; 
+   optional bool txLowVoltageAndCharging              = 19; 
+   optional bool txLowVoltageAndOverload              = 20; 
+   optional bool txOverloadRatioExceed                = 21; 
+   optional uint32 externalPowerPastWindow            = 22; 
+   optional uint32 externalPowerFutureWindow          = 23; 
+   optional uint32 externalPowerChangeDebounce        = 24; 
+   optional uint32 minimalTimeBetweenPowerFailEvents  = 25; 
+   optional uint32 enablePowerEvents                  = 26; 
+   optional uint32 lowVoltageStateForcesSleep         = 27; 
+   optional uint32 externalPowerRemovalDebounce       = 28; 
+}
+message TelemetryConfig {
+   optional SpeedsConfig speeds                                         = 1;  
+   optional TimersConfig timers                                         = 2;  
+   optional uint32 debounceMoving                                       = 3;  
+   optional uint32 debounceStopped                                      = 4;  
+   optional int32 pitchingMin                                           = 5;  
+   optional int32 pitchingMax                                           = 6;  
+   optional int32 rollingMin                                            = 7;  
+   optional int32 rollingMax                                            = 8;  
+   optional GSensorAlarmConfig hardAcceleration                         = 9;  
+   optional GSensorAlarmConfig hardBrake                                = 10; 
+   optional GSensorAlarmConfig hardCurve                                = 11; 
+   optional GSensorAlarmConfig hardBump                                 = 12; 
+   optional GSensorAlarmConfig hardCrash                                = 13; 
+   optional TelemetryEventsTransmissionMask eventsMask                  = 14; 
+   optional RpmConfig rpm                                               = 15; 
+   optional DeltaConfig delta                                           = 16; 
+   optional AccelerometerSamplesFrequency accelerometerSamplesFrequency = 17; 
+   optional uint32 accelerometerEventMask                               = 18; 
+   optional uint32 accOdometerSpeedLimit                                = 19; 
+   optional uint32 minimalTimeBetweenCrashEvents                        = 20; 
+   optional bool recalibAccelerometerNoExtPower                         = 21; 
+   optional bool fixedCanLibrary                                        = 22; 
+   optional bool blackBox                                               = 23; 
+   optional uint32 blackBoxReportTime                                   = 24; 
+   optional uint32 pulseOdometerConversionFactor                        = 25; 
+   optional uint32 pulseRPMConversionFactor                             = 26; 
+   optional bool usePulseOdometerPin                                    = 27; 
+   optional bool usePulseRPMPin                                         = 28; 
+   optional bool useWindshieldWipersPin                                 = 29; 
+   optional float pulseRPMConversionFactorFloat                         = 30; 
+   optional uint32 debouncePitchingRolling                              = 31; 
+   optional uint32 sampleDebouncePitchingRolling                        = 32; 
+   optional uint32 sampleDebounceStopped                                = 33; 
+   optional uint32 sampleDebounceMoving                                 = 34; 
+   optional uint32 angleProcessPreconditionMask                         = 35; 
+   optional uint32 autoRecalibrateAccelerometer                         = 36; 
+   optional TelemetryFunctionRunningCondition blackBoxRunningCondition  = 37; 
+   optional TelemetryFunctionRunningCondition ignDeltaRunningCondition  = 38; 
+   optional ExternalPowerConfig externalPower                           = 39; 
+   optional bool blackBoxfillGSensorData                                = 40; 
+   optional BlackBoxDataType blackBoxDataType                           = 41; 
+   optional bool disableGsrOdometerFilter				                = 42; 
+   optional bool disableDistanceOdometerFilter				            = 43; 
+   optional uint32 disableDistanceOdometerFilterAboveSpeedLimit		    = 44; 
+   optional TelemetryEventsDvrRequests dvrRequests                      = 45; 
+   optional uint32 movementTrigger                                      = 46; 
+   optional bool usePulseFuelConsumption 								= 47; 
+}
+message ReportBlackBox {
+   required uint64 deviceID            = 1;     
+   required uint64 packetID            = 2;     
+   required BlackBoxMinute minute      = 3;     
+   optional CustomerData customerData  = 128;   
+}
+
+
+
+
+
+message BlackBoxMinuteBits
+{
+   optional bytes info              = 1;  
+}
+message BlackBoxMinute {
+   required uint32 dateTime         = 1;  
+   required sfixed32 latitude       = 2;  
+   required sfixed32 longitude      = 3;  
+   required uint64 odometer         = 4;  
+   
+   optional BlackBoxSecond second00 = 5;  
+   optional BlackBoxSecond second01 = 6;  
+   optional BlackBoxSecond second02 = 7;  
+   optional BlackBoxSecond second03 = 8;  
+   optional BlackBoxSecond second04 = 9;  
+   optional BlackBoxSecond second05 = 10; 
+   optional BlackBoxSecond second06 = 11; 
+   optional BlackBoxSecond second07 = 12; 
+   optional BlackBoxSecond second08 = 13; 
+   optional BlackBoxSecond second09 = 14; 
+   
+   optional BlackBoxSecond second10 = 15; 
+   optional BlackBoxSecond second11 = 16; 
+   optional BlackBoxSecond second12 = 17; 
+   optional BlackBoxSecond second13 = 18; 
+   optional BlackBoxSecond second14 = 19; 
+   optional BlackBoxSecond second15 = 20; 
+   optional BlackBoxSecond second16 = 21; 
+   optional BlackBoxSecond second17 = 22; 
+   optional BlackBoxSecond second18 = 23; 
+   optional BlackBoxSecond second19 = 24; 
+   
+   optional BlackBoxSecond second20 = 25; 
+   optional BlackBoxSecond second21 = 26; 
+   optional BlackBoxSecond second22 = 27; 
+   optional BlackBoxSecond second23 = 28; 
+   optional BlackBoxSecond second24 = 29; 
+   optional BlackBoxSecond second25 = 30; 
+   optional BlackBoxSecond second26 = 31; 
+   optional BlackBoxSecond second27 = 32; 
+   optional BlackBoxSecond second28 = 33; 
+   optional BlackBoxSecond second29 = 34; 
+   
+   optional BlackBoxSecond second30 = 35; 
+   optional BlackBoxSecond second31 = 36; 
+   optional BlackBoxSecond second32 = 37; 
+   optional BlackBoxSecond second33 = 38; 
+   optional BlackBoxSecond second34 = 39; 
+   optional BlackBoxSecond second35 = 40; 
+   optional BlackBoxSecond second36 = 41; 
+   optional BlackBoxSecond second37 = 42; 
+   optional BlackBoxSecond second38 = 43; 
+   optional BlackBoxSecond second39 = 44; 
+   
+   optional BlackBoxSecond second40 = 45; 
+   optional BlackBoxSecond second41 = 46; 
+   optional BlackBoxSecond second42 = 47; 
+   optional BlackBoxSecond second43 = 48; 
+   optional BlackBoxSecond second44 = 49; 
+   optional BlackBoxSecond second45 = 50; 
+   optional BlackBoxSecond second46 = 51; 
+   optional BlackBoxSecond second47 = 52; 
+   optional BlackBoxSecond second48 = 53; 
+   optional BlackBoxSecond second49 = 54; 
+   
+   optional BlackBoxSecond second50 = 55; 
+   optional BlackBoxSecond second51 = 56; 
+   optional BlackBoxSecond second52 = 57; 
+   optional BlackBoxSecond second53 = 58; 
+   optional BlackBoxSecond second54 = 59; 
+   optional BlackBoxSecond second55 = 60; 
+   optional BlackBoxSecond second56 = 61; 
+   optional BlackBoxSecond second57 = 62; 
+   optional BlackBoxSecond second58 = 63; 
+   optional BlackBoxSecond second59 = 64; 
+   optional uint32 fuelConsumption              = 65; 
+   optional int32 altitude                      = 66; 
+   optional BlackBoxMinuteBits brakePedal       = 70; 
+   optional BlackBoxMinuteBits windShieldWipers = 71; 
+}
+message BlackBoxComputerVisionInfo {
+   optional uint64 flags            = 1;  
+   optional bool noFace             = 2;  
+   optional bool eyesClosed         = 3;  
+   optional bool yawn               = 4;  
+   optional bool direction          = 5;  
+   optional bool directionDown      = 6;  
+   optional bool directionSide      = 7;  
+   optional bool facialMask         = 8;  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+message BlackBoxSecond {
+   optional uint32 p_latitude                         = 1;  
+   optional uint32 n_latitude                         = 2;  
+   optional uint32 p_longitude                        = 3;  
+   optional uint32 n_longitude                        = 4;  
+   optional uint32 speed                              = 5;  
+   optional uint32 direction                          = 6;  
+   optional uint32 rpm                                = 7;  
+   optional uint32 p_odometer                         = 8;  
+   repeated AxisSample axisSamples                    = 9;  
+   optional bytes encodedAxisSamples                  = 10; 
+   optional AccelerometerState accelerometerState     = 11; 
+   optional uint32 p_fuelConsumption                  = 12; 
+   optional bool brakePedal                           = 14; 
+   optional bool windShieldWipers                     = 15; 
+   optional sfixed32 latitude                         = 16; 
+   optional sfixed32 longitude                        = 17; 
+   optional uint32 fuelConsumption                    = 18; 
+   optional uint64 odometer                           = 20; 
+   optional uint32 highPrecisionRpm                   = 21; 
+   optional BlackBoxComputerVisionInfo computerVision = 22; 
+   optional uint64 userID                             = 23; 
+   optional uint64 inputFlags                         = 24; 
+   optional uint64 outputFlags                        = 25; 
+   optional uint64 flags                              = 26; 
+   optional IOsInfo ios                               = 27; 
+   optional uint32 p_altitude                         = 28; 
+   optional uint32 n_altitude                         = 29; 
+   optional int32 altitude                            = 30; 
+   optional uint64 accessoryInputFlags                = 31; 
+   optional uint64 accessoryOutputFlags               = 32; 
+}
+message AxisSample {
+   optional int32 xAxis = 1;  
+   optional int32 yAxis = 2;  
+   optional int32 zAxis = 3;  
+}

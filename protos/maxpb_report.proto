@@ -1,0 +1,821 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_customer_data.proto";     
+import "maxpb_filetransfer.proto";      
+import "maxpb_geographic.proto";        
+import "maxpb_gps.proto";               
+import "maxpb_debug.proto";             
+import "maxpb_gpio.proto";              
+import "maxpb_telemetry.proto";         
+import "maxpb_accessories.proto";       
+import "maxpb_interfaces.proto";        
+
+import "maxpb_can_acquisition.proto";   
+import "maxpb_users.proto";             
+import "maxpb_embedded_actions.proto";  
+import "maxpb_dvr.proto";               
+import "maxpb_computer_vision.proto";   
+import "maxpb_video.proto";             
+
+
+import "maxpb_data_terminal.proto";     
+import "maxpb_multimedia.proto";        
+import "maxpb_wifi.proto";              
+import "maxpb_journey.proto";           
+import "maxpb_route.proto";             
+import "maxpb_beacon.proto";            
+
+enum ReportReason {
+   RR_SHUTDOWN                       = 0;     
+   RR_RFU_01                         = 1;     
+   RR_RFU_02                         = 2;     
+   RR_RFU_03                         = 3;     
+   RR_HIGH_TEMPERATURE               = 4;     
+   RR_RFU_05                         = 5;     
+   RR_RFU_06                         = 6;     
+   RR_RFU_07                         = 7;     
+   RR_PASSWORD_WRONG_3_TIMES         = 8;     
+   RR_RFU_09                         = 9;     
+   RR_RFU_10                         = 10;    
+   RR_RFU_11                         = 11;    
+   RR_POWER_ON                       = 12;    
+   RR_RFU_13                         = 13;    
+   RR_RFU_14                         = 14;    
+   RR_RFU_15                         = 15;    
+   RR_EVENTS                         = 16;    
+   RR_RFU_17                         = 17;    
+   RR_RFU_18                         = 18;    
+   RR_RFU_19                         = 19;    
+   RR_RFU_20                         = 20;    
+   RR_DIRECTION_CHANGED              = 50;    
+   RR_DISTANCE_THRESHOLD             = 52;    
+   RR_RFU_53                         = 53;    
+   RR_RFU_54                         = 54;    
+   RR_RFU_55                         = 55;    
+   RR_RFU_56                         = 56;    
+   RR_RFU_57                         = 57;    
+   RR_TIMER_PANIC                    = 60;    
+   RR_RFU_61                         = 61;    
+   RR_TIMER_JAMMER                   = 62;    
+   RR_RFU_63                         = 63;    
+   RR_TIMER_BATTERY                  = 64;    
+   RR_RFU_65                         = 65;    
+   RR_TIMER_SLEEP                    = 66;    
+   RR_RFU_67                         = 67;    
+   RR_TIMER_LOW_POWER                = 68;    
+   RR_RFU_69                         = 69;    
+   RR_TIMER_IGN_ON_MOVING            = 70;    
+   RR_RFU_71                         = 71;    
+   RR_TIMER_IGN_ON_STOP              = 72;    
+   RR_RFU_73                         = 73;    
+   RR_TIMER_IGN_OFF_MOVING           = 74;    
+   RR_RFU_75                         = 75;    
+   RR_TIMER_IGN_OFF_STOP             = 76;    
+   RR_RFU_77                         = 77;    
+   RR_TIMER_PORTABLE_MOVING          = 78;    
+   RR_TIMER_PORTABLE_MOVING_SAMPLES  = 79;    
+   RR_TIMER_PORTABLE_STOP            = 80;    
+   RR_TIMER_PORTABLE_STOP_SAMPLES    = 81;    
+   RR_LORA_REPORT_DATA               = 100;   
+   RR_RFU_101                        = 101;   
+   RR_ACCESSORIES_REPORT_DATA        = 102;   
+   RR_RFU_103                        = 103;   
+   RR_SUPER_LOG                      = 104;   
+   RR_RFU_105                        = 105;   
+   RR_BEACONS_REPORT_DATA            = 106;   
+   RR_RFU_107                        = 107;   
+   RR_RFU_108                        = 108;   
+   RR_RFU_109                        = 109;   
+   RR_RFU_110                        = 110;   
+   RR_RFU_111                        = 111;   
+   RR_CONSOLE_REQUISITION            = 122;   
+   RR_SMS_REQUISITION                = 123;   
+   RR_OPEN_DATA                      = 124;   
+   RR_RECONSTRUCTION                 = 125;   
+   RR_PASSWORD_CHANGED               = 126;   
+   RR_SERVER_REQUISITION             = 127;   
+   RR_RFU_128                        = 128;   
+   RR_RFU_129                        = 129;   
+   RR_RFU_130                        = 130;   
+   RR_RFU_131                        = 131;   
+   RR_FACE_ID_PROCESS                = 132;   
+}
+
+enum ReportEvents {
+   RE_NONE           = 0;   
+   RE_ENABLE         = 1;   
+   RE_WIFI_BT_SERIAL = 2;   
+   RE_RF             = 4;   
+   RE_GPRS           = 8;   
+   RE_SATELITTE      = 16;  
+   RE_RFU_32         = 32;  
+   RE_RFU_64         = 64;  
+   RE_RFU_128        = 128; 
+   RE_RFU_256        = 256; 
+}
+
+enum DeviceEvent {
+   DE_NONE                          = 0;     
+   DE_CONFIG_CHANGED                = 1;     
+   DE_GPS_FIXED                     = 2;     
+   DE_GPS_FIX_LOST                  = 3;     
+   DE_IGNITION_ON                   = 4;     
+   DE_IGNITION_OFF                  = 5;     
+   DE_PANIC_ACTIVATED               = 6;     
+   DE_PANIC_DEACTIVATED             = 7;     
+   DE_EXTPOWER_FAIL                 = 8;     
+   DE_EXTPOWER_OK                   = 9;     
+   DE_GPS_ANTENNA_FAIL              = 10;    
+   DE_GPS_ANTENNA_OK                = 11;    
+   DE_BATTERY_FAIL                  = 12;    
+   DE_BATTERY_OK                    = 13;    
+   DE_JAMMING_START                 = 14;    
+   DE_JAMMING_END                   = 15;    
+   DE_VIRTUAL_IGNITION_CALIBRATED   = 16;    
+   DE_ENTER_DEEP_SLEEP              = 17;    
+   DE_LBS_INFO                      = 18;    
+   DE_IGNITION_MODE_CHANGED         = 19;    
+   DE_ALARM_STATE_CHANGED           = 20;    
+   DE_JOURNEY_CHANGED               = 21;    
+   DE_GPRS_CONNECTED                = 22;    
+   DE_TRANSMISSION_RETRIES_LIMIT    = 23;    
+   DE_TRIP_RECONSTRUCTION           = 24;    
+   DE_EMERGENCY_STATE_CHANGED       = 25;    
+   DE_PAIRING_LOST                  = 26;    
+   DE_PAIRING_CONNECT               = 27;    
+   DE_LOW_BATTERY                   = 28;    
+   DE_EXTPOWER_LOW_VOLTAGE          = 29;    
+   DE_WIFI_CONNECTED                = 30;    
+   DE_RFU_31                        = 31;    
+   DE_RFU_32                        = 32;    
+   DE_RFU_33                        = 33;    
+   DE_RFU_34                        = 34;    
+   DE_RFU_35                        = 35;    
+   DE_INPUT1_STATE_CHANGE           = 50;    
+   DE_INPUT2_STATE_CHANGE           = 51;    
+   DE_INPUT3_STATE_CHANGE           = 52;    
+   DE_INPUT4_STATE_CHANGE           = 53;    
+   DE_INPUT5_STATE_CHANGE           = 54;    
+   DE_INPUT6_STATE_CHANGE           = 55;    
+   DE_INPUT7_STATE_CHANGE           = 56;    
+   DE_INPUT8_STATE_CHANGE           = 57;    
+   DE_INPUT9_STATE_CHANGE           = 58;    
+   DE_INPUT10_STATE_CHANGE          = 59;    
+   DE_INPUT11_STATE_CHANGE          = 60;    
+   DE_INPUT12_STATE_CHANGE          = 61;    
+   DE_INPUT13_STATE_CHANGE          = 62;    
+   DE_INPUT14_STATE_CHANGE          = 63;    
+   DE_INPUT15_STATE_CHANGE          = 64;    
+   DE_INPUT16_STATE_CHANGE          = 65;    
+   DE_MAXIO_INPUT1_STATE_CHANGE     = 66;    
+   DE_MAXIO_INPUT2_STATE_CHANGE     = 67;    
+   DE_MAXIO_INPUT3_STATE_CHANGE     = 68;    
+   DE_MAXIO_INPUT4_STATE_CHANGE     = 69;    
+   DE_RFU_70                        = 70;    
+   DE_RFU_71                        = 71;    
+   DE_RFU_72                        = 72;    
+   DE_RFU_73                        = 73;    
+   DE_RFU_74                        = 74;    
+   DE_RFU_75                        = 75;    
+   DE_RFU_76                        = 76;    
+   DE_RFU_77                        = 77;    
+   DE_RFU_78                        = 78;    
+   DE_RFU_79                        = 79;    
+   DE_OUTPUT1_STATE_CHANGE          = 100;   
+   DE_OUTPUT2_STATE_CHANGE          = 101;   
+   DE_OUTPUT3_STATE_CHANGE          = 102;   
+   DE_OUTPUT4_STATE_CHANGE          = 103;   
+   DE_OUTPUT5_STATE_CHANGE          = 104;   
+   DE_OUTPUT6_STATE_CHANGE          = 105;   
+   DE_OUTPUT7_STATE_CHANGE          = 106;   
+   DE_OUTPUT8_STATE_CHANGE          = 107;   
+   DE_MAXIO_OUTPUT1_STATE_CHANGE    = 108;   
+   DE_MAXIO_OUTPUT2_STATE_CHANGE    = 109;   
+   DE_RFU_110                       = 110;   
+   DE_RFU_111                       = 111;   
+   DE_RFU_112                       = 112;   
+   DE_RFU_113                       = 113;   
+   DE_RFU_114                       = 114;   
+   DE_RFU_115                       = 115;   
+   DE_RFU_116                       = 116;   
+   DE_RFU_117                       = 117;   
+   DE_RFU_118                       = 118;   
+   DE_RFU_119                       = 119;   
+}
+
+enum PositionSource {
+   PS_GPS       = 0;  
+   PS_LBS       = 1;  
+   PS_LORA      = 2;  
+   PS_GLONASS   = 3;  
+   PS_BLUETOOTH = 4;  
+   PS_BAROMETER = 5;  
+   PS_RFU_06    = 6;  
+   PS_RFU_07    = 7;  
+   PS_RFU_08    = 8;  
+   PS_RFU_09    = 9;  
+   PS_RFU_10    = 10; 
+}
+enum AccuracyMeasure {
+   AM_CEP      = 0;  
+   AM_DRMS     = 1;  
+   AM_2DRMS    = 2;  
+   AM_RFU_03   = 3;  
+   AM_RFU_04   = 4;  
+   AM_RFU_05   = 5;  
+   AM_RFU_06   = 6;  
+   AM_RFU_07   = 7;  
+}
+enum PositionFormat {
+   PF_SOURCE_DEFAULT = 0;  
+   PF_WGS84          = 1;  
+   PF_SAD69          = 2;  
+   PF_PZ90           = 3;  
+   PF_GTRF           = 4;  
+   PF_CGCS2000       = 5;  
+   PF_SIRGAS2000     = 6;  
+   PF_RFU_07         = 7;  
+   PF_RFU_08         = 8;  
+   PF_RFU_09         = 9;  
+   PF_RFU_10         = 10; 
+   PF_RFU_11         = 11; 
+}
+
+enum PowerState {
+   PS_NORMAL     = 0; 
+   PS_SLEEP      = 1; 
+   PS_LOW_POWER  = 2; 
+   PS_STOCK      = 3; 
+   PS_RESET      = 4; 
+   PST_RFU_05    = 5; 
+   PST_RFU_06    = 6; 
+   PST_RFU_07    = 7; 
+   PST_RFU_08    = 8; 
+   PST_RFU_09    = 9; 
+}
+enum ConnectionState {
+   CT_DISCONNECTED         = 0;  
+   CT_CONNECTED            = 1;  
+   CT_SOCKET_ESTABILISHED  = 2;  
+   CT_RFU_03               = 3;  
+   CT_RFU_04               = 4;  
+   CT_RFU_05               = 5;  
+   CT_RFU_06               = 6;  
+   CT_RFU_07               = 7;  
+}
+enum ConnectionType {
+   CONN_NONE      = 0;  
+   CONN_GPRS      = 1;  
+   CONN_WIFI      = 2;  
+   CONN_ZIGBEE    = 3;  
+   CONN_LORA_P2P  = 4;  
+   CONN_LORA_WAN  = 5;  
+   CONN_SIGFOX    = 6;  
+   CONN_RS232A    = 7;  
+   CONN_RS232B    = 8;  
+   CONN_WIFI_5G   = 9;  
+   CONN_ETHERNET  = 10; 
+   CONN_RS485A    = 11; 
+   CONN_RS485B    = 12; 
+   CONN_CATM1     = 13; 
+   CONN_NB     	  = 14; 
+   CONN_4G	      = 15; 
+   CONN_RFU_16    = 16; 
+   CONN_RFU_17    = 17; 
+   CONN_RFU_18    = 18; 
+}
+enum SimCard {
+   SC_NONE        = 0;  
+   SC_PRIMARY     = 1;  
+   SC_SECONDARY   = 2;  
+   SC_RFU_03      = 3;  
+   SC_RFU_04      = 4;  
+   SC_RFU_05      = 5;  
+   SC_RFU_06      = 6;  
+   SC_RFU_07      = 7;  
+}
+enum BatteryState {
+   BATT_CHARGING     = 0;  
+   BATT_COMPLETE     = 1;  
+   BATT_FAULT        = 2;  
+   BATT_DISCHARGING  = 3;  
+   BATT_MISSING      = 4;  
+   BATT_IDLE         = 5;  
+   BATT_LOW_BATTERY  = 6;  
+   BATT_RFU_07       = 7;  
+   BATT_RFU_08       = 8;  
+   BATT_RFU_09       = 9;  
+   BATT_RFU_10      = 10; 
+   BATT_RFU_11       = 11; 
+}
+enum VehicleBatteryState {
+   VBS_UNKNOW                       = 0;  
+   VBS_12V_BATTERY_OK               = 1;  
+   VBS_12V_BATTERY_LOW              = 2;  
+   VBS_12V_ALTERNATOR_OK            = 3;  
+   VBS_12V_ALTERNATOR_UNDERVOLTAGE  = 4;  
+   VBS_12V_ALTERNATOR_OVERVOLTAGE   = 5;  
+   VBS_24V_BATTERY_OK               = 6;  
+   VBS_24V_BATTERY_LOW              = 7;  
+   VBS_24V_ALTERNATOR_OK            = 8;  
+   VBS_24V_ALTERNATOR_UNDERVOLTAGE  = 9;  
+   VBS_24V_ALTERNATOR_OVERVOLTAGE   = 10; 
+   VBS_RFU_11                       = 11; 
+   VBS_RFU_12                       = 12; 
+   VBS_RFU_13                       = 13; 
+   VBS_RFU_14                       = 14; 
+   VBS_RFU_15                       = 15; 
+}
+enum Registration {
+   REG_NOT_REGISTERED   = 0;  
+   REG_REGISTERED       = 1;  
+   REG_SEARCHING        = 2;  
+   REG_DENIED           = 3;  
+   REG_UNKNOWN          = 4;  
+   REG_ROAMING          = 5;  
+   REG_SMS_ONLY         = 6;  
+   REG_SMS_ONLY_ROAMING = 7;  
+   REG_EMERGENCY        = 8;  
+   REG_CSFB             = 9;  
+   REG_CSFB_ROAMING     = 10; 
+   REG_RFU_11           = 11; 
+   REG_RFU_12           = 12; 
+   REG_RFU_13           = 13; 
+   REG_RFU_14           = 14; 
+   REG_RFU_15           = 15; 
+}
+enum AlarmState {
+   ALM_ST_DEACTIVATED         = 0;   
+   ALM_ST_ACTIVATE_IN_PROCESS = 1;   
+   ALM_ST_ACTIVATED           = 2;   
+   ALM_ST_ALARM_IN_PROCESS    = 3;   
+   ALM_ST_ALARMED             = 4;   
+   ALM_ST_PARTIAL_ACTIVATED   = 5;   
+   ALM_RFU_06                 = 6;   
+   ALM_RFU_07                 = 7;   
+   ALM_RFU_08                 = 8;   
+   ALM_RFU_09                 = 9;   
+   ALM_RFU_10                 = 10;  
+}
+
+enum EmergencyState {
+   EME_ST_DEACTIVATED   = 0;  
+   EME_ST_ACTIVATED     = 1;  
+   EME_ST_FORCED        = 2;  
+   EME_ST_FORCED_GSM    = 3;  
+   EME_ST_FORCED_EA     = 4;  
+   EME_ST_RFU_05        = 5;  
+   EME_ST_RFU_06        = 6;  
+   EME_ST_RFU_07        = 7;  
+   EME_ST_RFU_08        = 8;  
+   EME_ST_RFU_09        = 9;  
+}
+enum PowerEvent {
+   PE_NONE                    = 0;  
+   PE_POWER_LOSS              = 1;  
+   PE_POWER_CHANGE_12V_TO_24V = 2;  
+   PE_POWER_CHANGE_24V_TO_12V = 3;  
+   PE_RFU_04                  = 4;  
+   PE_RFU_05                  = 5;  
+   PE_RFU_06                  = 6;  
+   PE_RFU_07                  = 7;  
+   PE_RFU_08                  = 8;  
+}
+enum TrackingType {
+   TT_NONE     = 0;  
+   TT_TRUCK    = 1;  
+   TT_CARGO    = 2;  
+   TT_RFU_03   = 3;  
+   TT_RFU_04   = 4;  
+   TT_RFU_05   = 5;  
+   TT_RFU_06   = 6;  
+   TT_RFU_07   = 7;  
+}
+enum PairingState {
+   PAS_NONE             = 0;  
+   PAS_DEVICE_NEAR      = 1;  
+   PAS_MOVING_TOGETHER  = 2;  
+   PAS_PAIRING_COMPLETE = 3;  
+   PAS_RFU_04           = 4;  
+   PAS_RFU_05           = 5;  
+   PAS_RFU_06           = 6;  
+   PAS_RFU_07           = 7;  
+   PAS_RFU_08           = 8;  
+}
+enum StreamControlInterval {
+   SCI_NONE             = 0;   
+   SCI_LAST_MINUTE      = 1;   
+   SCI_LAST_5MINUTES    = 2;   
+   SCI_LAST_HOUR        = 3;   
+   SCI_LAST_DAY         = 4;   
+   SCI_LAST_WEEK        = 5;   
+   SCI_LAST_MONTH       = 6;   
+   SCI_RFU_07           = 7;   
+   SCI_RFU_08           = 8;   
+   SCI_RFU_09           = 9;   
+   SCI_RFU_10           = 10;  
+   SCI_RFU_11           = 11;  
+   SCI_RFU_12           = 12;  
+   SCI_RFU_13           = 13;  
+   SCI_RFU_14           = 14;  
+   SCI_RFU_15           = 15;  
+   SCI_RFU_16           = 16;  
+}
+
+message DeviceEventsTransmissionMask {
+   optional uint32 configChanged   = 1;   
+   optional uint32 gpsFixed        = 2;   
+   optional uint32 ignition        = 3;   
+   optional uint32 panic           = 4;   
+   optional uint32 externalPower   = 5;   
+   optional uint32 gpsAntenna      = 6;   
+   optional uint32 battery         = 7;   
+   optional uint32 jamming         = 8;   
+   optional uint32 enterDeepSleep  = 9;   
+   optional uint32 lbsInfo         = 10;  
+   optional uint32 alarm           = 11;  
+   optional uint32 reconstruction  = 12;  
+   optional uint32 emergency       = 13;  
+   optional uint32 lowBattery      = 14;  
+   optional uint32 wifi            = 15;  
+   optional uint32 journey         = 16;  
+   optional uint32 input1          = 50;  
+   optional uint32 input2          = 51;  
+   optional uint32 input3          = 52;  
+   optional uint32 input4          = 53;  
+   optional uint32 input5          = 54;  
+   optional uint32 input6          = 55;  
+   optional uint32 input7          = 56;  
+   optional uint32 input8          = 57;  
+   optional uint32 input9          = 58;  
+   optional uint32 input10         = 59;  
+   optional uint32 input11         = 60;  
+   optional uint32 input12         = 61;  
+   optional uint32 input13         = 62;  
+   optional uint32 input14         = 63;  
+   optional uint32 input15         = 64;  
+   optional uint32 input16         = 65;  
+   optional uint32 maxioInput1     = 70;  
+   optional uint32 maxioInput2     = 71;  
+   optional uint32 maxioInput3     = 72;  
+   optional uint32 maxioInput4     = 73;  
+   optional uint32 output1         = 100; 
+   optional uint32 output2         = 101; 
+   optional uint32 output3         = 102; 
+   optional uint32 output4         = 103; 
+   optional uint32 output5         = 104; 
+   optional uint32 output6         = 105; 
+   optional uint32 output7         = 106; 
+   optional uint32 output8         = 107; 
+   optional uint32 maxioOutput1     = 110;  
+   optional uint32 maxioOutput2     = 111;  
+}
+message DeviceEventsDrvRequests {
+   optional DvrRequests configChanged   = 1;   
+   optional DvrRequests gpsFixed        = 2;   
+   optional DvrRequests ignition        = 3;   
+   optional DvrRequests panic           = 4;   
+   optional DvrRequests externalPower   = 5;   
+   optional DvrRequests gpsAntenna      = 6;   
+   optional DvrRequests battery         = 7;   
+   optional DvrRequests jamming         = 8;   
+   optional DvrRequests enterDeepSleep  = 9;   
+   optional DvrRequests lbsInfo         = 10;  
+   optional DvrRequests alarm           = 11;  
+   optional DvrRequests reconstruction  = 12;  
+   optional DvrRequests emergency       = 13;  
+   optional DvrRequests lowBattery      = 14;  
+   optional DvrRequests wifi            = 15;  
+   optional DvrRequests input1          = 50;  
+   optional DvrRequests input2          = 51;  
+   optional DvrRequests input3          = 52;  
+   optional DvrRequests input4          = 53;  
+   optional DvrRequests input5          = 54;  
+   optional DvrRequests input6          = 55;  
+   optional DvrRequests input7          = 56;  
+   optional DvrRequests input8          = 57;  
+   optional DvrRequests input9          = 58;  
+   optional DvrRequests input10         = 59;  
+   optional DvrRequests input11         = 60;  
+   optional DvrRequests input12         = 61;  
+   optional DvrRequests input13         = 62;  
+   optional DvrRequests input14         = 63;  
+   optional DvrRequests input15         = 64;  
+   optional DvrRequests input16         = 65;  
+   optional DvrRequests maxioInput1     = 70;  
+   optional DvrRequests maxioInput2     = 71;  
+   optional DvrRequests maxioInput3     = 72;  
+   optional DvrRequests maxioInput4     = 73;  
+   optional DvrRequests output1         = 100; 
+   optional DvrRequests output2         = 101; 
+   optional DvrRequests output3         = 102; 
+   optional DvrRequests output4         = 103; 
+   optional DvrRequests output5         = 104; 
+   optional DvrRequests output6         = 105; 
+   optional DvrRequests output7         = 106; 
+   optional DvrRequests output8         = 107; 
+   optional DvrRequests maxioOutput1    = 110; 
+   optional DvrRequests maxioOutput2    = 111; 
+}
+message DeviceEvents {
+   required DeviceEvent eventID   			= 1; 
+   optional DvrRequestsInfo dvrRequestsInfo = 2; 
+}
+message PowerEvents {
+   required PowerEvent eventID         = 1;  
+   optional uint32 duration            = 2;  
+   optional uint32 previousSpeed       = 3;  
+   optional uint32 startSpeed          = 4;  
+   optional uint32 finishSpeed         = 5;  
+   optional uint32 previousGpsSvn      = 6;  
+   optional uint32 startGpsSvn         = 7;  
+   optional uint32 finishGpsSvn        = 8;  
+   optional bool previousIsMoving      = 9;  
+   optional bool startIsMoving         = 10; 
+   optional bool finishIsMoving        = 11; 
+   optional uint32 dayMovements        = 12; 
+   optional uint32 eventMovements      = 13; 
+   optional uint32 dayHardMovements    = 14; 
+   optional uint32 eventHardMovements  = 15; 
+   optional int32 voltageGap           = 16; 
+}
+message Events {
+   repeated DeviceEvents device                 = 1; 
+   repeated TelemetryEvents telemetry           = 2; 
+   repeated GeographicEvents geographic         = 3; 
+   repeated EmbeddedActionEvents actions        = 4; 
+   repeated UserEvents user                     = 5; 
+   repeated PowerEvents power                   = 6; 
+   repeated DvrEvents dvr                       = 8; 
+   
+
+
+   repeated BeaconEvents beacon                 = 13; 
+}
+message JammingInfo {
+   optional uint32 previousGpsSvn         = 1;  
+   optional uint32 finishGpsSvn           = 2;  
+   optional uint32 previousGpsSnr         = 3;  
+   optional uint32 finishGpsSnr           = 4;  
+   optional uint32 previousGsmCsq         = 5;  
+   optional uint32 finishGsmCsq           = 6;  
+   optional uint32 previousGsmNextCells   = 7;  
+   optional uint32 finishGsmNextCells     = 8;  
+}
+message PositionInfo {
+   required PositionSource positionSource   = 1;  
+   required PositionFormat positionFormat   = 2;  
+   required sfixed32 latitude               = 3;  
+   required sfixed32 longitude              = 4;  
+   optional int32 altitude                  = 5;  
+   optional int32 estimatedPositionError    = 6;  
+   optional int32 directionDegrees          = 7;  
+   optional Heading directionHeading        = 8;  
+}
+message CellInfo {
+   optional uint32 mcc           = 1;  
+   optional uint32 mnc           = 2;  
+   optional uint32 lac           = 3;  
+   optional uint32 cellID        = 4;  
+   optional uint32 age           = 5;  
+   optional uint32 rxLevel       = 6;  
+   optional uint32 timingAdvance = 7;  
+   optional string mac           = 8;  
+   optional sfixed32 latitude    = 9;  
+   optional sfixed32 longitude   = 10; 
+}
+message IpAddress {
+   optional fixed32 ipv4               = 1; 
+   optional bytes ipv6                 = 2; 
+}
+message TimeZoneInfo {
+   optional uint64 localTime	 		   = 1; 
+   optional int32 actualTimeZoneAdjust	= 2; 
+   optional bool summerTime				= 3; 
+   optional bool winterTime				= 4; 
+}
+message WifiConnectionInfo {
+   optional bool connected               = 1; 
+   optional int32 rssi                   = 2; 
+   optional int32 snr                    = 3; 
+   optional uint32 channel               = 4; 
+   optional string mac                   = 5; 
+   optional string ssid                  = 6; 
+   optional IpAddress ip                 = 7; 
+   optional WiFiSecurity security        = 8; 
+   optional int32 quality                = 9; 
+}
+message EthernetConnectionInfo {
+   optional bool connected                   = 1; 
+   optional IpAddress ip                     = 2; 
+}
+message BluetoothConnectionInfo {
+   optional bool connected                   = 1; 
+
+}
+message StreamControl {
+   optional StreamControlInterval interval   = 1; 
+   optional uint64 begin                     = 2; 
+   optional uint64 end                       = 3; 
+   optional uint64 uploadData                = 4; 
+   optional uint64 downloadData              = 5; 
+   optional uint64 averageUploadRate         = 6; 
+   optional uint64 averageDownloadRate       = 7; 
+}
+message ConnectionInfo {
+   optional ConnectionType connectionType    = 1;  
+   optional bool jamming                     = 2;  
+   optional SimCard simCardInUse             = 3;  
+   optional uint32 csq                       = 4;  
+   optional uint32 csqLevel                  = 5;  
+   optional Registration currentRegistration = 6;  
+   optional CellInfo currentCell             = 7;  
+   repeated CellInfo lbs                     = 8;  
+   optional ConnectionState connectionState  = 9;  
+   optional int32 rssi                       = 10; 
+   optional int32 snr                        = 11; 
+   optional int32 rssiDevice                 = 12; 
+   optional int32 snrDevice                  = 13; 
+   optional JammingInfo jammingInfo          = 14; 
+   optional WifiConnectionInfo wifi          = 15; 
+   optional BluetoothConnectionInfo bluetooth= 16; 
+   optional EthernetConnectionInfo ethernet  = 17; 
+   optional IpAddress gprsIp                 = 18; 
+}
+message ModulesPowerControl {
+   optional bool dvr                = 1;  
+   optional bool wifi5g             = 2;  
+   optional bool wifi               = 3;  
+   optional bool cvCameras          = 4;  
+   optional bool outputStates       = 5;  
+   optional bool gprs               = 6;  
+   optional bool gps                = 7;  
+   optional bool loraGateway        = 8;  
+   optional bool lora               = 9;  
+   optional bool movementWakesUp    = 10;  
+   optional bool ignitionWakesUp    = 11;  
+   optional bool ble                = 12;  
+   optional bool can                = 13;  
+}
+
+message DeviceInfo {
+   optional bool extPowerState                        = 1;  
+   optional uint32 extPowerValue                      = 2;  
+   optional BatteryState battState                    = 3;  
+   optional uint32 battPercent                        = 4;  
+   optional uint32 battValue                          = 5;  
+   optional PowerState powerState                     = 6;  
+   optional bool primarySimCard                       = 7;  
+   optional bool secondarySimCard                     = 8;  
+   optional int32 temperature1                        = 9;  
+   optional uint32 uptime                             = 10; 
+   optional uint32 lifeTime                           = 11; 
+   optional uint32 battInUse                          = 12; 
+   optional ResetReason lastResetReason               = 13; 
+   optional uint32 geoObjectGroupID                   = 14; 
+   optional uint32 lastResetID                        = 15; 
+   optional VehicleBatteryState vehicleBatteryState   = 16; 
+   optional bool veryLowVoltage                       = 17; 
+   optional bool overloadRatioExceed                  = 18; 
+   optional int32 temperature2                        = 19; 
+   optional HdmiState hdmi1                           = 20; 
+   optional HdmiState hdmi2                           = 21; 
+   optional ModulesPowerControl modulesPowerInfo      = 22; 
+}
+message OperationalInfo {
+   optional bool panic                 = 1;  
+   optional AlarmState alarm           = 2;  
+   optional EmergencyState emergency   = 3;  
+   optional uint32 emergencyLoraIDCmd  = 4;  
+   optional TrackingType trackingType  = 5;  
+   optional PairingState pairing       = 6;  
+}
+message FlagsInfo {
+   optional DeviceInfo deviceInfo           = 1;  
+   optional ConnectionInfo connectionInfo   = 2;  
+   optional OperationalInfo operationalInfo = 3;  
+   repeated GeographicInfo geographicInfo   = 4;  
+   optional BeaconInfo beaconInfo           = 5;  
+}
+message ReferenceNumbers {
+   optional uint32 loraWANUpLinkCounter     = 1;  
+}
+message ReportAccessories {
+   optional uint64 deviceID               	= 1;  
+   optional IDPack identificationPack     	= 2;  
+   optional uint32 sequenceNumber         	= 3;  
+   optional ReportReason reason           	= 4;  
+   optional uint64 dateTime               	= 5;  
+   repeated PositionInfo positionInfo     	= 6;  
+   optional GpsInfo gps                   	= 7;  
+   optional IOsInfo ios                   	= 8;  
+   optional FlagsInfo flags               	= 9;  
+   optional TelemetryInfo telemetry       	= 10; 
+   optional Events events                 	= 11; 
+   optional ProductModel product          	= 12; 
+   optional DataTerminalInfo dataTerminal       = 13; 
+   optional DvrInfo dvr                         = 14; 
+   optional WiFiInfo wifi                       = 15; 
+
+   optional ComputerVisionInfo cvInfo           = 17; 
+   optional bytes openData                      = 18; 
+}
+message ReportData {
+   required uint32 sequenceNumber             = 1;  
+   required ReportReason reason               = 2;  
+   required uint64 dateTime                   = 3;  
+   repeated PositionInfo positionInfo         = 4;  
+   optional GpsInfo gps                       = 5;  
+   optional IOsInfo ios                       = 6;  
+   optional FlagsInfo flags                   = 7;  
+   optional TelemetryInfo telemetry           = 8;  
+   optional Events events                     = 9;  
+   optional bytes openData                    = 10; 
+   optional bytes reconstruction              = 11; 
+   repeated ReportAccessories accessories     = 12; 
+   repeated UserInfo user                     = 13; 
+   optional UartMode openDataMode             = 14; 
+   optional ReferenceNumbers referenceNumbers = 15; 
+   optional EmbeddedAction embeddedAction     = 16; 
+   optional uint64 superLogSequenceNumber     = 17; 
+   optional DataTerminalInfo dataTerminal     = 18; 
+   optional DvrInfo dvr                       = 19; 
+   optional WiFiInfo wifi                     = 20; 
+   optional JourneyInfo journey               = 21; 
+   optional TimeZoneInfo timezone             = 22; 
+   optional ComputerVisionInfo cvInfo         = 23; 
+   optional RouteInfo routeInfo               = 24; 
+   repeated ReportBeacons beacons             = 25; 
+   optional CustomerData customerData         = 128;
+}
+message IDPack {
+   optional uint64 imei                   = 1;  
+   optional uint64 ieee                   = 2;  
+   optional uint64 costumerID             = 3;  
+   optional uint64 vehicleID              = 4;  
+   optional bytes sessionID               = 5;  
+   optional uint32 loraP2pID              = 6;  
+   optional uint64 loraWanEUI             = 7;  
+   optional uint64 loraWanDeviceID        = 8;  
+   optional string deviceIDStr            = 9;  
+   optional bytes uniqueID                = 10; 
+   optional bool isValidDeviceID          = 11; 
+   optional ConnectionType connectionType = 13; 
+   optional uint64 sigfoxID               = 14; 
+   optional bytes  sigfoxPKey             = 15; 
+}
+message MultipleReportData {
+   required uint64 deviceID            = 1;     
+   required uint64 packetID            = 2;     
+   optional IDPack identificationPack  = 3;     
+   optional ReportData newReportData   = 4;     
+   repeated ReportData oldReportData   = 5;     
+   optional CustomerData customerData  = 128;   
+}
+message AccessoryStatus {
+   required uint64 deviceID                     = 1;  
+   optional IDPack identificationPack           = 3;  
+   optional uint64 dateTime                     = 4;  
+   repeated FileInfo files                      = 5;  
+   optional uint32 deviceType                   = 6;  
+   optional uint32 boardRevision                = 7;  
+   optional string macBT                        = 10; 
+   optional string macWIFI                      = 11; 
+   optional ResetReason lastResetReason         = 12; 
+   optional bool passwordRequired               = 13; 
+   optional VirtualIgnitionInfo virtualIgnition = 14; 
+   optional VehicleSignature vehicleSignature   = 18; 
+   optional ProductModel product                = 19; 
+   optional string macETH                       = 20; 
+   optional uint32 slotID                       = 21; 
+   optional string macWIFI5G                    = 22; 
+   optional DvrUploadStatus uploader            = 24; 
+   optional CVisionFaceRecInfo faceRecStatus    = 25; 
+}
+message ReportStatus {
+   required uint64 deviceID                     = 1;   
+   required uint64 commandID                    = 2;   
+   optional IDPack identificationPack           = 3;   
+   required uint64 dateTime                     = 4;   
+   repeated FileInfo files                      = 5;   
+   optional uint32 deviceType                   = 6;   
+   optional uint32 boardRevision                = 7;   
+   optional string primaryICCID                 = 8;   
+   optional string secondaryICCID               = 9;   
+   optional string macBT                        = 10;  
+   optional string macWIFI                      = 11;  
+   optional ResetReason lastResetReason         = 12;  
+   optional bool passwordRequired               = 13;  
+   optional VirtualIgnitionInfo virtualIgnition = 14;
+   optional DiagnosticPacket diagnosticPacket             = 15;//adicionado manualmente
+   optional uint64 loraID                       = 16;  
+   repeated AccessoryStatus accessories         = 17;  
+   optional VehicleSignature vehicleSignature   = 18;  
+   optional ProductModel product                = 19;  
+   optional string macETH                       = 20;  
+   optional MultiMediaStatus multimedia         = 21;  
+   optional string macWIFI5G                    = 22;  
+   repeated StreamControl gprsStream            = 23;  
+   optional DvrUploadStatus uploader            = 24;  
+   optional CustomerData customerData           = 128; 
+}

@@ -1,0 +1,22 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_filetransfer.proto";  /// $SUPPORTEDBY[MXT13X, MXT16X]
+import "maxpb_lora.proto";          /// $SUPPORTEDBY[MXT13X, MXT16X]
+import "maxpb_users.proto";         /// $SUPPORTEDBY[MXT13X, MXT16X]
+message FileEdit {
+   required uint64 deviceID               = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X]
+   required uint64 commandID              = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X]
+   required FileType fileType             = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X]
+   optional UserLibrayEdit userEdit       = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X]
+   optional LoraActionsFileEdit loraEdit  = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X]
+}
+message FileEditResult {
+   required uint64 deviceID         = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X]
+   required uint64 commandID        = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X]
+   optional uint32 addSuccess       = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X]
+   optional uint32 addFail          = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X]
+   optional uint32 deleteSuccess    = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X]
+   optional uint32 deleteFail       = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X]
+   optional uint32 replaceSuccess   = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X]
+   optional uint32 replaceFail      = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X]
+}

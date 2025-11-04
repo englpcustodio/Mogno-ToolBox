@@ -1,0 +1,329 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_gps.proto";        /// $SUPPORTEDBY[]
+import "maxpb_interfaces.proto"; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX]
+import "maxpb_telemetry.proto";  /// $SUPPORTEDBY[]
+enum VehicleBrand {
+   VB_NONE            = 0;
+   VB_ACURA           = 1;
+   VB_AGRALE          = 2;
+   VB_ALFA_ROMEO      = 3;
+   VB_AM_GEN          = 4;
+   VB_ASIA_MOTORS     = 5;
+   VB_ASTON_MARTIN    = 6;
+   VB_AUDI            = 7;
+   VB_BMW             = 8;
+   VB_BRM             = 9;
+   VB_BUGGY           = 10;
+   VB_BUGRE           = 11;
+   VB_CADILLAC        = 12;
+   VB_CATTERPILLAR    = 13;
+   VB_CBT_JIPE        = 14;
+   VB_CHANA           = 15;
+   VB_CHANGAN         = 16;
+   VB_CHERY           = 17;
+   VB_CHEVROLET       = 18;
+   VB_CHRYSLER        = 19;
+   VB_CICCOBUS        = 20;
+   VB_CITROEN         = 21;
+   VB_CROSS_LANDER    = 22;
+   VB_DAEWOO          = 23;
+   VB_DAF             = 24;
+   VB_DAIHATSU        = 25;
+   VB_DAIMLER         = 26;
+   VB_DODGE           = 27;
+   VB_EFFA            = 28;
+   VB_EFFA_JMC        = 29;
+   VB_ENGESA          = 30;
+   VB_ENVEMO          = 31;
+   VB_FERRARI         = 32;
+   VB_FIAT            = 33;
+   VB_FIATALLIS       = 34;
+   VB_FIBRAVAN        = 35;
+   VB_FORD            = 36;
+   VB_FOTON           = 37;
+   VB_FYBER           = 38;
+   VB_GEELY           = 39;
+   VB_GMC             = 40;
+   VB_GREAT_WALL      = 41;
+   VB_GURGEL          = 42;
+   VB_HAFEI           = 43;
+   VB_HONDA           = 44;
+   VB_HYUNDAI         = 45;
+   VB_ISUZU           = 46;
+   VB_IVECO           = 47;
+   VB_JAC             = 48;
+   VB_JAGUAR          = 49;
+   VB_JEEP            = 50;
+   VB_JINBEI          = 51;
+   VB_JOHN_DEERE      = 52;
+   VB_JPX             = 53;
+   VB_KIA             = 54;
+   VB_LADA            = 55;
+   VB_LAMBORGHINI     = 56;
+   VB_LAND_ROVER      = 57;
+   VB_LEXUS           = 58;
+   VB_LIFAN           = 59;
+   VB_LOBINI          = 60;
+   VB_LOTUS           = 61;
+   VB_MACK            = 62;
+   VB_MAHINDRA        = 63;
+   VB_MAN             = 64;
+   VB_MARCOPOLO       = 65;
+   VB_MASCARELLO      = 66;
+   VB_MASERATI        = 67;
+   VB_MATRA           = 68;
+   VB_MAXIBUS         = 69;
+   VB_MAZDA           = 70;
+   VB_MERCEDES_BENZ   = 71;
+   VB_MERCURY         = 72;
+   VB_MG              = 73;
+   VB_MINI            = 74;
+   VB_MITSUBISHI      = 75;
+   VB_MIURA           = 76;
+   VB_NAVISTAR        = 77;
+   VB_NEOBUS          = 78;
+   VB_NISSAN          = 79;
+   VB_PEUGEOT         = 80;
+   VB_PLYMOUTH        = 81;
+   VB_PONTIAC         = 82;
+   VB_PORSCHE         = 83;
+   VB_PUMA_ALFA       = 84;
+   VB_RAM             = 85;
+   VB_RELY            = 86;
+   VB_RENAULT         = 87;
+   VB_ROLLS_ROYCE     = 88;
+   VB_ROVER           = 89;
+   VB_SAAB            = 90;
+   VB_SAAB_SCANIA     = 91;
+   VB_SATURN          = 92;
+   VB_SCANIA          = 93;
+   VB_SEAT            = 94;
+   VB_SHACMAN         = 95;
+   VB_SHINERAY        = 96;
+   VB_SINOTRUK        = 97;
+   VB_SMART           = 98;
+   VB_SSANGYONG       = 99;
+   VB_SUBARU          = 100;
+   VB_SUZUKI          = 101;
+   VB_TAC             = 102;
+   VB_TOYOTA          = 103;
+   VB_TROLLER         = 104;
+   VB_VDL             = 105;
+   VB_VOLKSWAGEN      = 106;
+   VB_VOLVO           = 107;
+   VB_WAKE            = 108;
+   VB_WALK            = 109;
+   VB_WALKBUS         = 110;
+}
+enum InformationCode  {
+   IC_NONE                          = 0;  /// $SUPPORTEDBY[MAXIO]
+   IC_ODOMETER                      = 1;  /// $SUPPORTEDBY[MAXIO]
+   IC_SPEED                         = 2;  /// $SUPPORTEDBY[MAXIO]
+   IC_RPM                           = 3;  /// $SUPPORTEDBY[MAXIO]
+   IC_FUEL_LEVEL_1                  = 4;  /// $SUPPORTEDBY[MAXIO]
+   IC_FUEL_LEVEL_2                  = 5;  /// $SUPPORTEDBY[MAXIO]
+   IC_FUEL_CONSUMPTION              = 6;  /// $SUPPORTEDBY[MAXIO]
+   IC_INTAKE_AIR_TEMPERATURE        = 7;  /// $SUPPORTEDBY[MAXIO]
+   IC_INTAKE_AIR_FLOW               = 8;  /// $SUPPORTEDBY[MAXIO]
+   IC_THROTTLE_POSITION             = 9;  /// $SUPPORTEDBY[MAXIO]
+   IC_BAROMETRIC_PRESSURE           = 10; /// $SUPPORTEDBY[MAXIO]
+   IC_AIR_TEMPERATURE               = 11; /// $SUPPORTEDBY[MAXIO]
+   IC_FUEL_TYPE                     = 12; /// $SUPPORTEDBY[MAXIO]
+   IC_ETHANOL_RATIO                 = 13; /// $SUPPORTEDBY[MAXIO]
+   IC_OIL_TEMPERATURE               = 14; /// $SUPPORTEDBY[MAXIO]
+   IC_ENGINE_TEMPERATURE            = 15; /// $SUPPORTEDBY[MAXIO]
+   IC_ENGINE_REFERENCE_TORQUE       = 16; /// $SUPPORTEDBY[MAXIO]
+   IC_ENGINE_FUEL_RATE              = 17; /// $SUPPORTEDBY[MAXIO]
+   IC_CURRENT_GEAR                  = 18; /// $SUPPORTEDBY[MAXIO]
+   IC_CLUTCH                        = 19; /// $SUPPORTEDBY[MAXIO]
+   IC_NORMAL_BRAKE                  = 20; /// $SUPPORTEDBY[MAXIO]
+   IC_PARKING_BRAKE                 = 21; /// $SUPPORTEDBY[MAXIO]
+   IC_MOTOR_BRAKE                   = 22; /// $SUPPORTEDBY[MAXIO]
+   IC_WINDOW_WIPERS                 = 23; /// $SUPPORTEDBY[MAXIO]
+   IC_DOOR_CLOSED                   = 24; /// $SUPPORTEDBY[MAXIO]
+   IC_DOOR_LOCKED                   = 25; /// $SUPPORTEDBY[MAXIO]
+   IC_TRUNK_CLOSED                  = 26; /// $SUPPORTEDBY[MAXIO]
+   IC_SEAT_BELT                     = 27; /// $SUPPORTEDBY[MAXIO]
+   IC_HEAD_LIGHTS                   = 28; /// $SUPPORTEDBY[MAXIO]
+   IC_MALFUNCTION_INDICATOR_LAMP    = 29; /// $SUPPORTEDBY[MAXIO]
+   IC_TRACTION_STATE                = 30; /// $SUPPORTEDBY[MAXIO]
+   IC_ODOMETER_SPEED_RPM            = 31; /// $SUPPORTEDBY[MAXIO]
+}
+enum CANTestType{
+   CT_NONE              = 0;/// $SUPPORTEDBY[MAXIO]
+   CT_GET_CAR_INFO      = 1;/// $SUPPORTEDBY[MAXIO]
+   CT_ACQUIRE_CAN_DATA  = 2;/// $SUPPORTEDBY[MAXIO]
+   CT_TEST_CAN_LIB     =  3;/// $SUPPORTEDBY[MAXIO]
+}
+enum OBDDiagnosticChannel {
+   OCT_NONE          = 0;  /// $SUPPORTEDBY[MAXIO]
+   OCT_CAN           = 1;  /// $SUPPORTEDBY[MAXIO]
+   OCT_KLINE         = 2;  /// $SUPPORTEDBY[MAXIO]
+   OCT_CAN_AND_KLINE = 3;  /// $SUPPORTEDBY[MAXIO]
+   OCT_OTHER         = 4;  /// $SUPPORTEDBY[MAXIO]
+}
+enum CarLocation {
+   CL_NONE           = 0;/// $SUPPORTEDBY[]
+   CL_REAR_LEFT      = 1;/// $SUPPORTEDBY[]
+   CL_REAR_RIGHT     = 2;/// $SUPPORTEDBY[]
+   CL_FRONT_LEFT     = 3;/// $SUPPORTEDBY[]
+   CL_FRONT_RIGHT    = 4;/// $SUPPORTEDBY[]
+   CL_REAR           = 5;/// $SUPPORTEDBY[]
+   CL_FRONT          = 6;/// $SUPPORTEDBY[]
+}
+enum SpeedStep {
+   SS_NONE           = 0; /// $SUPPORTEDBY[]
+   SS_SPEED_1        = 1; /// $SUPPORTEDBY[]
+   SS_SPEED_2        = 2; /// $SUPPORTEDBY[]
+   SS_SPEED_3        = 3; /// $SUPPORTEDBY[]
+   SS_SPEED_4        = 4; /// $SUPPORTEDBY[]
+   SS_SPEED_5        = 5; /// $SUPPORTEDBY[]
+   SS_SPEED_6        = 6; /// $SUPPORTEDBY[]
+   SS_SPEED_7        = 7; /// $SUPPORTEDBY[]
+   SS_SPEED_8        = 8; /// $SUPPORTEDBY[]
+   SS_SPEED_9        = 9; /// $SUPPORTEDBY[]
+   SS_SPEED_10       = 10;/// $SUPPORTEDBY[]
+}
+enum GearStep {
+   GEAR_STEP_NONE          = 0;  /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_1        = 1;  /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_2        = 2;  /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_3        = 3;  /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_4        = 4;  /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_5        = 5;  /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_6        = 6;  /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_7        = 7;  /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_8        = 8;  /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_9        = 9;  /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_10       = 10; /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_11       = 11; /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_12       = 12; /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_13       = 13; /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_14       = 14; /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_15       = 15; /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_16       = 16; /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_17       = 17; /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_18       = 18; /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_19       = 19; /// $SUPPORTEDBY[]
+   GEAR_STEP_GEAR_20       = 20; /// $SUPPORTEDBY[]
+   GEAR_STEP_REVERSE       = 127;/// $SUPPORTEDBY[]
+}
+message CANIDSample {
+   required uint32  id             = 1;/// $SUPPORTEDBY[]
+   required uint32  uptime         = 2;/// $SUPPORTEDBY[]
+   required uint32  period         = 3;/// $SUPPORTEDBY[]
+   required uint32  canPeriod      = 4;/// $SUPPORTEDBY[]
+   repeated bytes   samples        = 5;/// $SUPPORTEDBY[]
+}
+message OBDIDSample {
+   required uint32  uptime          = 2;/// $SUPPORTEDBY[]
+   required uint32  period          = 3;/// $SUPPORTEDBY[]
+   repeated uint64  convertedValues = 5;/// $SUPPORTEDBY[]
+}
+message GPSSample {
+   required FixState fixState     = 1;/// $SUPPORTEDBY[]
+   required float    hdop         = 2;/// $SUPPORTEDBY[]
+   required double   latitude     = 3;/// $SUPPORTEDBY[]
+   required double   longitude    = 4;/// $SUPPORTEDBY[]
+   required float    direction    = 5;/// $SUPPORTEDBY[]
+   required float    speed        = 6;/// $SUPPORTEDBY[]
+}
+message DigitalTestCondition {
+   optional bool           digitalState                    = 1;/// $SUPPORTEDBY[]
+   optional CarLocation    carLocation                     = 2;/// $SUPPORTEDBY[]
+   optional SpeedStep      speedStep                       = 3;/// $SUPPORTEDBY[]
+   optional GearStep       gearStep                        = 4;/// $SUPPORTEDBY[]
+   optional TractionState  tractionState                   = 5;/// $SUPPORTEDBY[]
+}
+message TestCondition {
+   optional DigitalTestCondition    digitalTestCondition   = 1;/// $SUPPORTEDBY[]
+   optional uint64                  integerAnalogValue     = 2;/// $SUPPORTEDBY[]
+   optional float                   floatPointAnalogValue  = 3;/// $SUPPORTEDBY[]
+}
+message CarInfo {
+   required uint64                  initialDatetime        = 1;/// $SUPPORTEDBY[]
+   required VehicleBrand            vehicleBrand           = 2;/// $SUPPORTEDBY[]
+   required string                  vehicleModel           = 3;/// $SUPPORTEDBY[]
+   optional string                  vehicleSubmodel        = 4;/// $SUPPORTEDBY[]
+   required uint32                  manufacturingYear      = 5;/// $SUPPORTEDBY[]
+   required uint32                  modelYear              = 6;/// $SUPPORTEDBY[]
+   required CanBitRate              canBitRate             = 7;/// $SUPPORTEDBY[]
+   required OBDDiagnosticChannel    obdChannelType         = 8;/// $SUPPORTEDBY[]
+   optional string                  VIN                    = 9;/// $SUPPORTEDBY[]
+}
+message CanDataAcquisition {
+   required uint64            beginDatetime                = 1;/// $SUPPORTEDBY[]
+   required InformationCode   informationCode              = 2;/// $SUPPORTEDBY[]
+   required uint32            totalTime                    = 3;/// $SUPPORTEDBY[]
+   optional TestCondition     testCondition                = 4;/// $SUPPORTEDBY[]
+   optional string            observations                 = 5;/// $SUPPORTEDBY[]
+   repeated CANIDSample       canIDSamples                 = 6;/// $SUPPORTEDBY[]
+   repeated OBDIDSample       obdIDSamples                 = 7;/// $SUPPORTEDBY[]
+   repeated GPSSample         gpsSamples                   = 8;/// $SUPPORTEDBY[]
+}
+message AcquisitionFile {
+   required CarInfo              carInfo                   = 1;/// $SUPPORTEDBY[]
+   repeated CanDataAcquisition   canDataAcquisitions       = 2;/// $SUPPORTEDBY[]
+   optional string               finalObservations         = 3;/// $SUPPORTEDBY[]
+}
+message CanLibAcquisitionTest {
+   required uint64            deviceID                     = 1;/// $SUPPORTEDBY[MAXIO]
+   required uint64            commandID                    = 2;/// $SUPPORTEDBY[MAXIO]
+   required bool              state                        = 3;/// @exclude $SUPPORTEDBY[MAXIO]  $DESCRIPTION_ENGLISH[1 - start, 0 - finish]
+   required CANTestType       testType                     = 4;/// $SUPPORTEDBY[MAXIO]
+   optional InformationCode   informationCode              = 5;/// $SUPPORTEDBY[MAXIO]
+   optional bool              useOBD                       = 6;/// $SUPPORTEDBY[MAXIO]
+   optional uint32            totalTestTime                = 7;/// @exclude $SUPPORTEDBY[MAXIO]  $DESCRIPTION_ENGLISH[Total test time in milliseconds]
+   optional uint32            acquisitionPeriod            = 8;/// @exclude $SUPPORTEDBY[MAXIO]  $DESCRIPTION_ENGLISH[Acquisition period in milliseconds]
+}
+message VehicleCanInfo {
+   required CanBitRate              canBitRate             = 1;/// $SUPPORTEDBY[MAXIO]
+   required OBDDiagnosticChannel    obdChannelType         = 2;/// $SUPPORTEDBY[MAXIO]
+   required uint32                  qtdIds                 = 3;/// $SUPPORTEDBY[MAXIO]
+   optional bytes                   VIN                    = 4;/// $SUPPORTEDBY[MAXIO]
+   repeated InformationCode         infosWithObd           = 5;/// $SUPPORTEDBY[MAXIO] $DESCRIPTION_ENGLISH[Infos that has avaliable OBD PID]
+}
+message ReportCanData {
+   required uint32          uptime           = 1;/// $SUPPORTEDBY[MAXIO]
+   optional VehicleCanInfo  canInfo          = 2;/// $SUPPORTEDBY[MAXIO]
+   optional uint64          obdValue         = 3;/// $SUPPORTEDBY[MAXIO]
+   repeated CanLogData      canLogData       = 4;/// $SUPPORTEDBY[MAXIO]
+   
+   optional bool            testResult       = 5;/// $SUPPORTEDBY[MAXIO]
+   optional uint32          testProgress     = 6;/// $SUPPORTEDBY[MAXIO]
+   optional string          testMessage      = 7;/// $SUPPORTEDBY[MAXIO]
+   
+   optional uint64          obdValueRPM      = 8;/// $SUPPORTEDBY[MAXIO]
+   optional uint64          obdValueSpeed    = 9;/// $SUPPORTEDBY[MAXIO]
+   optional uint64          obdValueOdometer = 10;/// $SUPPORTEDBY[MAXIO]
+}
+message CanLogData {
+   required uint32 id        = 1;/// $SUPPORTEDBY[MAXIO]
+   required uint32 timestamp = 2;/// $SUPPORTEDBY[MAXIO]
+   required uint32 period    = 3;/// $SUPPORTEDBY[MAXIO]
+   required bytes  busData   = 4;/// $SUPPORTEDBY[MAXIO]
+}
+/// This messaged is used to report the vehicle signature and ask a library that fits
+message VehicleSignature {
+   optional CanBitRate bitRate         = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX]
+   optional bytes vehicleKey           = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX]
+}
+message CanLib {
+   optional string description         = 1; /// $SUPPORTEDBY[MTC8XX]
+   repeated uint32 years               = 2; /// $SUPPORTEDBY[MTC8XX]
+   optional bytes content              = 3; /// $SUPPORTEDBY[MTC8XX]
+   optional uint64 fileId              = 4; /// $SUPPORTEDBY[MTC8XX]
+   optional uint32 fileCrc32           = 5; /// $SUPPORTEDBY[MTC8XX]
+}
+message Model {
+   optional string description         = 1; /// $SUPPORTEDBY[MTC8XX]
+   repeated CanLib libs                = 2; /// $SUPPORTEDBY[MTC8XX]
+}
+message Manufacture {
+   optional string description         = 1; /// $SUPPORTEDBY[MTC8XX]
+   repeated Model models               = 2; /// $SUPPORTEDBY[MTC8XX]
+}
+message CanLibs {
+   repeated Manufacture manufactures   = 1; /// $SUPPORTEDBY[MTC8XX]
+}

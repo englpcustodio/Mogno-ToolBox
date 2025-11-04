@@ -1,0 +1,25 @@
+syntax = "proto2";
+
+message UltimoMotoristaIdentificado {
+
+	required string serial = 1;
+	optional string identificador = 2;
+	optional int64 data_identificacao = 3;
+	optional int32 motoristaid = 4;
+	optional string motorista_nome = 5;
+
+	enum IdentificacaoCondutorForma {
+		IBUTTON = 0;
+		CHAVEIRO_WIRELESS = 1;
+		CARTAO_RFID = 2;
+		MOTORISTA_PADRAO = 3;
+	}
+
+	enum IdentificadorCondutorJornada {
+		NAO_ESPECIFICADO = 0; INICIO_JORNADA = 1; FIM_JORNADA = 2; TIMEOUT = 3;
+	}
+
+	optional IdentificacaoCondutorForma forma = 6;
+	optional IdentificadorCondutorJornada idcondutorjornada = 7;
+	optional string idcliente = 8;
+}

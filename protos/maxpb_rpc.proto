@@ -1,0 +1,8 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_network.proto";          /// $SUPPORTEDBY[A6X, MTC8XX, TD80, AS80]
+message RpcChannel {
+  optional Network networkChannel       = 1;  /// $SUPPORTEDBY[A6X, MTC8XX, TD80, AS80] $DESCRIPTION_ENGLISH[]
+  optional string host                  = 2;  /// $SUPPORTEDBY[MTC8XX]
+  optional uint32 port                  = 3;  /// $SUPPORTEDBY[MTC8XX]
+}

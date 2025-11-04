@@ -1,0 +1,46 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_report.proto"; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2]
+enum Network {
+   N_BROADCAST       = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]
+   N_TRACKER         = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]
+   N_RS485A          = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80, AS80]
+   N_RS485B          = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, TD80, AS80]
+   N_RS232A          = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, MTC8XX, DLR, A6X, TD80]
+   N_RS232B          = 5;  /// $SUPPORTEDBY[]
+   N_WIFI            = 6;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, A90, MAXIO2]
+   N_GSM_GPRS        = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]
+   N_CAN1            = 8;  /// $SUPPORTEDBY[]
+   N_CAN2            = 9;  /// $SUPPORTEDBY[]
+   N_USB             = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR]
+   N_ZIGBEE          = 11; /// $SUPPORTEDBY[A6X]
+   N_LORA_P2P        = 12; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]
+   N_SATELLITE_IDP   = 13; /// $SUPPORTEDBY[]
+   N_SATELLITE       = 14; /// $SUPPORTEDBY[]
+   N_LUA             = 15; /// $SUPPORTEDBY[]
+   N_BLUETOOTH       = 16; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, A6X, MTC8XX, DLR, A90, MAXIO2]
+   N_UDP             = 17; /// $SUPPORTEDBY[]
+   N_CLOUD           = 18; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]
+   N_LORA_WAN        = 19; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]
+   N_ETHERNET        = 20; /// $SUPPORTEDBY[MTC8XX, DLR]
+   N_MQTT            = 21; /// $SUPPORTEDBY[MTC8XX, DLR]
+   N_RFU_01          = 22; /// $SUPPORTEDBY[]
+   N_RFU_02          = 23; /// $SUPPORTEDBY[]
+   N_RFU_03          = 24; /// $SUPPORTEDBY[]
+   N_RFU_04          = 25; /// $SUPPORTEDBY[]
+   N_RFU_05          = 26; /// $SUPPORTEDBY[]
+   N_RFU_06          = 27; /// $SUPPORTEDBY[]
+   N_RFU_07          = 28; /// $SUPPORTEDBY[]
+   N_RFU_08          = 29; /// $SUPPORTEDBY[]
+   N_RFU_09          = 30; /// $SUPPORTEDBY[]
+}
+message Routing {
+   optional Network fromNetwork  = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2]
+   optional Network toNetwork    = 64; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2]
+}
+message RoutePack {
+   required uint32 deviceID            = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2]
+   optional IDPack identificationPack  = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2]
+   required Routing route              = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2]
+   required bytes   data               = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2]
+}

@@ -1,0 +1,18 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+message CdlQueue {
+}
+message CdlItemBuffer {
+}
+message RfidItem {
+}
+message GPS_STORED {
+}
+message GSR_ACCVECTOR {
+}
+message DL_FILE_T {
+}
+message OUTPUT_CTRL {
+}
+message BlackBoxInfo {
+}

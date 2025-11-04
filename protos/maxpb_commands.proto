@@ -1,0 +1,335 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_customer_data.proto"; /// $SUPPORTEDBY[]
+import "maxpb_gpio.proto";          /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, A40, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+import "maxpb_report.proto";        /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MAXIO, A6X, MTC8XX, DLR, FINDER, TD80, AS80, A90, MAXIO2]
+import "maxpb_network.proto";       /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]
+import "maxpb_interfaces.proto";    /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A6X, MTC8XX, DLR]
+/// Describes the Nack codes provided from device
+enum NackCodes {
+   NACK_PACK_FORMAT           = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, FINDER, MTC8XX_MCU, TD80, AS80, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE] $DESCRIPTION[Tamanho ou cabeçalho não encontrado] $DESCRIPTION_ENGLISH[Do not find the size or header while it is waiting]
+   NACK_PACK_CRC              = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, FINDER, MTC8XX_MCU, TD80, AS80, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE] $DESCRIPTION[CRC inválido, mesmo contendo informação de tamanho correta] $DESCRIPTION_ENGLISH[Wrong package CRC, even with the right size]
+   NACK_PACK_DECODE           = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, FINDER, MTC8XX_MCU, TD80, AS80, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE] $DESCRIPTION[Falha ao decodificar o protobuf por algum tipo de mensagem] $DESCRIPTION_ENGLISH[Failed to decode a protobuf for some message type]
+   NACK_MT                    = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, FINDER, MTC8XX_MCU, TD80, AS80, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE] $DESCRIPTION[Tipo da mensagem não implementada] $DESCRIPTION_ENGLISH[Not implemented message type]
+   NACK_PACK_DATA             = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, FINDER, MTC8XX_MCU, TD80, AS80, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE] $DESCRIPTION[Dados do pacote inválido] $DESCRIPTION_ENGLISH[Wrong package data]
+   NACK_CMD_EXEC_ERR          = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, FINDER, MTC8XX_MCU, TD80, AS80, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE] $DESCRIPTION[Erro na execução do comando] $DESCRIPTION_ENGLISH[Error in command execution]
+   NACK_BUSY                  = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, FINDER, MTC8XX_MCU, TD80, AS80, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE] $DESCRIPTION[Dispositivo ocupado] $DESCRIPTION_ENGLISH[Device is busy]
+   NACK_INVALID_PASSWORD      = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A40, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Senha enviada incorreta] $DESCRIPTION_ENGLISH[Invalid password sent]
+   NACK_INVALID_FIRMWARE      = 8;  /// $SUPPORTEDBY[MAXIO, A40, A6X, TD80, A90, MAXIO2] $DESCRIPTION[@deprecated Firmware inválido enviado] $DESCRIPTION_ENGLISH[@deprecated Invalid firmware sent]
+   NACK_FILE_CRC              = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, FINDER, TD80, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[@deprecated Arquivo CRC inválido]$DESCRIPTION_ENGLISH[@deprecated Wrong file CRC]
+   NACK_LOCKED                = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A40, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2] $DESCRIPTION[Dispositivo está bloqueado por senha] $DESCRIPTION_ENGLISH[Device is locked by password]
+   NACK_MULTIPLE_REPORT_DATA  = 11; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A40, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Multiplos dados enviados] $DESCRIPTION_ENGLISH[Wrong data on multiple report data]
+   NACK_LORA_DATA             = 12; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A40, A6X, MTC8XX, DLR, FINDER, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Informação inválida no pacote LoRa] $DESCRIPTION_ENGLISH[Wrong data on lora packet data]
+   NACK_RFU_01                = 13; /// $SUPPORTEDBY[]
+   NACK_RFU_02                = 14; /// $SUPPORTEDBY[]
+   NACK_RFU_03                = 15; /// $SUPPORTEDBY[]
+   NACK_RFU_04                = 16; /// $SUPPORTEDBY[]
+   NACK_RFU_05                = 17; /// $SUPPORTEDBY[]
+}
+enum PasswordType {
+   PT_SMS      = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2] $DESCRIPTION[Senha necessária para enviar SMS] $DESCRIPTION_ENGLISH[Password necessary for sending SMS]
+   PT_DTMF     = 1;  /// $SUPPORTEDBY[] $DESCRIPTION[Senha necessária para DTMF] $DESCRIPTION_ENGLISH[Password necessary for DTMF]
+   PT_MAXPB    = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Senha necessária para desbloquear acesso binário] $DESCRIPTION_ENGLISH[Password necessary for unlocking binary access]
+   PT_CONSOLE  = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2] $DESCRIPTION[Senha necessária para desbloquear acesso ao terminal] $DESCRIPTION_ENGLISH[Password necessary for unlocking terminal access]
+   PT_RFU_01   = 4;  /// $SUPPORTEDBY[]
+   PT_RFU_02   = 5;  /// $SUPPORTEDBY[]
+   PT_RFU_03   = 6;  /// $SUPPORTEDBY[]
+   PT_RFU_04   = 7;  /// $SUPPORTEDBY[]
+   PT_RFU_05   = 8;  /// $SUPPORTEDBY[]
+}
+/// Describes which information is requested
+enum LogSystem {
+   LS_POSITIONS                  = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Solicita informação de posição a memória do dispositivo.] $DESCRIPTION_ENGLISH[Request position data from device memory.]
+   LS_BLACKBOX                   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, MOBILE_PHONE] $DESCRIPTION[Solicita informações de Blackbox a memória do dispositivo.] $DESCRIPTION_ENGLISH[Request blackbox data from device memory.]
+   LS_LORA                       = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Solicita informações de LoRa a memória do dispositivo.] $DESCRIPTION_ENGLISH[Request lora data from device memory.]
+   LS_ACCELEROMETER_EVENT_DETAIL = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, MOBILE_PHONE] $DESCRIPTION[Solicita eventos detalhados do acelerômetro a memória do dispositivo.] $DESCRIPTION_ENGLISH[Request detailed accelerometer events from memory.]
+   LS_RFU_01                     = 4;  /// $SUPPORTEDBY[]
+   LS_RFU_02                     = 5;  /// $SUPPORTEDBY[]
+   LS_RFU_03                     = 6;  /// $SUPPORTEDBY[]
+   LS_RFU_04                     = 7;  /// $SUPPORTEDBY[]
+   LS_RFU_05                     = 8;  /// $SUPPORTEDBY[]
+}
+/// Used to identify on commands that don't have payload. Used to send a command without parameter
+message BasicCommand {
+   required uint64 deviceID   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, FINDER, MTC8XX_MCU, TD80, AS80, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE] $DESCRIPTION[Id do equipamento] $DESCRIPTION_ENGLISH[Device ID]
+   required uint64 commandID  = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, FINDER, MTC8XX_MCU, TD80, AS80, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE] $DESCRIPTION[Id do comando] $DESCRIPTION_ENGLISH[Command ID]
+}
+/// Used to send a command together with the ack packet
+message Command {
+   required uint32 messageType   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, DLR, FINDER, TD80, A90, MAXIO2, MOBILE_PHONE]
+   optional bytes  commandData   = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, DLR, FINDER, TD80, A90, MAXIO2, MOBILE_PHONE]
+}
+/// MT 0x0002 Used to send a command response ack
+message Ack {
+   required uint64 deviceID            = 1;     /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, FINDER, MTC8XX_MCU, TD80, AS80, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE]
+   required uint64 commandID           = 2;     /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, FINDER, MTC8XX_MCU, TD80, AS80, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE]
+   optional Command newCommand         = 3;     /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2, MOBILE_PHONE]
+   optional CustomerData customerData  = 128;   /// $SUPPORTEDBY[] $DESCRIPTION[Informações adicionais inclusas pelo gateway] $DESCRIPTION_ENGLISH[Additional data add by gateway]
+}
+/// MT 0x0003 Command response
+message Nack {
+   required uint64 deviceID            = 1;     /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, FINDER, MTC8XX_MCU, TD80, AS80, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE]
+   required uint64 commandID           = 2;     /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, FINDER, MTC8XX_MCU, TD80, AS80, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE]
+   required NackCodes code             = 3;     /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A40, A6X, MTC8XX, DLR, FINDER, MTC8XX_MCU, TD80, AS80, A90, MAXIO2, MAXIO2_MCU, MOBILE_PHONE] $DESCRIPTION[Motivo do nack] $DESCRIPTION_ENGLISH[Nack reason]
+   optional CustomerData customerData  = 128;   /// $SUPPORTEDBY[] $DESCRIPTION[Informações adicionais inclusas pelo gateway] $DESCRIPTION_ENGLISH[Additional data add by gateway]
+}
+/// MT 0x0005 Request Data Log stored on flash (position discharge)
+message ReportDataLog {
+   required uint64 deviceID      = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]
+   required uint64 commandID     = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]
+   optional uint32 fromSequence  = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Informa o índice inicial do log da requisição de informações] $DESCRIPTION_ENGLISH[Inform start index of request data log]
+   optional uint32 toSequence    = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Informa o índice final do log da requisição de informações] $DESCRIPTION_ENGLISH[Inform end index of request data log]
+   optional Network destination  = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]
+   optional LogSystem logSystem  = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]
+}
+/// MT 0x0017 Write Raw Data on RS232 Port, port must be configured to UM_RAW_DATA mode
+message WriteRs232 {
+   required uint64 deviceID      = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, TD80]
+   required uint64 commandID     = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, TD80]
+   required bytes rawData        = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, TD80]
+}
+/// MT 0x0018 Add open data to position
+message OpenDataAdd {
+   required uint64 deviceID       = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR]
+   required uint64 commandID      = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR]
+   required bytes openData        = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR] $DESCRIPTION[Tamanho da informação adicinoal. Tamanho máximo de 1024] $DESCRIPTION_ENGLISH[Added data size. Max size is 1024]
+   optional UartMode openDataMode = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR]
+}
+/// MT 0x0021 Enter password
+message PasswordEnter {
+   required uint64 deviceID   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]
+   required uint64 commandID  = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]
+   required string password   = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]
+}
+/// MT 0x0022 Store password. AVOID USE CHARACTER WITH ASCII HEX VALUE LOWER THAN 0x20 AND HIGHER THAN 0x7E.
+message SetPassword {
+   required uint64 deviceID            = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]
+   required uint64 commandID           = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]
+   required PasswordType passwordType  = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]
+   required string passwordOld         = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Mínimo de 4 caracteres e máximo de 8. Se string vazia, não há senha definida.] $DESCRIPTION_ENGLISH[Min 4 character, Max 8 character or empty string if has no password]
+   required string passwordNew         = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Mínimo de 4 caracteres e máximo de 8. Se string vazia, remove a senha previamente configurada.] $DESCRIPTION_ENGLISH[Min 4 character, Max 8 character or empty string to erase password]
+}
+/// Telemetry variables that can be read and set
+message TelemetryVariables { 
+   optional uint32 odometer               = 1; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2]   $DESCRIPTION[Metros] $DESCRIPTION_ENGLISH[Meters]
+   optional uint32 vehicleOperationTime   = 2; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2]   $DESCRIPTION[Segundos] $DESCRIPTION_ENGLISH[Seconds]
+   optional uint32 odometerCan            = 3; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Segundos] $DESCRIPTION_ENGLISH[Meters]
+   optional uint32 odometerPulse          = 4; /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU] $DESCRIPTION[Metros] $DESCRIPTION_ENGLISH[Meters]
+}
+/// Value limited from 0 to 65535
+message EmbeddedActionsVariables {
+   optional uint32 register00 = 1;  		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register01 = 2;  		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register02 = 3;  		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register03 = 4;  		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register04 = 5;  		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register05 = 6;  		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register06 = 7;  		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register07 = 8;  		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register08 = 9;  		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register09 = 10; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register10 = 11; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register11 = 12; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register12 = 13; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register13 = 14; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register14 = 15; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register15 = 16; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register16 = 17; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register17 = 18; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register18 = 19; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register19 = 20; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register20 = 21; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register21 = 22; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register22 = 23; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register23 = 24; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register24 = 25; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register25 = 26; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register26 = 27; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register27 = 28; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register28 = 29; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register29 = 30; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register30 = 31; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register31 = 32; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register32 = 33; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register33 = 34; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register34 = 35; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register35 = 36; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register36 = 37; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register37 = 38; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register38 = 39; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register39 = 40; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register40 = 41; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register41 = 42; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register42 = 43; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register43 = 44; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register44 = 45; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register45 = 46; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register46 = 47; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register47 = 48; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register48 = 49; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register49 = 50; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register50 = 51; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register51 = 52; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register52 = 53; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register53 = 54; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register54 = 55; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register55 = 56; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register56 = 57; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register57 = 58; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register58 = 59; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register59 = 60; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register60 = 61; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register61 = 62; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register62 = 63; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint32 register63 = 64; 		/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint64 long_register00 = 65;  	/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint64 long_register01 = 66;  	/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint64 long_register02 = 67;  	/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint64 long_register03 = 68;  	/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint64 long_register04 = 69;  	/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint64 long_register05 = 70;  	/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint64 long_register06 = 71;  	/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional uint64 long_register07 = 72;  	/// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+}
+message RouteVariables {
+   optional uint64 routeID                            = 1;  /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+/// MT 0x0023 MT 0x0024 Set/Get Variables, Note: not all variables can be set
+message Variables {
+   required uint64 deviceID                           = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   required uint64 commandID                          = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   optional TelemetryVariables telemetry              = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A6X, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   optional EmbeddedActionsVariables embeddedActions  = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   optional RouteVariables route                      = 6;  /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+/// MT 0x0028 Force the device enter a new power state (Sleep, Reset, Stock)
+message ExecuteEmbeddedAction {
+   required uint64 deviceID   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   required uint64 commandID  = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90]
+   required uint32 actionID   = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90] $DESCRIPTION[Os ids das ações são definidas pelo usuário.] $DESCRIPTION_ENGLISH[Action id is defined by user.]
+   required bool condition    = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR, A90] $DESCRIPTION[Status da condição: 0 - desligada, 1 - ligada] $DESCRIPTION_ENGLISH[0 - condition off, 1 - condition on]
+}
+/// MT 0x0030 Force the device enter a new power state (Sleep, Reset, Stock)
+message SetPower {
+   required uint64 deviceID   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, DLR, FINDER, TD80, AS80, A90, MAXIO2]
+   required uint64 commandID  = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, DLR, FINDER, TD80, AS80, A90, MAXIO2]
+   required PowerState state  = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MXT180, A6X, MTC8XX, DLR, FINDER, TD80, AS80, A90, MAXIO2]
+}
+/// MT 0x0031 Activate Outputs
+message SetOutput {
+   required uint64 deviceID                  = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A40, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   required uint64 commandID                 = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A40, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   repeated OutputControl outputs            = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A40, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   repeated OutputControl accessoriesOutputs = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A40, MAXIO, MTC8XX, DLR]
+}
+message SetInputCounter {
+   required uint64 deviceID                = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   required uint64 commandID               = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   repeated InputCounter inputs            = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR, MTC8XX_MCU, A90, MAXIO2, MAXIO2_MCU]
+   repeated InputCounter accessoriesInputs = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, MTC8XX, DLR]
+}
+/// MT 0x0032 Changes device operational state (panic, anchor, alarm, emergency)
+message SetOperationalState {
+   required uint64 deviceID            = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]
+   required uint64 commandID           = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]
+   optional bool panic                 = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]   
+   optional uint32 anchorCircleRadius  = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR] $DESCRIPTION[Se um número for atribuído, tenta habilitar o modo âncora e definir seu raio (metros).] $DESCRIPTION_ENGLISH[If a number is given, tries to enable anchor and set its radius (meters).]
+   optional AlarmState alarm           = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR]
+   optional bool loraEmergency         = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]
+   optional uint32 geoObjectGroupID    = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MTC8XX, DLR] $DESCRIPTION[Filtra quais pontos estarão ativos. Cada ponto pode ter id de um grupo, ou um id próprio.]
+   optional EmergencyState emergency   = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]
+}
+/// MT 0x0036
+message Disconnect {
+   required uint64 deviceID   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR]
+   required uint64 commandID  = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR]
+   required Network network   = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR]
+}
+/// Sets a fixed latitude and longitude to device
+message SetBleStationaryLatLng {
+   required uint64 deviceID    = 1;  /// $SUPPORTEDBY[A6X]
+   required uint64 commandID   = 2;  /// $SUPPORTEDBY[A6X]
+   required sfixed32 latitude  = 3;  /// $SUPPORTEDBY[A6X] $DESCRIPTION[Formato do valor: Graus.décimosDoGrau * 10,000,000] $DESCRIPTION_ENGLISH[Value format: Degrees.decimalsOfDegrees * 10,000,000]
+   required sfixed32 longitude = 4;  /// $SUPPORTEDBY[A6X] $DESCRIPTION[Formato do valor: Graus.décimosDoGrau * 10,000,000] $DESCRIPTION_ENGLISH[Value format: Degrees.decimalsOfDegrees * 10,000,000]
+}
+/// BLE calibration to A6x products
+message SetBleTxRssi {
+   required uint64 deviceID   = 1;  /// $SUPPORTEDBY[A6X]
+   required uint64 commandID  = 2;  /// $SUPPORTEDBY[A6X]
+   required int32  txRssi     = 3;  /// $SUPPORTEDBY[A6X] $DESCRIPTION[Valor do RSSI a um metro de distância do dispositivo para calibração.] $DESCRIPTION_ENGLISH[RSSI value in 1 meter away for calibration]
+}
+/// Configure A6x BLE power. Note: the higher the power the higher the RSSI imprecision.
+message SetBleTxPower {
+   required uint64 deviceID   = 1;  /// $SUPPORTEDBY[A6X]
+   required uint64 commandID  = 2;  /// $SUPPORTEDBY[A6X]
+   required int32  txPower    = 3;  /// $SUPPORTEDBY[A6X] $DESCRIPTION[Potência do Bluetooth (dB)] $DESCRIPTION_ENGLISH[Bluetooth power (dB)]
+}
+/// Configures BLE path loss coefficient used in indoor localization
+message SetBleTxPathLossCoef {
+   required uint64 deviceID   	= 1;  /// $SUPPORTEDBY[A6X]
+   required uint64 commandID  	= 2;  /// $SUPPORTEDBY[A6X]
+   required int32  pathLossCoef	= 3;  /// $SUPPORTEDBY[A6X] $DESCRIPTION[Coeficiente de perda para localizações indoor. (0 ~ 3)] $DESCRIPTION_ENGLISH[Loss coefficient for indoor localization (0 - 3)]
+}
+/// MT 0x0039
+message SetBleVars {
+   required uint64 deviceID   	                    = 1; /// $SUPPORTEDBY[A6X]
+   required uint64 commandID  	                    = 2; /// $SUPPORTEDBY[A6X]
+   optional SetBleTxPathLossCoef txPathLossCoef      = 3; /// $SUPPORTEDBY[A6X]
+   optional SetBleTxPower txPower                    = 4; /// $SUPPORTEDBY[A6X]
+   optional SetBleTxRssi txRssi                      = 5; /// $SUPPORTEDBY[A6X]
+   optional SetBleStationaryLatLng stationaryLatLng  = 6; /// $SUPPORTEDBY[A6X]
+}
+/// MT 0x0203
+message SetDateTime{
+   required uint64 dateTime         = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MAXIO, A6X, MTC8XX, DLR, FINDER, MTC8XX_MCU, TD80] $DESCRIPTION[Tempo Unix; segundos desde 01/01/1970] $DESCRIPTION_ENGLISH[Unix time; seconds since 01/01/1970]
+}
+/// From where the command was received.
+enum LogSource {
+   LSR_NONE             = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, TD80] $DESCRIPTION_ENGLISH[Proto3 compatibility]
+   LSR_RS485A           = 1;  /// $SUPPORTEDBY[]
+   LSR_RS485B           = 2;  /// $SUPPORTEDBY[]
+   LSR_RS232A           = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, TD80] $DESCRIPTION[Comando recebido por RS232A] $DESCRIPTION_ENGLISH[Command received through RS232A]
+   LSR_RS232B           = 4;  /// $SUPPORTEDBY[]
+   LSR_WIFI             = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, TD80] $DESCRIPTION[Comando recebido por rede WiFi] $DESCRIPTION_ENGLISH[Command received through WiFi network]
+   LSR_GSM_GPRS         = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR] $DESCRIPTION[Comando recebido por GSM/GPRS] $DESCRIPTION_ENGLISH[Command received through GSM/GPRS]
+   LSR_CAN1             = 7;  /// $SUPPORTEDBY[]
+   LSR_CAN2             = 8;  /// $SUPPORTEDBY[]
+   LSR_USB              = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR] $DESCRIPTION[Comando recebido por USB] $DESCRIPTION_ENGLISH[Command received through USB]
+   LSR_ZIGBEE           = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR] $DESCRIPTION[Comando recebido por ZigBee] $DESCRIPTION_ENGLISH[Command received through ZigBee network]
+   LSR_LORA_P2P         = 11; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR] $DESCRIPTOIN[Comando recebido por LoRa P2P] $DESCRIPTION_ENGLISH[Command received through LoRa P2P network]
+   LSR_SATELLITE_IDP    = 12; /// $SUPPORTEDBY[]
+   LSR_SATELLITE        = 13; /// $SUPPORTEDBY[]
+   LSR_LUA              = 14; /// $SUPPORTEDBY[]
+   LSR_BLUETOOTH        = 15; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR] $DESCRIPTION[Comando recebido por Bluetooth] $DESCRIPTION_ENGLISH[Command received through Bluetooth network] 
+   LSR_CLOUD            = 16; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR] $DESCRIPTION[Comando recebido pela nuvem] $DESCRIPTION_ENGLISH[Command received through Cloud]
+   LSR_LORA_WAN         = 17; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR] $DESCRIPTION[Comando recebido por LoRaWAN] $DESCRIPTION_ENGLISH[Command received through LoRaWAN]
+   LSR_EMBEDDED_ACTIONS = 18; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR] $DESCRIPTION[Comando recebido por Ações Embarcadas] $DESCRIPTION_ENGLISH[Command received through Embedded Action]
+   LSR_GEO_LIBRARY      = 19; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR] $DESCRIPTION[Comando recebido por Biblioteca Geográfica] $DESCRIPTION_ENGLISH[Command received through Geo Library]
+   LSR_RFU_03           = 20; /// $SUPPORTEDBY[]
+   LSR_RFU_04           = 21; /// $SUPPORTEDBY[]
+   LSR_RFU_05           = 22; /// $SUPPORTEDBY[]
+   LSR_RFU_06           = 23; /// $SUPPORTEDBY[]
+   LSR_RFU_07           = 24; /// $SUPPORTEDBY[]
+   LSR_RFU_08           = 25; /// $SUPPORTEDBY[]
+   LSR_RFU_09           = 26; /// $SUPPORTEDBY[]
+   LSR_RFU_10           = 27; /// $SUPPORTEDBY[]
+}
+/// Packet containing information of the last received command  
+message LogInfo {
+   required LogSource origin     = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X] $DESCRIPTION[Fonte geradora do comando] $DESCRIPTION_ENGLISH[Where the command was generated]
+   required uint32 dateTime      = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X] $DESCRIPTION[Tempo Unix. Segundos desde 01/01/1970] $DESCRIPTION_ENGLISH[Unix Time. Seconds since 01/01/1970]
+   optional uint32 messageType   = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X] $DESCRIPTION[Message Type do comando] $DESCRIPTION_ENGLISH[Message type of the command]
+   optional uint32 actionID      = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X] $DESCRIPTION[Ação embarcada que gerou o comando] $DESCRIPION_ENGLISH[Embedded Action who generated the command]
+   optional uint64 geoObjectID   = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X] $DESCRIPTION[Ponto embarcado] $DESCRIPTION_ENGLISH[Embedded point]
+   optional bytes rawData        = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X] $DESCRIPTION[Dado binário do comando correspondente] $DESCRIPTION_ENGLISH[The raw data of the corresponding command]
+}
+/// Report a history of last received commands. Up to 4kB information. 
+message ReportLogInfo {
+   required uint64 deviceID   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X] $DECRIPTION[ID do dispositivo] $DESCRIPTION_ENGLISH[Device ID]
+   required uint64 commandID  = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X] $DESCRIPTION[ID do comando recebido] $DESCRIPTION_ENGLISH[Received ID command]
+   repeated LogInfo log       = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X] $DESCRIPTION[Lista dos ultimos comandos recebidos] $DESCRIPTION_ENGLIHS[List of last received commands]
+}
+message FileSyncCommand {
+   required uint64 deviceID   = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Id do equipamento] $DESCRIPTION_ENGLISH[Device ID]
+   required uint64 commandID  = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Id do comando] $DESCRIPTION_ENGLISH[Command ID]
+}

@@ -1,0 +1,152 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+enum AntennaState {
+   AS_NONE     = 0;  /// $SUPPORTEDBY[]   
+   AS_OK       = 1;  /// $SUPPORTEDBY[MXT142]   
+   AS_SHORT    = 2;  /// $SUPPORTEDBY[]   
+   AS_OPEN     = 3;  /// $SUPPORTEDBY[MXT142]   
+   AS_RFU_01   = 4;  /// $SUPPORTEDBY[]   
+   AS_RFU_02   = 5;  /// $SUPPORTEDBY[]   
+   AS_RFU_03   = 6;  /// $SUPPORTEDBY[]   
+   AS_RFU_04   = 7;  /// $SUPPORTEDBY[]   
+   AS_RFU_05   = 8;  /// $SUPPORTEDBY[]   
+}
+/// Defines all GPS fix states
+enum FixState {
+   FS_NONE              = 0; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2, MOBILE_PHONE]   
+   FS_FIX_NOT_AVAILABLE = 1; /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2, MOBILE_PHONE]   
+   FS_FIX_2D            = 2; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2, MOBILE_PHONE]   
+   FS_FIX_3D            = 3; /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2, MOBILE_PHONE]   
+   FS_RFU_01            = 4; /// $SUPPORTEDBY[]   
+   FS_RFU_02            = 5; /// $SUPPORTEDBY[]   
+   FS_RFU_03            = 6; /// $SUPPORTEDBY[]   
+   FS_RFU_04            = 7; /// $SUPPORTEDBY[]   
+   FS_RFU_05            = 8; /// $SUPPORTEDBY[]   
+}
+enum FixQuality {
+   FQ_INVALID                   = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]   
+   FQ_GPS_FIX                   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]   
+   FQ_DGPS_FIX                  = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]   
+   FQ_REAL_TIME_KINEMATIC       = 3;  /// $SUPPORTEDBY[]   
+   FQ_FLOAT_RTK                 = 4;  /// $SUPPORTEDBY[]   
+   FQ_ESTIMATED_DEAD_RECKONING  = 5;  /// $SUPPORTEDBY[]   
+   FQ_RFU_01                    = 6;  /// $SUPPORTEDBY[]   
+   FQ_RFU_02                    = 7;  /// $SUPPORTEDBY[]   
+   FQ_RFU_03                    = 8;  /// $SUPPORTEDBY[]   
+   FQ_RFU_04                    = 9;  /// $SUPPORTEDBY[]   
+   FQ_RFU_05                    = 10; /// $SUPPORTEDBY[]   
+}
+enum GpsStatus {
+   GS_NONE                          = 0;  /// $SUPPORTEDBY[]   
+   GS_POWER_ON_NOW_ACTUAL_FIX_STATE = 1;  /// $SUPPORTEDBY[]   
+   GS_POWER_ON_NOW_OLD_FIX_STATE    = 2;  /// $SUPPORTEDBY[]   
+   GS_POWER_OFF_RACING              = 3;  /// $SUPPORTEDBY[]   
+   GS_POWER_OFF_SAMPLING_INTERVAL_0 = 4;  /// $SUPPORTEDBY[]   
+   GS_POWER_OFF_RACING_INTERVAL_0   = 5;  /// $SUPPORTEDBY[]   
+   GS_RFU_01                        = 6;  /// $SUPPORTEDBY[]   
+   GS_RFU_02                        = 7;  /// $SUPPORTEDBY[]   
+   GS_RFU_03                        = 8;  /// $SUPPORTEDBY[]   
+   GS_RFU_04                        = 9;  /// $SUPPORTEDBY[]   
+   GS_RFU_05                        = 10; /// $SUPPORTEDBY[]   
+}
+enum GpsFilterState {
+   GFS_ANALYSIS_DISAPPROVED   = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]   
+   GFS_ANALYSIS_APPROVED      = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]   
+   GFS_RFU_01                 = 2;  /// $SUPPORTEDBY[]   
+   GFS_RFU_02                 = 3;  /// $SUPPORTEDBY[]   
+   GFS_RFU_03                 = 4;  /// $SUPPORTEDBY[]   
+   GFS_RFU_04                 = 5;  /// $SUPPORTEDBY[]   
+   GFS_RFU_05                 = 6;  /// $SUPPORTEDBY[]   
+}
+enum Heading {
+   H_NORTH       = 0; /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]   
+   H_NORTHEAST   = 1; /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]   
+   H_EAST        = 2; /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]   
+   H_SOUTHEAST   = 3; /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]   
+   H_SOUTH       = 4; /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]   
+   H_SOUTHWEST   = 5; /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]   
+   H_WEST        = 6; /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]   
+   H_NORTHWEST   = 7; /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]   
+   H_ALL         = 8; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]  $DESCRIPTION[Usado em bibliotecas Geográficas ] $DESCRIPTION_ENGLISH[Used on Geographical libs] 
+}
+enum DayOfWeek {
+   DOW_NONE             = 0; /// $SUPPORTEDBY[MTC8XX, DLR]
+   DOW_MONDAY           = 1; /// $SUPPORTEDBY[MTC8XX, DLR]
+   DOW_TUESDAY          = 2; /// $SUPPORTEDBY[MTC8XX, DLR]
+   DOW_WEDNESDAY        = 3; /// $SUPPORTEDBY[MTC8XX, DLR]
+   DOW_THURSDAY         = 4; /// $SUPPORTEDBY[MTC8XX, DLR]
+   DOW_FRIDAY           = 5; /// $SUPPORTEDBY[MTC8XX, DLR]
+   DOW_SATURDAY         = 6; /// $SUPPORTEDBY[MTC8XX, DLR]
+   DOW_SUNDAY           = 7; /// $SUPPORTEDBY[MTC8XX, DLR]
+   DOW_MONDAY_TO_FRIDAY = 8; /// $SUPPORTEDBY[MTC8XX, DLR]
+   DOW_WEEKEND          = 9; /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+enum AGPSState {
+   AGPSST_NONE          = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]   
+   AGPSST_AUTONOMOUS    = 1;  /// $SUPPORTEDBY[]   
+   AGPSST_AGPS_OFFLINE  = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]   
+   AGPSST_AGPS_ONLINE   = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]   
+   AGPSST_RFU_01        = 4;  /// $SUPPORTEDBY[]   
+   AGPSST_RFU_02        = 5;  /// $SUPPORTEDBY[]   
+   AGPSST_RFU_03        = 6;  /// $SUPPORTEDBY[]   
+   AGPSST_RFU_04        = 7;  /// $SUPPORTEDBY[]   
+   AGPSST_RFU_05        = 8;  /// $SUPPORTEDBY[]   
+}
+enum GPSPowerState {
+   GPWS_POWER_OFF       = 0; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]   
+   GPWS_POWER_LOW_POWER = 1; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]   
+   GPWS_POWER_ON        = 2; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]   
+   GPWS_RFU_01          = 3; /// $SUPPORTEDBY[]   
+   GPWS_RFU_02          = 4; /// $SUPPORTEDBY[]   
+   GPWS_RFU_03          = 5; /// $SUPPORTEDBY[]   
+   GPWS_RFU_04          = 6; /// $SUPPORTEDBY[]   
+   GPWS_RFU_05          = 7; /// $SUPPORTEDBY[]   
+}
+enum GPSPower {
+   GPW_AUTO       = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2]   
+   GPW_ALWAYS_ON  = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2]   
+   GPW_RFU_01     = 2;  /// $SUPPORTEDBY[]   
+   GPW_RFU_02     = 3;  /// $SUPPORTEDBY[]   
+   GPW_RFU_03     = 4;  /// $SUPPORTEDBY[]   
+   GPW_RFU_04     = 5;  /// $SUPPORTEDBY[]   
+   GPW_RFU_05     = 6;  /// $SUPPORTEDBY[]   
+   GPW_RFU_06     = 7;  /// $SUPPORTEDBY[]   
+}
+message Satellite {
+   required uint32 snr        = 1;  /// $SUPPORTEDBY[]   
+   optional uint32 prn        = 2;  /// $SUPPORTEDBY[]   
+   optional uint32 elevation  = 3;  /// $SUPPORTEDBY[]   
+   optional uint32 azimuth    = 4;  /// $SUPPORTEDBY[]   
+}
+message GpsInfo {
+   optional AntennaState internalAntenna  = 1;  /// $SUPPORTEDBY[MXT142]   
+   optional FixState fixState             = 2;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, FINDER, A90, MAXIO2, MOBILE_PHONE]   
+   optional int32 svn                     = 3;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]   
+   repeated Satellite satellitesInView    = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, MTC8XX, DLR]   
+   optional int32 hdop                    = 5;  /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]  $DESCRIPTION[Formato do valor: HDOP * 10] $DESCRIPTION_ENGLISH[HDOP * 10] 
+   optional int32 vdop                    = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]  $DESCRIPTION[Formato do valor: VDOP * 10] $DESCRIPTION_ENGLISH[ VDOP * 10] 
+   optional int32 pdop                    = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]  $DESCRIPTION[Formato do valor: PDOP * 10] $DESCRIPTION_ENGLISH[PDOP * 10] 
+   optional uint32 age                    = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]  $DESCRIPTION[Segudos desde o ultimo fix] $DESCRIPTION_ENGLISH[Seconds since last fix] 
+   optional GpsFilterState filter         = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]   
+   optional FixQuality fixQuality         = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]   
+   optional uint32 averageSnr             = 11; /// $SUPPORTEDBY[MXT142, MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[SNR médio (dB)] $DESCRIPTION_ENGLISH[(dB)]
+   optional AGPSState agpsState           = 12; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]   
+   optional GPSPowerState gpsPowerState   = 13; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE]   
+   optional FixState filterInternalState  = 14; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]  $DESCRIPTION[GPS fix atual quando o filtro é desaprovado] $DESCRIPTION_ENGLISH[Current GPS Fix when filter is disapproved] 
+   optional bool jamming                  = 15; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]  $DESCRIPTION[0 - Não jamming, 1 - Jamming] $DESCRIPTION_ENGLISH[0 - Not Jamming, 1 - Jamming] 
+   optional bool spoofing                 = 16; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]  $DESCRIPTION[0 - Não spoofing, 1 - Spoofing] $DESCRIPTION_ENGLISH[0 - Not Spoofing, 1 - Spoofing] 
+   optional uint32 gpsDebug               = 17; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2]   
+}
+message GpsConfig {
+   optional bool sendUnfilteredPositions               = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $COMMENT[Se habilitado, outras configurações de filtro não tem efeito] $DESCRIPTION[Envia posições filtradas] $DEFAULTVALUE[0] $VALIDATOR[^(0|1)$] $DESCRIPTION_ENGLISH[If enabled, other filter configurations has no effect]  
+   optional bool signalStrenghtFilter                  = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Filtro de força do sinal] $VALIDATOR[^(0|1)$]  
+   optional uint32 intervalFixTransmissionMoving       = 3;  /// $SUPPORTEDBY[MXT180, A6X, A90, MAXIO2, MOBILE_PHONE] $UNIT[segundos] $DESCRIPTION[Intervalo fixo de transmissão em movimento] $DESCRIPTION_ENGLISH[seconds]
+   optional uint32 intervalFixTransmissionStop         = 4;  /// $SUPPORTEDBY[MXT180, A6X, A90, MAXIO2, MOBILE_PHONE] $UNIT[segundos] $DESCRIPTION[Intervalo fixo de transmissão parado] $DESCRIPTION_ENGLISH[seconds]
+   optional uint32 intervalFixSampleMoving             = 5;  /// $SUPPORTEDBY[MXT180, A6X, A90, MAXIO2, MOBILE_PHONE] $UNIT[segundos] $DESCRIPTION[Intervalo fixo de amostra em movimento] $DESCRIPTION_ENGLISH[seconds]
+   optional uint32 intervalFixSampleStop               = 6;  /// $SUPPORTEDBY[MXT180, A6X, A90, MAXIO2, MOBILE_PHONE] $UNIT[segundos] $DESCRIPTION[Intervalo fixo de amostra parado] $DESCRIPTION_ENGLISH[seconds]
+   optional uint32 intervalFixEmergencyMoving          = 7;  /// $SUPPORTEDBY[A6X, A90, MAXIO2, MOBILE_PHONE] $UNIT[segundos] $DESCRIPTION[Intervalo fixo de emergência movendo] $DESCRIPTION_ENGLISH[seconds, used for samples and transmission]
+   optional uint32 intervalFixEmergencyStop            = 8;  /// $SUPPORTEDBY[A6X, A90, MAXIO2, MOBILE_PHONE] $UNIT[segundos] $DESCRIPTION[Intervalo fixo de emergência parado] $DESCRIPTION_ENGLISH[seconds, used for samples and transmission]
+   optional uint32 numSamplesToValidateInstantDistance = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Número de amostras GPS com distância válida]  $DESCRIPTION_ENGLISH[Minimum of GPS samples with valid distance delta before accept current location] 
+   optional uint32 maxSpeed                            = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $UNIT[Km/h] $DESCRIPTION[Velocidade máxima permitida para filtro do GPS]  $DESCRIPTION_ENGLISH[Maximum speed (Km/h) allowed for GPS filter] 
+   optional GPSPower power                             = 11; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, A90, MAXIO2] $DESCRIPTION[Modo de trabalho do GPS]  $DESCRIPTION_ENGLISH[Working power mode for GPS] 
+}

@@ -1,0 +1,12 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+message StatusPanel {
+   required uint64 deviceID            = 1;     /// $SUPPORTEDBY[MTC8XX, DLR]
+   required uint32 destination			= 2;     /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional uint32 extraTextNumber		= 3;     /// $SUPPORTEDBY[MTC8XX, DLR]
+   required uint32 routeDirection		= 4;     /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional uint32 tariffNumber			= 5;     /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional string extraFreeText		   = 6;     /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional uint64 speed485			   = 7;     /// $SUPPORTEDBY[MTC8XX, DLR]
+   optional bool panelAlive			   = 8;     /// $SUPPORTEDBY[MTC8XX, DLR]
+}

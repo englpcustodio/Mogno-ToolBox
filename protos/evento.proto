@@ -1,0 +1,601 @@
+/* Versao 0.34
+ *
+ * Novo tipo de evento 78 - "FIM_VELOCIDADE_ACIMA_DO_PADRAO"
+ * Novo tipo de evento 53 - "CARCACA_VIOLADA"
+ * Novo tipo de evento 54 - "JAMMING_RESTAURADO"
+ * Novo tipo de evento 55 - "GPS_FALHA"
+ * Novo tipo de evento 57 - "BLOQUEADOR_VIOLADO"
+ * Novo campo 29 - horimetro
+ * Novo tipo de evento 58 - "BLOQUEADOR_RESTAURADO"
+ * Novo campos: velocidade_maxima 30, tempo_velocidade_maxima 31 e dados_aceleracao 32
+ * Nova Flag: 33 Bloqueador Violado
+ * Novo Fabricante Adicionado: CALAMP = 8
+ * Novo Evento: COLISAO = 59;
+ * Novos Eventos de ECU (ECU_VIOLADA + ECU_INSTALADA) + flag de ECU (ecu_conectada)
+ * Novos campos modelo = 7 e velocidade_media = 11;
+ * Novos Eventos - CalAmp 2720 - "IDENTIFICACAO_CONDUTOR_NAO_CADASTRADO = 62", "FREQ_CONT_PULSOS_ACIMA_LIMITE = 63"
+ *   Mxt 141 - Projeto estrutural:
+ *   "PLATAFORMA_DESACIONADA = 64;", "BETONEIRA_CARREGANDO = 65;", "BETONEIRA_DESCARREGANDO = 66;",
+ * 	 "PORTA_ABERTA = 67;", "PORTA_FECHADA = 68;", frequencia_maxima_contador_pulsos_desde_ultima_posicao,
+ * 	 frequencia_contador_pulsos, SensorBetoneira, porta
+ * Novo fabricante: SCOPE = 9
+ */
+syntax = "proto2";
+
+
+import "rev_geo.proto";
+import "evento_regras_violacoes.proto";
+import "ultimo_motorista_identificado.proto";
+
+message Evento {
+
+	enum TiposEventos {
+		POSICAO = 0;
+		PANICO = 1;
+		FAKE_VIOLADO = 2;
+		FAKE_RESTAURADO = 3;
+		ANTENA_GPS_CORTADA = 4;
+		ANTENA_GPS_RECONECTADA = 5;
+		IGNICAO_ON = 6;
+		IGNICAO_OFF = 7;
+		BATERIA_EXTERNA_PERDIDA = 8;
+		BATERIA_EXTERNA_RECONECTADA = 9;
+		BATERIA_EXTERNA_BAIXA = 10;
+		BATERIA_INTERNA_PERDIDA = 11;
+		BATERIA_INTERNA_RECONECTADA = 12;
+		BATERIA_INTERNA_BAIXA = 13;
+		BATERIA_INTERNA_ERRO = 14;
+		INICIO_SLEEP = 15;
+		RESET_RASTREADOR = 16;
+		INICIO_SUPER_SLEEP = 17;
+		BLOQUEIO_ANTIFURTO = 18;
+		DESBLOQUEIO_ANTIFURTO = 19;
+		RESPOSTA_POSICAO_SOLICITADA = 20;
+		POSICAO_EM_SLEEP = 21;
+		POSICAO_EM_SUPER_SLEEP = 22;
+		OPERADORA_CELULAR = 23;
+		ALARME_ANTIFURTO = 24;
+		DADOS_VIAGEM = 25;
+		DADOS_ESTACIONAMENTO = 26;
+		PAINEL_VIOLADO = 27;
+		PAINEL_RESTAURADO = 28;
+		TECLADO_CONECTADO = 29;
+		TECLADO_DESCONECTADO = 30;
+		SENSOR_LIVRE_RESTAURADO = 31;
+		MACRO = 32;
+		MENSAGEM_NUMERICA = 33;
+		TERMINO_SLEEP = 34;
+		TERMINO_SUPER_SLEEP = 35;
+		INICIO_DEEP_SLEEP = 36;
+		TERMINO_DEEP_SLEEP = 37;
+		BATERIA_BACKUP_RECONECTADA = 38;
+		BATERIA_BACKUP_DESCONECTADA = 39;
+		ANTENA_GPS_EM_CURTO = 40;
+		ANTIFURTO_RESTAURADO = 41;
+		ANTIFURTO_VIOLADO = 42;
+		INICIO_MODO_PANICO = 43;
+		FIM_MODO_PANICO = 44;
+		ALERTA_ACELERACAO_FORA_PADRAO = 45;
+		ALERTA_FREADA_BRUSCA = 46;
+		ALERTA_CURVA_AGRESSIVA = 47;
+		ALERTA_DIRECAO_ACIMA_VELOCIDADE_PADRAO = 48;
+		JAMMING_DETECTADO = 49;
+		PLATAFORMA_ACIONADA = 50;
+		BOTAO_ANTIFURTO_PRESSIONADO = 51;
+		EVENTO_GENERICO = 52;
+		CARCACA_VIOLADA = 53;
+		JAMMING_RESTAURADO = 54;
+		GPS_FALHA = 55;
+		IDENTIFICACAO_CONDUTOR = 56;
+
+		//Projeto de Seguran�a
+		BLOQUEADOR_VIOLADO = 57;
+		BLOQUEADOR_RESTAURADO = 58;
+	    COLISAO = 59;
+
+	    //Sensor de ECU
+		ECU_VIOLADA = 60;
+		ECU_INSTALADA = 61;
+
+		//CalAmp 2720
+		IDENTIFICACAO_CONDUTOR_NAO_CADASTRADO = 62;
+		FREQ_CONT_PULSOS_ACIMA_LIMITE = 63;
+
+		//Mxt 141 - Projeto estrutural
+		PLATAFORMA_DESACIONADA = 64;
+		BETONEIRA_CARREGANDO = 65;
+		BETONEIRA_DESCARREGANDO = 66;
+		PORTA_ABERTA = 67;
+		PORTA_FECHADA = 68;
+		ALERTA_FREADA_BRUSCA_ACELERACAO_FORA_PADRAO = 69;
+		TIMEOUT_IDENTIFICADOR_CONDUTOR = 70;
+		BAU_ABERTO = 71;
+		BAU_FECHADO = 72;
+		CARRETA_ENGATADA = 73;
+		CARRETA_DESENGATADA = 74;
+		TECLADO_MENSAGEM = 75;
+		ACAO_EMBARCADA_ACIONADA = 76;
+		ACAO_EMBARCADA_DESACIONADA = 77;
+		FIM_VELOCIDADE_ACIMA_DO_PADRAO = 78;
+
+		ENTRADA_EM_BANGUELA = 79;
+		SAIDA_DE_BANGUELA = 80;
+		RPM_EXCEDIDO = 81;
+		ALERTA_DE_DIRECAO_COM_VELOCIDADE_EXCESSIVA_NA_CHUVA = 82;
+		FIM_DE_VELOCIDADE_ACIMA_DO_PADRAO_NA_CHUVA = 83;
+
+		VEICULO_PARADO_COM_MOTOR_FUNCIONANDO = 84;
+		VEICULO_PARADO = 85;
+
+		CALIBRACAO_AUTOMATICA_DO_RPM_REALIZADA = 86;
+		CALIBRACAO_DO_ODOMETRO_FINALIZADA = 87;
+
+		// ST380
+		MODO_ERB = 88;
+		EMERGENCIA_OU_POSICAO_DE_DISPOSITIVO_RF_EM_MODO_ERB = 89;
+		EMERGENCIA_POR_PRESENCA = 90;
+		EMERGENCIA_POR_RF = 91;
+		DISPOSITIVO_PRESENCA_AUSENTE = 92;
+		BATERIA_VEICULO_ABAIXO_LIMITE_PRE_DEFINIDO = 93;
+
+		//ST500
+		LEITURA_OBD = 94;
+		VEICULO_PARADO_COM_RPM = 95;
+		MODO_EMERGENCIA_POR_JAMMING = 96;
+
+		EMERGENCIA_POR_GPRS = 97;
+		DETECCAO_RF = 98;
+
+		//LoRa
+		DISPOSITIVO_PRESENCA_RECUPERADO = 99;
+		ENTRADA_MODO_EMERGENCIA = 100;
+		SAIDA_MODO_EMERGENCIA = 101;
+		EMERGENCIA = 102;
+		INICIO_DE_MOVIMENTO = 103;
+		FIM_DE_MOVIMENTO = 104;
+		VEICULO_PARADO_COM_IGNICAO_LIGADA = 105;
+		REGRA_GEOGRAFICO = 106;
+
+		ALERTA_DE_IGNICAO_SEM_FAROL = 107;
+		FIM_DE_IGNICAO_SEM_FAROL = 108;
+
+		INICIO_MOVIMENTO_SEM_BATERIA_EXTERNA = 109;
+		FIM_MOVIMENTO_SEM_BATERIA_EXTERNA = 110;
+		RASTREAMENTO_ATIVADO = 111;
+		RASTREAMENTO_DESATIVADO = 112;
+
+		ALERTA_DE_MOTORISTA_COM_SONOLENCIA = 113;
+		ALERTA_DE_MOTORISTA_COM_DISTRACAO = 114;
+		ALERTA_DE_MOTORISTA_BOCEJANDO = 115;
+		ALERTA_DE_MOTORISTA_AO_TELEFONE = 116;
+		ALERTA_DE_MOTORISTA_FUMANDO = 117;
+
+	}
+
+	required TiposEventos tipo_evento = 1;
+
+	message Rastreador {
+		enum Fabricante {
+			SUNTECH = 0;
+			MAXTRACK = 1;
+			CEABS = 2;
+			CONTINENTAL = 3;
+			RST = 4;
+			GENERICO = 5;
+			COMPSIS = 6;
+			QUANTA = 7;
+			CALAMP = 8;
+			SCOPE = 9;
+			TELEMACHINE = 10;
+			LIFTHEC = 11;
+			VOLVO = 12;
+			MAGNETI_MARELLI = 13;
+			QUECLINK = 14;
+			X3TECH = 15;
+			MOBILOGIX = 16;
+			LINKWORLD = 17;
+			POSITRON = 18;
+			OMNILINK = 19;
+			BWS = 20;
+			TELTONIKA=21;
+			APTAMAX=22;
+			WANWAYTECH=23;
+			FKGROUP=24;
+		}
+
+		enum Plataforma {
+			ANDROID = 1;
+			IOS = 2;
+		}
+
+		required string numero_serie = 1;
+		required Fabricante fabricante = 2;
+		optional string versao_hardware = 3;
+		optional string versao_firmware = 4;
+		optional Bateria bateria_interna = 5;
+		optional Plataforma plataforma = 6;
+		optional int32 modelo = 7;
+	}
+
+	required Rastreador rastreador = 2;
+	optional int32 numero_sequencial = 3;
+	required int64 data_hora_evento = 4;
+	required int64 data_hora_recebimento = 5;
+	optional int64 data_hora_armazenamento = 6;
+
+	message Gps {
+		optional bool fixado = 1;
+		optional int32 numero_satelites = 2;
+		optional int32 hdop = 3;
+		required float latitude = 4;
+		required float longitude = 5;
+		optional float velocidade = 6;
+		optional float proa = 7;
+		optional int32 altitude = 8;
+		optional float odometro = 9;
+		optional bool antena_conectada = 10;
+		optional float velocidade_media = 11;
+		optional float odometro_gps = 12;
+		optional int32 relacao_sinal_ruido = 13;
+		optional float odometro_can = 14;
+		optional float velocidade_configurada = 15;
+	}
+
+	optional Gps gps = 7;
+	message Gsm {
+		optional bool sinal = 1;
+		optional int32 qualidade_sinal = 2;
+	}
+
+	optional Gsm gsm = 8;
+	message Bateria {
+		optional bool ativa = 1;
+		optional bool conectada = 2;
+		optional float tensao = 3;
+		optional int32 porcentagem = 4;
+	}
+
+	optional Bateria bateria_externa = 9;
+	optional bool ignicao = 10;
+	optional bool ignicao_virtual = 11;
+	optional bool bloqueador = 12;
+	optional bool botao_panico = 13;
+	optional bool antifurto = 14;
+	optional bool fake = 15;
+	optional bool sleep = 16;
+	optional RevGeo revgeo = 17;
+	optional EventoRegrasViolacoes evento_regras_violacoes = 18;
+	required bool posicao_online = 19 [default = false];
+	optional string ibutton = 20;
+	optional int32 rpmMaximo = 21;
+	optional int32 rpmMinimo = 22;
+	optional int32 rpmMedio = 23;
+
+	message ButtonTag {
+		required string driver_id = 1;
+		required int32 porcentagem_bateria = 2;
+		required int32 forma_ativacao = 3;
+		required int32 temperatura = 4;
+	}
+
+	optional ButtonTag button_tag = 24;
+	optional bool plataforma = 25;
+
+	enum IdentificacaoCondutorForma {
+		IBUTTON = 0;
+		CHAVEIRO_WIRELESS = 1;
+		CARTAO_RFID = 2;
+		MOTORISTA_PADRAO = 3;
+	}
+
+	enum IdentificadorCondutorJornada {
+		NAO_ESPECIFICADO = 0; INICIO_JORNADA = 1; FIM_JORNADA = 2; TIMEOUT = 3;
+	}
+
+	message IdentificacaoCondutor {
+		required string identificador = 1; //-1
+		required IdentificacaoCondutorForma forma = 2;
+		optional IdentificadorCondutorJornada idcondutorjornada = 3;
+		optional string idcliente = 4;
+		optional string idMotoristaPadrao = 5;
+		optional string nomeMotoristaPadrao = 6;
+	}
+
+	repeated IdentificacaoCondutor identificacoes_condutores = 26;
+	optional bool status_sirene = 27;
+	optional int32 rpm = 28;
+	optional float horimetro = 29;
+	optional float velocidade_maxima = 30;
+	optional int32 tempo_velocidade_maxima = 31;
+
+	message DadosAceleracao {
+		optional float aceleracaoX = 1;
+		optional float aceleracaoY = 2;
+		optional float aceleracaoZ = 3;
+		optional float forca = 4;
+		optional int32 duracao_evento = 5;
+		optional bool  movendo = 6;
+		optional string estado_acelerometro = 7;
+	}
+
+	optional DadosAceleracao dados_aceleracao = 32;
+	optional bool BloqueadorViolado = 33;
+
+	optional bool ecu_conectada = 34;
+
+	optional int32 frequencia_maxima_contador_pulsos_desde_ultima_posicao = 35;
+	optional float frequencia_contador_pulsos = 36;
+
+	enum ESensorBetoneira {
+		CARREGANDO = 1;
+		DESCARREGANDO = 2;
+		PARADA = 3;
+		SEM_SENSOR = 4;
+	}
+	optional ESensorBetoneira SensorBetoneira = 37;
+	optional bool porta = 38;
+
+	message ERB {
+		required int32 cellid = 1;				//cell identity
+		required int32 bsic = 2;				//base station identity
+		required int32 rssi = 3;				//received signal strength indicator
+		required int32 ta = 4;					//timing advance
+		required int32 lac = 5;					//location area code
+		required int32 mcc = 6;					//mobile country code
+		required int32 mnc = 7;					//mobile network code
+		optional int32 location_code = 8;		//location code
+		optional int32 distance = 9;			//distance
+		optional int32 sig_gsm = 10;			//Level of GSM signal
+	}
+	repeated ERB erbs = 39;
+
+	message Teclado {
+		required string modelo = 1;
+		required string numero_serie = 2;
+		required string versao_firwmare = 3;
+
+		enum ETipoMensagemTeclado{
+			TEXTO_LIVRE = 1;
+			PRE_DEFINIDA = 2;
+			PRE_DEFINIDA_COM_SUB_MACRO = 3;
+			RESPOSTA_COMANDO = 4;
+			ID_MOTORISTA = 5;
+			SENHA_MASTER = 6;
+		}
+		required ETipoMensagemTeclado tipoMensagem = 4;
+		required string grupo = 5;
+		required string mensagem = 6;
+		optional string codigoCombustivel = 7;
+		optional string quantidadeCombustivel = 8;
+		optional string valorCombustivel = 9;
+		optional string nota = 10;
+	}
+	optional Teclado teclado = 40;
+	optional bool SensorDesengate = 41;
+	optional float velocidade_maxima_em_banguela = 42;
+	optional bool sensor_chuva = 43;
+
+	optional UltimoMotoristaIdentificado ultimo_motorista_identificado = 44;
+
+	message RF {
+		enum Fabricante {
+			SUNTECH = 0;
+			MAXTRACK = 1;
+			CEABS = 2;
+			CONTINENTAL = 3;
+			RST = 4;
+			GENERICO = 5;
+			COMPSIS = 6;
+			QUANTA = 7;
+			CALAMP = 8;
+			SCOPE = 9;
+			TELEMACHINE = 10;
+			LIFTHEC = 11;
+			VOLVO = 12;
+			QUECLINK = 13;
+			LINKWORLD = 14;
+			OMNILINK = 15;
+			FKGROUP = 16;
+			APTAMAX = 17;
+		}
+		required string dispositivo_rf_numero_serie = 1;
+		required Fabricante dispositivo_rf_fabricante = 2;
+		required string dispositivo_rf_tipo = 3;
+		required string dispositivo_rf_mensagem = 4;
+		required float dispositivo_rf_latitude = 5;
+		required float dispositivo_rf_longitude = 6;
+		required bool dispositivo_rf_caixa_aberta = 7;
+		required float dispositivo_rf_bateria_tensao = 8;
+		required int32 dispositivo_rf_rssi = 9;
+		optional float dispositivo_rf_bateria_porcentagem = 10;
+		optional float dispositivo_rf_snr = 11;
+		optional bool dispositivo_rf_fix = 12;
+
+		optional int64 device_date_time = 13;
+		optional int64 rx_timestamp = 14;
+		optional int32 command_sequence_rx = 15;
+		optional float dispositivo_rf_frequencia = 16;
+	}
+	optional RF dispositivo_rf = 45;
+	optional bool em_operacao = 46;
+
+	message ODB {
+		optional string type_code = 1;
+		optional string type_description = 2;
+		optional string value = 3;
+	}
+	repeated ODB obd = 47;
+
+	message PontoMaisProximo {
+		required int32 ponto_id = 1;
+		required string nome = 2;
+		required string endereco = 3;
+		required float latitude = 4;
+		required float longitude = 5;
+		required float distancia = 6;
+		required int32 conta_id = 7;
+		required string direcao = 8;
+		required float proa = 9;
+	}
+	repeated PontoMaisProximo pontosMaisProximos = 48;
+
+	message DispositivoPresenca {
+		enum DispositivoModelo {
+			A40A = 1;
+			A40B = 2;
+		}
+		required DispositivoModelo dispositivo_modelo = 1;
+		required string numero_serie = 2;
+		enum ConexaoStatus {
+			CONECTADO = 1;
+			DESCONECTADO = 2;
+		}
+		required ConexaoStatus conexao_status = 3;
+		optional int64 tempo_de_vida_bateria_interna = 4;
+	}
+	repeated DispositivoPresenca dispositivos_presenca = 49;
+	optional bool jamming = 50;
+	optional bool emergencia_por_comando = 51;
+	optional string raw_package = 52;
+	optional bool emergencia = 53;
+	optional bool crash_habilitado = 54;
+	optional bool velocidade_acima_do_limite = 55;
+	optional bool motor_ligado = 56;
+	optional bool rpm_faixa_azul = 57;
+	optional bool rpm_faixa_vermelha = 58;
+	optional bool banguela = 59;
+	optional int32 nivel_de_combustivel = 60;
+	optional string maxio_serial = 61;
+	optional float velocidade_media_em_chuva = 62;
+	optional float velocidade_maxima_em_chuva = 63;
+
+	message FaixasRpm {
+		optional int64 intervalo_faixa_azul = 1;
+		optional int64 intervalo_faixa_verde = 2;
+		optional int64 intervalo_faixa_amarela = 3;
+		optional int64 intervalo_faixa_vermelha = 4;
+		optional int32 quatidade_faixa_vermelha = 5;
+		optional int32 rpm_maximo = 6;
+		optional int32 rpm_medio = 7;
+	}
+	optional FaixasRpm faixas_rpm = 64;
+	optional bool conectado_can = 65;
+	optional bool buzzer = 66;
+
+	enum OrigemMensagem {
+		GSM = 0;
+		LORA_WAN = 1;
+		LORA_P2P = 2;
+		SIGFOX = 3;
+		SINAL_4G = 4;
+		SINAL_2G = 5;
+	}
+
+	optional OrigemMensagem origem_mensagem = 67;
+	optional float horimetro2 = 68;
+
+	message DadosGeograficos {
+		enum tipoCerca {
+			CIRCULAR = 0;
+			POLIGONAL = 1;
+		}
+		enum motivoEnvio {
+			ENTRADA = 0;
+			SAIDA = 1;
+			PERMANENCIA = 2;
+			CERCA_SEM_GPS = 3;
+		}
+		required motivoEnvio motivo_envio = 1;
+		required int64 id_cerca = 2;
+		optional int64 tempo_permanencia = 3;
+		optional tipoCerca tipo_cerca = 4;
+	}
+	repeated DadosGeograficos dados_geografico = 69;
+
+	message EstadosPortas {
+		enum estado_saida {
+			ATIVADA = 0;
+			DESATIVADA = 1;
+		}
+		enum tipo {
+			ENTRADA = 0;
+			SAIDA = 1;
+		}
+		enum equipamento {
+			RASTREADOR = 0;
+			ACESSORIO = 1;
+			DISPOSITIVO = 2;
+		}
+		required equipamento equipamento_porta = 1;
+		required int64 numero_porta = 2;
+		required tipo tipo_portas = 3;
+		optional estado_saida valor_saida = 4;
+		optional string valor_entrada = 5;
+	}
+	repeated EstadosPortas portas = 70;
+	optional bool farol = 71;
+
+	message AnaliseConducaoDoVeiculo {
+		enum eixo {
+			X = 1;
+			Y = 2;
+			Z = 3;
+		}
+		required eixo eixo_analise = 1;
+		optional int64 horario_inicial = 2;
+		optional int32 tempo_analisado = 3;
+
+		optional int32 abaixo_do_normal = 4;
+		optional int32 normal = 5;
+		optional int32 pouco_agressivo = 6;
+		optional int32 agressivo = 7;
+		optional int32 muito_agressivo = 8;
+	}
+	repeated AnaliseConducaoDoVeiculo analiseConducaoDoVeiculo = 72;
+
+	message LoraWanInfos {
+	    optional float delay = 1;
+	    optional int64 rxTime = 2;
+	    optional int64 rssi = 3;
+			optional int32 snr = 4;
+			optional int32 spreading = 5;
+			optional int32 size = 6;
+			optional float time = 7;
+			optional float snr_float = 8;
+
+	}
+
+	optional LoraWanInfos loraWanInfos = 73;
+
+	optional bool botao_rastreamento = 74;
+	optional int32 loraid_motivo_emergencia = 75;
+	optional string trafego_dados_can = 76;
+
+	message DadosCan {
+        optional int32 nivel_comb1 = 1;
+        optional int32 nivel_comb2 = 2;
+        optional int32 sensor_posicao_acelerador = 3;
+        optional int32 pressao_pneu = 4;
+        optional bool freio = 5;
+        optional bool freio_de_mao = 6;
+        optional bool cinto = 7;
+        optional bool porta_fechada = 8;
+        optional bool porta_travada = 9;
+        optional bool freio_motor = 10;
+        optional bool farol = 11;
+        optional bool lim_parab = 12;
+        optional bool modulo_removido = 13;
+        optional int32 consumo_comb = 14;
+        optional string lam_mal_funciona = 15;
+        optional string ecu_vin = 16;
+        optional int32 marcha_atual = 17;
+        optional int32 pressao_oleo = 18;
+        optional int32 temp_oleo = 19;
+        optional int32 temp_motor = 20;
+	}
+
+	optional DadosCan dadosCan = 77;
+	optional bytes snapshot_camera = 78;
+	optional bool painel_violado = 79;
+	optional float temperatura = 80;
+}

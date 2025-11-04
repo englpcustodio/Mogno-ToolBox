@@ -1,0 +1,106 @@
+syntax = "proto2";
+package dadoslorawan;
+
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+option java_outer_classname = "maxtrack_lorawan";
+
+//REGEX para remover os comentarios dos protos maxtrack
+//->>>        //?(.*)
+
+option cc_enable_arenas = true;
+
+message MaxtrackLoraWan
+{
+	message Position {
+		required float latitude = 1;
+		required float longitude = 2;
+		required int32 heading = 3;
+		required int32 moving = 4;
+		required int32 jamming = 5;
+		required int32 gpsValid = 6;
+		required int32 extPower = 7;
+		required int32 criticalBattery = 8;
+		required int32 ignition = 9;
+		required int32 speed = 10;
+		required int32 output = 11;
+		required int32 panic = 12;
+		required int32 emergency = 13;
+		required int32 batteryInfo = 14;
+		required int32 dummy = 15;
+		required int32 tamanhoPayload = 16;
+		required int32 optionalBatteryInfo =17;
+	}
+
+	repeated Position position = 1;
+
+	message DeltaInfo{
+		required int32 movingTime = 1;
+		required int32 maxSpeed = 2;
+		required int32 meanSpeed = 3;
+		required int32 hardAcc = 4;
+		required int32 hardCurve = 5;
+		required int32 hardBrake = 6;
+		required int32 travelDistance = 7;
+		required int32 hour = 8;
+		required int32 day = 9;
+		required int32 month = 10;
+		required int32 speedHistogram0 = 11;
+		required int32 speedHistogram1 = 12;
+		required int32 speedHistogram2 = 13;
+		required int32 speedHistogram3 = 14;
+		required int32 speedHistogram4 = 15;
+		required int32 speedHistogram5 = 16;
+		required int32 tripQty = 17;
+		required int32 tripMeanTime = 18;
+		optional int32 last_hours_movement = 19;
+	}
+	repeated DeltaInfo deltainfo = 2;
+
+	message GsensorData{
+		required int32 moving_time = 1;
+		required int32 battery_voltage = 2;
+		required int32 ext_power = 3;
+		required int32 critical_battery = 4;
+		required int32 ignition = 5;
+		required int32 output = 6;
+		required int32 alarm = 7;
+		required int32 emergency = 8;
+		required int32 pairing = 9;
+		required int32 moving = 10;
+		required int32 tampering = 11;
+		required int32 z_inversion = 12;
+		required int32 impact = 13;
+		required int32 gsr_calibrated = 14;
+		required int32 pitching = 15;
+		required int32 rolling = 16;
+		required int32 dummy = 17;
+		required int32 fake_move_cnt = 18;
+		required int32 fake_rotate_cnt = 19;
+		required int32 true_move_cnt = 20;
+		required int32 true_rotate_cnt = 21;
+		required int32 reset_cnt = 22;
+		required int32 cputime = 23;
+	}
+	optional GsensorData gsensordata = 3;
+
+	message StatusData{
+		required int32 version_patch = 1;
+		required int32 version_minor = 2;
+		required int32 version_major = 3;
+		required int32 crcConfig = 4;
+		required int32 crcWan = 5;
+		required int32 lora_help_tx_cnt = 6;
+		required int32 uptime_s = 7; //reset zero if watchdog reset
+		required int32 life_s = 8; ; //total second from plugin batte
+		required int32 sleep_100ms = 9;
+		required int64 lora_tx_100ms = 10;
+		required int64 lora_rx_100ms = 11;
+		required int64 lora_rx_cnt = 12;
+		required int64 lora_tx_cnt = 13;
+		required int32 lorawan_tx_cnt = 14;
+		required int32 used_ma_s = 15;
+		required int32 saved_ma_s = 16;
+	}
+	optional StatusData statusdata = 4;
+
+}

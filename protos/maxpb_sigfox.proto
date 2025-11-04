@@ -1,0 +1,81 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_report.proto";        /// $SUPPORTEDBY[] 
+import "maxpb_gpio.proto";          /// $SUPPORTEDBY[] 
+import "maxpb_gps.proto";           /// $SUPPORTEDBY[] 
+//import "maxpb_geographic.proto";    /// $SUPPORTEDBY[] 
+import "maxpb_telemetry.proto";     /// $SUPPORTEDBY[] 
+//import "maxpb_filetransfer.proto";  /// $SUPPORTEDBY[] 
+import "maxpb_customer_data.proto"; /// $SUPPORTEDBY[] 
+/// Selects when and how device will send Sigfox packets
+enum SigfoxMode {
+   SFM_NONE                        = 0;  /// $SUPPORTEDBY[MXT13X, MXT180, A40, A6X, MTC8XX, MTC8XX_MCU] $DESCRIPTION[Nenhum pacote será enviado] $DESCRIPTION_ENGLISH[No packets will be sent]
+   SFM_POSITIONS                   = 1;  /// $SUPPORTEDBY[MXT13X, MXT180, A40, A6X, MTC8XX, MTC8XX_MCU] $DESCRIPTION[Pacotes de posição serão enviados de acordo com o intervalo de transmissão SigFox] $DESCRIPTION_ENGLISH[Position packets will be sent according Sigfox intervals]
+   SFM_POSITIONS_GPRS_UNAVAILABLE  = 2;  /// $SUPPORTEDBY[MXT13X, MXT180, A40, A6X, MTC8XX, MTC8XX_MCU] $DESCRIPTION[Pacotes de posição serão enviados de acordo com o intervalo de transmissão SigFox, mas apenas quando não tiver conexão GPRS] $DESCRIPTION_ENGLISH[Position packets will be sent according Sigfox intervals but only when device doesn't have GPRS connection]
+   SFM_RFU_01                      = 3;  /// $SUPPORTEDBY[] 
+   SFM_RFU_02                      = 4;  /// $SUPPORTEDBY[] 
+   SFM_RFU_03                      = 5;  /// $SUPPORTEDBY[] 
+   SFM_RFU_04                      = 6;  /// $SUPPORTEDBY[] 
+   SFM_RFU_05                      = 7;  /// $SUPPORTEDBY[] 
+}
+enum SigfoxDataType {
+   SDT_POSITION      = 0;  /// $SUPPORTEDBY[A6X]
+   SDT_EXT_PWR       = 1;  /// $SUPPORTEDBY[A6X]
+   SDT_EXT_PWR_FAIL  = 2;  /// $SUPPORTEDBY[A6X]
+   SDT_DELTA         = 3;  /// $SUPPORTEDBY[A6X]
+   SDT_RFU_01        = 4;  /// $SUPPORTEDBY[] 
+   SDT_RFU_02        = 5;  /// $SUPPORTEDBY[] 
+   SDT_RFU_03        = 6;  /// $SUPPORTEDBY[] 
+   SDT_RFU_04        = 7;  /// $SUPPORTEDBY[] 
+   SDT_RFU_05        = 8;  /// $SUPPORTEDBY[] 
+}
+message frameInfo
+{
+  optional uint32 quantity       = 1;  /// $SUPPORTEDBY[GATEWAY] 
+  optional uint32 total          = 2;  /// $SUPPORTEDBY[GATEWAY] 
+}
+message SigfoxRadioInfo
+{
+   optional sint32 RSSI             = 1;  /// $SUPPORTEDBY[GATEWAY] $DESCRIPTION[Formato do valor: 10 * dBm] $DESCRIPTION_ENGLISH[10 * dBm]
+   optional sint32 SNR              = 2;  /// $SUPPORTEDBY[GATEWAY] $DESCRIPTION[Formato do valor: 10 * dB] $DESCRIPTION_ENGLISH[10 * dB]
+   optional uint32 frequency        = 3;  /// $SUPPORTEDBY[GATEWAY] $DESCRIPTION[kHz] $DESCRIPTION_ENGLISH[kHz]
+   optional frameInfo frames        = 4;  /// $SUPPORTEDBY[GATEWAY] 
+}
+message SigfoxData {
+   required uint32 sigfoxID               = 1;     /// $SUPPORTEDBY[GATEWAY]
+   required uint32 sequenceNumber         = 2;     /// $SUPPORTEDBY[GATEWAY]
+   optional IDPack identificationPack     = 3;     /// $SUPPORTEDBY[GATEWAY]
+   optional SigfoxRadioInfo sigfoxRadio   = 4;     /// $SUPPORTEDBY[GATEWAY]
+   repeated PositionInfo position         = 5;     /// $SUPPORTEDBY[GATEWAY]
+   optional IOsInfo ios                   = 6;     /// $SUPPORTEDBY[GATEWAY]
+   optional FlagsInfo flags               = 7;     /// $SUPPORTEDBY[GATEWAY]
+   optional TelemetryInfo telemetry       = 8;     /// $SUPPORTEDBY[GATEWAY]
+   optional uint64 gatewayDateTime        = 9;     /// $SUPPORTEDBY[GATEWAY]
+   optional uint64 gatewayDeviceId        = 10;    /// $SUPPORTEDBY[GATEWAY]
+   repeated PositionInfo gatewayPosition  = 11;    /// $SUPPORTEDBY[GATEWAY]
+   optional GpsInfo gps                   = 13;    /// $SUPPORTEDBY[GATEWAY]
+   optional GpsInfo gatewayGps            = 14;    /// $SUPPORTEDBY[GATEWAY]
+   optional uint64 deviceDateTime         = 15;    /// $SUPPORTEDBY[GATEWAY]
+   optional Events events                 = 16;    /// $SUPPORTEDBY[GATEWAY]
+   optional bytes openData                = 17;    /// $SUPPORTEDBY[GATEWAY]
+   optional bool isAck                    = 18;    /// $SUPPORTEDBY[GATEWAY]
+   optional uint32 port                   = 19;    /// $SUPPORTEDBY[GATEWAY]
+   repeated AccessoryStatus accessories   = 20;    /// $SUPPORTEDBY[GATEWAY]
+   
+   optional CustomerData customerData     = 128;   /// $SUPPORTEDBY[GATEWAY] $DESCRIPTION[Informação adicional inclusa pelo gateway] $DESCRIPTION_ENGLISH[Additional data add by gateway]
+   optional uint64 networkDelay           = 129;   /// $SUPPORTEDBY[GATEWAY] 
+}
+message SigfoxTxInterval {
+   optional uint32 moving           = 1;  /// $SUPPORTEDBY[A6X] $DESCRIPTION[Intervalo para transmitir posição quando o dispositivo está em movimento] $DESCRIPTION_ENGLISH[Interval in Seconds to transmit position when device is moving]
+   optional uint32 stopped          = 2;  /// $SUPPORTEDBY[A6X] $DESCRIPTION[Intervalo para transmitir posição quando o dispositivo está parado] $DESCRIPTION_ENGLISH[Interval in Seconds to transmit position when device is stopped]
+   optional uint32 movingEmergency  = 3;  /// $SUPPORTEDBY[A6X] $DESCRIPTION[Intervalo para transmitir posição quando o dispositivo está em emergência e em movimento] $DESCRIPTION_ENGLISH[Interval in Seconds to transmit position when device is in emergency and moving]
+   optional uint32 stoppedEmergency = 4;  /// $SUPPORTEDBY[A6X] $DESCRIPTION[Intervalo para transmitir posição quando o dispositivo está em emergência e parado] $DESCRIPTION_ENGLISH[Interval in Seconds to transmit position when device is in emergency and stopped]
+}
+message SigfoxDownlinkRequest {
+   optional bool always = 1;  /// $SUPPORTEDBY[A6X] $DESCRIPTION[Downlink será requerido em todas as transmissões] $COMMENT[0 ou 1] $VALIDATOR[^(0|1)$] $DESCRIPTION_ENGLISH[Downlink will be requested on every transmission]
+}
+message SigfoxConfig {
+   optional SigfoxMode mode                        = 1;  /// $SUPPORTEDBY[A6X] $DESCRIPTION[Modo]
+   optional SigfoxTxInterval txInterval            = 2;  /// $SUPPORTEDBY[A6X] $DESCRIPTION[Intervalo]
+   optional SigfoxDownlinkRequest downlinkRequest  = 3;  /// $SUPPORTEDBY[A6X] $DESCRIPTION[downlinkRequest]
+}

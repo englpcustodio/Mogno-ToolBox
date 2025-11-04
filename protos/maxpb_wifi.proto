@@ -1,0 +1,308 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+import "maxpb_transmission.proto";   /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2]
+enum WifiWebLoginType {
+   WBLT_NONE         = 0;   /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] 
+   WBLT_USER_TERMS   = 1;   /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] 
+   WBLT_EMAIL_ONLY   = 2;   /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] 
+   WBLT_PASSWORD_DB  = 3;   /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] 
+   WBLT_RADIUS       = 4;   /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] 
+   WBLT_GO_DENOX     = 5;   /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] 
+   WBLT_RFU_06       = 6;   /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] 
+   WBLT_RFU_07       = 7;   /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] 
+   WBLT_RFU_08       = 8;   /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] 
+   WBLT_RFU_09       = 9;   /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] 
+   WBLT_RFU_10       = 10;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] 
+}
+enum WiFiMode {
+   WM_NONE           = 0;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80] $DESCRIPTION[None] $DESCRIPTION_ENGLISH[None]
+   WM_AP_MODE        = 1;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80] $DESCRIPTION_ENGLISH[Wifi set in client mode] $DESCRIPTION[Wifi configurado no modo AP]
+   WM_CLIENT_MODE    = 2;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80] $DESCRIPTION_ENGLISH[Wifi set in AP mode] $DESCRIPTION[Wifi configurado no modo cliente]
+   WM_AP_CLIENT_MODE = 3;  /// $SUPPORTEDBY[]
+   WM_RFU_04         = 4;  /// $SUPPORTEDBY[]
+   WM_RFU_05         = 5;  /// $SUPPORTEDBY[]
+   WM_RFU_06         = 6;  /// $SUPPORTEDBY[]
+   WM_RFU_07         = 7;  /// $SUPPORTEDBY[]
+   WM_RFU_08         = 8;  /// $SUPPORTEDBY[]
+}
+enum WiFiSecurity {
+   WS_OPEN           = 0;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[WiFi aberto (sem senha)] $DESCRIPTION_ENGLISH[Open WiFi (no password)]
+   WS_WEP            = 1;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Wifi com segurança WEP] $DESCRIPTION_ENGLISH[Wifi with WEP security]
+   WS_WPA_PSK        = 2;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Wifi com segurança WPA-PSK] $DESCRIPTION_ENGLISH[Wifi with WPA-PSK security]
+   WS_WPA2_PSK       = 3;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Wifi com segurança WPA2-PSK] $DESCRIPTION_ENGLISH[Wifi with WPA2-PSK security]
+   WS_WPA_WPA2_PSK   = 4;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Wifi com segurança WPA-PSK e WPA2-PSK] $DESCRIPTION_ENGLISH[Wifi with WPA-PSK and WPA2-PSK security]
+   WS_RFU_01         = 5;  /// $SUPPORTEDBY[]
+   WS_RFU_02         = 6;  /// $SUPPORTEDBY[]
+   WS_RFU_03         = 7;  /// $SUPPORTEDBY[]
+   WS_RFU_04         = 8;  /// $SUPPORTEDBY[]
+   WS_RFU_05         = 9;  /// $SUPPORTEDBY[]
+}
+enum WiFiChannel {
+   WC_AUTO                    = 0;   /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[O canal do WiFi será escolhido automaticamente] $DESCRIPTION_ENGLISH[The WiFi channel will be chosen automatically]
+   WC_2_4_GHZ_CHANNEL_1       = 1;   /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Canal 1 do WiFi 2.4 GHz]  $DESCRIPTION_ENGLISH[Wifi 2.4 GHz channel 1]
+   WC_2_4_GHZ_CHANNEL_2       = 2;   /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Canal 2 do WiFi 2.4 GHz]  $DESCRIPTION_ENGLISH[Wifi 2.4 GHz channel 2]
+   WC_2_4_GHZ_CHANNEL_3       = 3;   /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Canal 3 do WiFi 2.4 GHz]  $DESCRIPTION_ENGLISH[Wifi 2.4 GHz channel 3]
+   WC_2_4_GHZ_CHANNEL_4       = 4;   /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Canal 4 do WiFi 2.4 GHz]  $DESCRIPTION_ENGLISH[Wifi 2.4 GHz channel 4]
+   WC_2_4_GHZ_CHANNEL_5       = 5;   /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Canal 5 do WiFi 2.4 GHz]  $DESCRIPTION_ENGLISH[Wifi 2.4 GHz channel 5]
+   WC_2_4_GHZ_CHANNEL_6       = 6;   /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Canal 6 do WiFi 2.4 GHz]  $DESCRIPTION_ENGLISH[Wifi 2.4 GHz channel 6]
+   WC_2_4_GHZ_CHANNEL_7       = 7;   /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Canal 7 do WiFi 2.4 GHz]  $DESCRIPTION_ENGLISH[Wifi 2.4 GHz channel 7]
+   WC_2_4_GHZ_CHANNEL_8       = 8;   /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Canal 8 do WiFi 2.4 GHz]  $DESCRIPTION_ENGLISH[Wifi 2.4 GHz channel 8]
+   WC_2_4_GHZ_CHANNEL_9       = 9;   /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Canal 9 do WiFi 2.4 GHz]  $DESCRIPTION_ENGLISH[Wifi 2.4 GHz channel 9]
+   WC_2_4_GHZ_CHANNEL_10      = 10;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Canal 10 do WiFi 2.4 GHz] $DESCRIPTION_ENGLISH[Wifi 2.4 GHz channel 10]
+   WC_2_4_GHZ_CHANNEL_11      = 11;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Canal 11 do WiFi 2.4 GHz] $DESCRIPTION_ENGLISH[Wifi 2.4 GHz channel 11]
+   WC_2_4_GHZ_CHANNEL_12      = 12;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Canal 12 do WiFi 2.4 GHz] $DESCRIPTION_ENGLISH[Wifi 2.4 GHz channel 12]
+   WC_2_4_GHZ_CHANNEL_13      = 13;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Canal 13 do WiFi 2.4 GHz] $DESCRIPTION_ENGLISH[Wifi 2.4 GHz channel 13]
+   WC_2_4_GHZ_CHANNEL_14      = 14;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Canal 14 do WiFi 2.4 GHz] $DESCRIPTION_ENGLISH[Wifi 2.4 GHz channel 14]
+   WC_RFU_15                  = 15;  /// $SUPPORTEDBY[]
+   WC_RFU_16                  = 16;  /// $SUPPORTEDBY[]
+   WC_RFU_17                  = 17;  /// $SUPPORTEDBY[]
+   WC_RFU_18                  = 18;  /// $SUPPORTEDBY[]
+   WC_RFU_19                  = 19;  /// $SUPPORTEDBY[]
+   WC_DEPRECATED_35           = 35;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION_ENGLISH[No use this value]
+   WC_5_0_GHZ_CHANNEL_36      = 36;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 36 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 36]
+   WC_5_0_GHZ_CHANNEL_40      = 40;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 40 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 40]
+   WC_5_0_GHZ_CHANNEL_44      = 44;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 44 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 44]
+   WC_5_0_GHZ_CHANNEL_48      = 48;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 48 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 48]
+   WC_5_0_GHZ_CHANNEL_52      = 52;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 52 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 52]
+   WC_5_0_GHZ_CHANNEL_56      = 56;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 56 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 56]
+   WC_5_0_GHZ_CHANNEL_60      = 60;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 60 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 60]
+   WC_5_0_GHZ_CHANNEL_64      = 64;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 64 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 64]
+   WC_5_0_GHZ_CHANNEL_100     = 100; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 100 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 100]
+   WC_5_0_GHZ_CHANNEL_104     = 104; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 104 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 104]
+   WC_5_0_GHZ_CHANNEL_108     = 108; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 108 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 108]
+   WC_5_0_GHZ_CHANNEL_112     = 112; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 112 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 112]
+   WC_5_0_GHZ_CHANNEL_116     = 116; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 116 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 116]
+   WC_5_0_GHZ_CHANNEL_120     = 120; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 120 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 120]
+   WC_5_0_GHZ_CHANNEL_124     = 124; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 124 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 124]
+   WC_5_0_GHZ_CHANNEL_128     = 128; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 128 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 128]
+   WC_5_0_GHZ_CHANNEL_132     = 132; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 132 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 132]
+   WC_5_0_GHZ_CHANNEL_136     = 136; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 136 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 136]
+   WC_5_0_GHZ_CHANNEL_140     = 140; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 140 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 140]
+   WC_5_0_GHZ_CHANNEL_144     = 144; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 144 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 144]
+   WC_5_0_GHZ_CHANNEL_149     = 149; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 149 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 149]
+   WC_5_0_GHZ_CHANNEL_153     = 153; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 153 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 153]
+   WC_5_0_GHZ_CHANNEL_157     = 157; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 157 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 157]
+   WC_5_0_GHZ_CHANNEL_161     = 161; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 161 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 161]
+   WC_5_0_GHZ_CHANNEL_165     = 165; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[Canal 165 do WiFi 5.0 GHz] $DESCRIPTION_ENGLISH[Wifi 5.0 GHz channel 165]
+   WC_RFU_166                 = 166; /// $SUPPORTEDBY[]
+   WC_RFU_167                 = 167; /// $SUPPORTEDBY[]
+   WC_RFU_168                 = 168; /// $SUPPORTEDBY[]
+   WC_RFU_169                 = 169; /// $SUPPORTEDBY[]
+   WC_RFU_170                 = 170; /// $SUPPORTEDBY[]
+}
+enum WiFiChannelBandwidth {
+   WCB_NONE          = 0;  /// $SUPPORTEDBY[]
+   WCB_HT20          = 1;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   WCB_HT40          = 2;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   WCB_HT40_PLUS     = 3;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   WCB_HT40_MINUS    = 4;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   WCB_HT80          = 5;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   WCB_HT160         = 6;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   WCB_HT80_80       = 7;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   WCB_RFU_01        = 8;  /// $SUPPORTEDBY[]
+   WCB_RFU_02        = 9;  /// $SUPPORTEDBY[]
+   WCB_RFU_03        = 10; /// $SUPPORTEDBY[]
+   WCB_RFU_04        = 11; /// $SUPPORTEDBY[]
+   WCB_RFU_05        = 12; /// $SUPPORTEDBY[]
+}
+enum WiFiStatus {
+   WST_NONE                         = 0;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   WST_VISIBLE                      = 1;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   WST_CONNECTED_INVALID            = 2;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   WST_CONNECTED                    = 3;  /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+enum FtpRecordMedia {
+   FTPRM_NONE                 = 0; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   FTPRM_NFS                  = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   FTPRM_UDISK                = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   FTPRM_EMMC                 = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+   FTPRM_RFU_4                = 4; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+   FTPRM_RFU_5                = 5; /// $SUPPORTEDBY[] $DESCRIPTION_ENGLISH[]
+}
+enum EthernetConfigMode {
+   ECM_NONE            = 0;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   ECM_LAN             = 1;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   ECM_DUAL_LAN        = 2;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   ECM_WAN             = 3;  /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+enum WifiInterferenceCode {
+   WIC_NONE               = 0;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   WIC_WEATHER_RADAR      = 1;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   WIC_HIGH_NOISE         = 2;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   WIC_HIGH_CHANNEL_LOAD  = 3;  /// $SUPPORTEDBY[MTC8XX, DLR]
+   WIC_LOW_RSSI           = 4;  /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+message WiFiRadioConfig {
+   optional WiFiMode mode                         = 1;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR] $DESCRIPTION[Seleciona o modo do WiFi: desligado, AP ou cliente] $DESCRIPTION_ENGLISH[Selects WiFi mode: turned off, AP or client]
+   optional WiFiChannel channel                   = 2;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80] $DESCRIPTION[Seleciona o canal do WiFi] $DESCRIPTION_ENGLISH[Selects WiFi channel]       
+   optional WiFiChannelBandwidth channelBandwidth = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] 
+}
+message WiFiScanInfo {
+   optional WiFiSecurity security            = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[]
+   optional WiFiChannel channel              = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[]
+   optional string ssid                      = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[]
+   optional uint64 rfu                       = 4;  /// $SUPPORTEDBY[] $DESCRIPTION[]
+   optional int32 quality                    = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional int32 rssi                       = 6;  /// $SUPPORTEDBY[MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[]
+   optional WiFiStatus status                = 7;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional string mac                       = 8;  /// $SUPPORTEDBY[MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[]
+   optional int32 frequency                  = 9;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+}
+//message WifiApConnectionStatistics {
+//}
+message WifiApConnectionInfo {
+   optional bytes mac                        = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional uint64 connectionTimestamp       = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional string deviceDescription         = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional int32 rssi                       = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional int32 snr                        = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional bool accepted                    = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional uint64 dhcpLease                 = 7;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional uint32 ipv4                      = 8;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional string ipv6                      = 9;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+}
+//message WifiApStatistics {
+//}
+message WifiApInfo {
+   optional WiFiSecurity security            = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional string ssid                      = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   repeated WifiApConnectionInfo connections = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+}
+message WifiApRadioInfo {
+   optional WiFiMode mode                    = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional bytes mac                        = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional WiFiChannel channel              = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   repeated WifiApInfo apInfo                = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+}
+message WifiChannelInfo {
+   optional uint32 channel         = 1; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional uint32 value           = 2; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional uint32 ranking         = 3; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+}
+message WifiChannelsInfo {
+   optional uint32 timeStamp                = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   repeated WifiChannelInfo channelInfo     = 2; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional uint32 bestChannel_2_4Ghz       = 3; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional uint32 bestChannel_5Ghz         = 4; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional uint32 interferenceLevel_2_4Ghz = 5; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional uint32 interferenceLevel_5Ghz   = 6; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+}
+message WiFiClientConfig {
+   optional WiFiSecurity security                 = 1;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Seleciona a segurança do WiFi] $DESCRIPTION_ENGLISH[Selects WiFi security]
+   optional bool clientFixedIP                    = 2;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Define se o device irá usar IP fixo ou receber um IP automaticamente quando se conectar em uma rede WiFi] $DESCRIPTION_ENGLISH[Defines if device will use a fixed IP or get an IP automatically when it connects in a WiFi network]
+   optional string ssid                           = 3;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Nome SSID da rede WiFi que será usada pelo device no modo AP/cliente] $DESCRIPTION_ENGLISH[SSID name of WiFi network which will be used by AP/client mode device]
+   optional string password                       = 4;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Define a senha da rede WiFi que será usada pelo device no modo AP/cliente] $DESCRIPTION_ENGLISH[Defines the password of WiFi network which will be used by AP/client mode device]
+   optional AddressConfig fixedAddress            = 5;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Configuração de endereço fixo que o device (no modo cliente) irá usar quando conectar em uma rede] $DESCRIPTION_ENGLISH[Fixed address configuration in which the device (in client mode) will use when it connects in a network]
+   optional AddressConfig remoteHostAddress       = 6;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] $DESCRIPTION[Configuração de endereço do servidor que o device (no modo cliente) irá usar quando conectar em uma rede] $DESCRIPTION_ENGLISH[Server address configuration in which the device (in client mode) will use when it connects in a network]
+   optional bool hiddenNetwork                    = 7;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2] 
+   optional AddressConfig connectionTest          = 8;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+}
+message WiFiApConfig {
+   optional WiFiSecurity security                 = 1;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR] $DESCRIPTION[Seleciona a segurança do WiFi] $DESCRIPTION_ENGLISH[Selects WiFi security]
+   optional string ssid                           = 2;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR] $DESCRIPTION[Nome SSID da rede WiFi que será usada pelo device no modo AP/cliente] $DESCRIPTION_ENGLISH[SSID name of WiFi network which will be used by AP/client mode device]
+   optional string password                       = 3;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR] $DESCRIPTION[Define a senha da rede WiFi que será usada pelo device no modo AP/cliente] $DESCRIPTION_ENGLISH[Defines the password of WiFi network which will be used by AP/client mode device]
+   optional bool hiddenNetwork                    = 4;  /// $SUPPORTEDBY[MTC8XX, DLR]
+}
+message WiFiInfo {
+   repeated WiFiScanInfo      scan             = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[]
+   optional WifiApRadioInfo   radio2_4Ghz      = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional WifiApRadioInfo   radio5Ghz        = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional WifiChannelsInfo  channelsUse      = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+   optional WifiChannelsInfo  interference     = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+}   
+message WiFiTransmissionConfig {
+   optional uint32 reportInterval                = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[]
+   optional uint32 statusInterval                = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[]
+   optional bool enableWifiScanInfo              = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[]
+   optional DischargeConfig discharge	         = 4;  /// $SUPPORTEDBY[A6X, A90, MAXIO2] $DESCRIPTION[]
+   optional bool enableWifiScanChannels          = 5;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[]
+   optional bool enableWifiScanInterference      = 6;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[]
+   optional uint32 wifiScanInfoInterval          = 7;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[]
+   optional uint32 wifiScanInterferenceInterval  = 8;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[]
+}
+message EthernetConfig {
+   optional bool enabled                     =  1;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+   optional bool dhcp                        =  2;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+   optional string ip                        =  3;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+   optional string gw                        =  4;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+   optional string mask                      =  5;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+   optional EthernetConfigMode mode          = 10;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+}
+message FtpServerConfig {
+  optional bool enable                       = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION_ENGLISH[]
+  optional string user                       = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION_ENGLISH[]
+  optional string password                   = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION_ENGLISH[]
+  optional string root                       = 4;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION_ENGLISH[]
+  optional FtpRecordMedia media              = 5;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION_ENGLISH[]
+}
+message FtpClientConfig {
+  optional string host                       = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 port                       = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional string user                       = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional string password                   = 4; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional string path                       = 5; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional string localPath                  = 6; /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION_ENGLISH[]
+}
+message FileServerSyncConfig{
+  optional AwsS3ClientConfig awsS3ClientConfig         = 1; /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION_ENGLISH[]
+  optional uint64 intervalToSync                       = 2; /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION_ENGLISH[Interval in seconds - 0 Disable]
+}
+message UploadForwaderConfig{
+  repeated AwsS3ClientConfig awsS3ClientConfig         = 1; /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION_ENGLISH[]
+  repeated FtpClientConfig ftpClientConfig             = 2; /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION_ENGLISH[]  
+}
+message LanNetworkConfig{
+  optional string ip                 = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 dhcpStart          = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint32 dhcpEnd            = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional string netMask            = 4; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message WifiScheduleReboot{
+  optional bool enable               = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint64 period             = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional uint64 dateTime           = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+  optional bool checkIgnition        = 4; /// $SUPPORTEDBY[MTC8XX, DLR, DVR] $DESCRIPTION_ENGLISH[]
+}
+message WifiCoordinatorLimitConfig {
+   optional uint32 maxUsers            = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+   optional uint32 minUserBandwidth    = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+   optional uint32 maxUserBandwidth    = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR]
+}
+message WifiCoordinatorConfig {
+   optional WifiCoordinatorLimitConfig HConnection    = 1; /// $SUPPORTEDBY[MTC8XX, DLR, WIFI]
+   optional WifiCoordinatorLimitConfig LTEConnection  = 2; /// $SUPPORTEDBY[MTC8XX, DLR, WIFI]
+   optional WifiWebLoginType webLoginType             = 3; /// $SUPPORTEDBY[MTC8XX, DLR, WIFI]
+   optional string webLoginUrl                        = 4; /// $SUPPORTEDBY[MTC8XX, DLR, WIFI]
+   optional string webLoginToken                      = 5; /// $SUPPORTEDBY[MTC8XX, DLR, WIFI]
+}
+message DnsConfig{
+   optional string domainName     = 1; /// $SUPPORTEDBY[MTC8XX, DLR, WIFI]
+   repeated string dnsServers     = 2; /// $SUPPORTEDBY[MTC8XX, DLR, WIFI]
+   optional string cpeId          = 3; /// $SUPPORTEDBY[MTC8XX, DLR, WIFI]
+}
+message MaxWifiConfig {
+  optional uint64 deviceID                             = 1;   /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION_ENGLISH[]
+  optional AddressConfig mqttServerConfig              = 2;   /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION_ENGLISH[]
+  optional WiFiRadioConfig radio2G                     = 3;   /// $SUPPORTEDBY[A6X, MTC8XX, DLR] $DESCRIPTION[]
+  optional WiFiRadioConfig radio5G                     = 4;   /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+  optional WiFiTransmissionConfig transmission         = 5;   /// $SUPPORTEDBY[A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Configurações de transmissão]
+  optional FtpServerConfig ftpServer                   = 6;   /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[]
+  optional FileServerSyncConfig fileServerSync         = 7;   /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[]
+  optional UploadForwaderConfig uploadForwarderConfig  = 8;   /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[]
+  optional EthernetConfig ethPrimaryConfig             = 9;   /// $SUPPORTEDBY[MTC8XX, DLR, WIFI] $DESCRIPTION[]
+ 
+  optional WiFiApConfig accessPoint2G_1        = 10;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR] $DESCRIPTION[]
+  optional WiFiApConfig accessPoint2G_2        = 11;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+  optional WiFiApConfig accessPoint5G_1        = 12;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+  optional WiFiApConfig accessPoint5G_2        = 13;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+  optional LanNetworkConfig lanConfig          = 20;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+  optional WiFiClientConfig client1                    = 30;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[]
+  optional WiFiClientConfig client2                    = 31;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+  optional WiFiClientConfig client3                    = 32;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+  optional WiFiClientConfig client4                    = 33;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+  optional WifiScheduleReboot scheduleReboot           = 40;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+  optional WifiCoordinatorConfig wifiCoordinatorConfig = 42;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[]
+  optional DnsConfig dnsConfig                         = 43;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI]
+  optional string firewallRules                        = 44;  /// $SUPPORTEDBY[MTC8XX, DLR, WIFI]
+  
+}

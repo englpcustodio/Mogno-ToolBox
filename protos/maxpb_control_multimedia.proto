@@ -1,0 +1,24 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+enum MultimediaAction {
+    MA_NONE                 = 0;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    MA_ADD                  = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    MA_CLEAR                = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    MA_BUZZER_ON            = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    MA_BUZZER_OFF           = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    MA_RFU05                = 5;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    MA_RFU06                = 6;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    MA_RFU07                = 7;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    MA_RFU08                = 8;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    MA_RFU09                = 9;  /// $SUPPORTEDBY[] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message MultimediaServiceControl {
+    optional MultimediaAction Action        = 1; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    optional string pathMSC                 = 2; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 listSize                = 3; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 index                   = 4; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    required uint64 DTMultiSC               = 5; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+}
+message MultimediaServiceControlReturn {
+    repeated string list                    = 1; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+}

@@ -1,0 +1,151 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+
+message LoraGatewayRadio
+{
+  optional bool   enable     = 1;  /// Enable radio, default: radio0 = 1, radio1 = 1 SupportedBy: MTC8XX
+  optional string typeRadio  = 2;  /// Transceiver type, default: radio0 = "SX1257", radio1 = "SX1257" SupportedBy: MTC8XX
+  optional uint64 freq       = 3;  /// Central radio frequency, 0 to 2000000000 Hz, default: radio0 = 915600000Hz, radio1=916400000 SupportedBy: MTC8XX
+  optional double rssiOffset = 4;  /// RSSI offset minimum value, -200 to 0, default = -166 SupportedBy: MTC8XX
+  optional bool   txEnable   = 5;  /// Radio TX enable, default: radio0 = 1, radio1 = 0 SupportedBy: MTC8XX
+  optional uint64 txFreqMin  = 6;  /// Minimum TX frequency, 0 to 2000000000 Hz, default: radio0 = 915200000, radio1 = 0 SupportedBy: MTC8XX
+  optional uint64 txFreqMax  = 7;  /// Maximum TX frequency, 0 to 2000000000 Hz, default: radio0 = 928000000, radio1 = 0 SupportedBy: MTC8XX
+}
+
+message ChanLoraStd
+{
+  optional string desc         = 1;  /// Description of the Lora Std Channel, default = NULL SupportedBy: MTC8XX
+  optional bool   enable       = 2;  /// Enable the Lora STD channel, default = 0 SupportedBy: MTC8XX
+  optional uint32 radio        = 3;  /// Radio ID of the Lora Std , default = 0 (radio0) SupportedBy: MTC8XX
+  optional int32  iFreq        = 4;  /// Frequency offset in Hz (related to designated radio central frequency), default = 300000Hz SupportedBy: MTC8XX
+  optional uint32 bandWidth    = 5;  /// Bandwidth, 0 to 1000000Hz, default = 500000 Hz SupportedBy: MTC8XX
+  optional uint32 spreadFactor = 6;  /// Spread factor, 0 to 15, default = 8 SupportedBy: MTC8XX
+}
+
+message ChanLoraFSK
+{
+  optional string desc          = 1;  /// Description of the Lora FSK Channel, default = NULL SupportedBy: MTC8XX
+  optional bool   enable        = 2;  /// Enable Lora FSK Channel, default = 0 SupportedBy: MTC8XX
+  optional uint32 radio         = 3;  /// Radio ID of the Lora Std , default = 0 (radio0) SupportedBy: MTC8XX
+  optional int32  iFreq         = 4;  /// Frequency offset (related to designated radio central frequency), -2000000000Hz to 2000000000Hz, default = 300000Hz SupportedBy: MTC8XX
+  optional uint32 bandWidth     = 5;  /// SupportedBy: MTC8XX
+  optional uint32 freqDeviation = 6;  /// SupportedBy: MTC8XX
+  optional uint32 dataRate      = 7;  /// SupportedBy: MTC8XX
+}
+
+message ChanMultiSF
+{
+  optional string desc    = 1;  /// Description of the Lora Multi Channel, default = NULL SupportedBy: MTC8XX
+  optional bool   enable  = 2;  /// Enable the MultiChannel Lora, default = 1 SupportedBy: MTC8XX
+  optional uint32 radio   = 3;  /// Radio ID (0 or 1) for the channel SupportedBy: MTC8XX
+  optional int32  iFreq   = 4;  /// Offset frequency (from center of radio), -2000000000Hz to 2000000000Hz SupportedBy: MTC8XX
+}
+
+message LoraTxLut
+{
+  optional int32 paGain  = 1;  /// Power Amplifier Gain SupportedBy: MTC8XX
+  optional int32 mixGain = 2;  /// Mix Gain SupportedBy: MTC8XX
+  optional int32 rfPower = 3;  /// RF Power SupportedBy: MTC8XX
+  optional int32 digGain = 4;  /// Dig Gain SupportedBy: MTC8XX
+}
+
+message Sx1301Conf
+{
+  optional bool   lorawanPublic      = 1;  /// LoraWan is public, default = 0 SupportedBy: MTC8XX 
+  optional uint32 clkSrc             = 2;  /// Clock Source from radio, default = 0 SupportedBy: MTC8XX 
+  optional uint32 antennaGain        = 3;  /// Ganho da antena, default = 0 SupportedBy: MTC8XX 
+
+  //LoraGatewayRadio radio0 [default = LoraGatewayRadio(true, "SX1257", 915600000, -166.0, true,  915200000, 928000000)];
+  optional LoraGatewayRadio radio_0  = 4;  /// Radio 0 Configuration SupportedBy: MTC8XX
+  //LoraGatewayRadio radio1 [default = LoraGatewayRadio(true, "SX1257", 916400000, -166.0, false, 0,         0        )];
+  optional LoraGatewayRadio radio_1  = 5;  /// Radio 1 Configuration SupportedBy: MTC8XX
+
+  /*
+  ChanMultiSF chan_multiSF_0 [default = ChanMultiSF(true, 0, -400000)];
+  ChanMultiSF chan_multiSF_1 [default = ChanMultiSF(true, 0, -200000)];
+  ChanMultiSF chan_multiSF_2 [default = ChanMultiSF(true, 0, 0)];
+  ChanMultiSF chan_multiSF_3 [default = ChanMultiSF(true, 0, 200000)];
+
+  ChanMultiSF chan_multiSF_4 [default = ChanMultiSF(true, 1, -400000)];
+  ChanMultiSF chan_multiSF_5 [default = ChanMultiSF(true, 1, -200000)];
+  ChanMultiSF chan_multiSF_6 [default = ChanMultiSF(true, 1, 0)];
+  ChanMultiSF chan_multiSF_7 [default = ChanMultiSF(true, 1, 200000)];
+  maximo de estruturas para chanMultiSF = 8*/
+  optional ChanMultiSF chanMultiSF_0 = 6;  /// Lora MultiChannel (channel 1) SupportedBy: MTC8XX 
+  optional ChanMultiSF chanMultiSF_1 = 7;  /// Lora MultiChannel (channel 2) SupportedBy: MTC8XX 
+  optional ChanMultiSF chanMultiSF_2 = 8;  /// Lora MultiChannel (channel 3) SupportedBy: MTC8XX 
+  optional ChanMultiSF chanMultiSF_3 = 9;  /// Lora MultiChannel (channel 4) SupportedBy: MTC8XX 
+  optional ChanMultiSF chanMultiSF_4 = 10; /// Lora MultiChannel (channel 5) SupportedBy: MTC8XX 
+  optional ChanMultiSF chanMultiSF_5 = 11; /// Lora MultiChannel (channel 6) SupportedBy: MTC8XX 
+  optional ChanMultiSF chanMultiSF_6 = 12; /// Lora MultiChannel (channel 7) SupportedBy: MTC8XX 
+  optional ChanMultiSF chanMultiSF_7 = 13; /// Lora MultiChannel (channel 8) SupportedBy: MTC8XX 
+  
+  optional ChanLoraStd chanLoraStd   = 14;  /// Lora Std Channel (1 channel) SupportedBy: MTC8XX 
+  
+  optional ChanLoraFSK chanFSK       = 15;  /// Lora FSK Channel (1 channel) SupportedBy: MTC8XX 
+
+  /*
+  LoraTxLut txLut_0   [default = LoraTxLut(0, 8,-6,0); // Padrao: pa_gain=0;  mix_gain=8;   rf_power=-6;  dig_gain=0;
+  LoraTxLut txLut_1   [default = LoraTxLut(0,10,-3,0); // Padrao: pa_gain=0;  mix_gain=10;  rf_power=-3;  dig_gain=0;    
+  LoraTxLut txLut_2   [default = LoraTxLut(0,12, 0,0); // Padrao: pa_gain=0;  mix_gain=12;  rf_power=0;   dig_gain=0;
+  LoraTxLut txLut_3   [default = LoraTxLut(1, 8, 3,0); // Padrao: pa_gain=1;  mix_gain=8;   rf_power=3;   dig_gain=0;
+  LoraTxLut txLut_4   [default = LoraTxLut(1,10, 6,0); // Padrao: pa_gain=1;  mix_gain=10;  rf_power=6;   dig_gain=0;
+  LoraTxLut txLut_5   [default = LoraTxLut(1,12,10,0); // Padrao: pa_gain=1;  mix_gain=12;  rf_power=10;  dig_gain=0;
+  LoraTxLut txLut_6   [default = LoraTxLut(1,13,11,0); // Padrao: pa_gain=1;  mix_gain=13;  rf_power=11;  dig_gain=0;
+  LoraTxLut txLut_7   [default = LoraTxLut(2, 9,12,0); // Padrao: pa_gain=2;  mix_gain=9;   rf_power=12;  dig_gain=0;
+  LoraTxLut txLut_8   [default = LoraTxLut(1,15,13,0); // Padrao: pa_gain=1;  mix_gain=15;  rf_power=13;  dig_gain=0;
+  LoraTxLut txLut_9   [default = LoraTxLut(2,10,14,0); // Padrao: pa_gain=2;  mix_gain=10;  rf_power=14;  dig_gain=0;
+  LoraTxLut txLut_10  [default = LoraTxLut(2,11,16,0); // Padrao: pa_gain=2;  mix_gain=11;  rf_power=16;  dig_gain=0;
+  LoraTxLut txLut_11  [default = LoraTxLut(3, 9,20,0); // Padrao: pa_gain=3;  mix_gain=9;   rf_power=20;  dig_gain=0;
+  LoraTxLut txLut_12  [default = LoraTxLut(3,10,23,0); // Padrao: pa_gain=3;  mix_gain=10;  rf_power=23;  dig_gain=0;
+  LoraTxLut txLut_13  [default = LoraTxLut(3,11,25,0); // Padrao: pa_gain=3;  mix_gain=11;  rf_power=25;  dig_gain=0;
+  LoraTxLut txLut_14  [default = LoraTxLut(3,12,26,0); // Padrao: pa_gain=3;  mix_gain=12;  rf_power=26;  dig_gain=0;
+  LoraTxLut txLut_15  [default = LoraTxLut(3,14,27,0); // Padrao: pa_gain=3;  mix_gain=14;  rf_power=27;  dig_gain=0;
+  maximo de estruturas para txLoraLut: 16*/
+  optional LoraTxLut txLut_0         = 16;  /// Lora Tx Lookup Table (entry 1) SupportedBy: MTC8XX 
+  optional LoraTxLut txLut_1         = 17;  /// Lora Tx Lookup Table (entry 2) SupportedBy: MTC8XX 
+  optional LoraTxLut txLut_2         = 18;  /// Lora Tx Lookup Table (entry 3) SupportedBy: MTC8XX 
+  optional LoraTxLut txLut_3         = 19;  /// Lora Tx Lookup Table (entry 4) SupportedBy: MTC8XX 
+  optional LoraTxLut txLut_4         = 20;  /// Lora Tx Lookup Table (entry 5) SupportedBy: MTC8XX 
+  optional LoraTxLut txLut_5         = 21;  /// Lora Tx Lookup Table (entry 6) SupportedBy: MTC8XX 
+  optional LoraTxLut txLut_6         = 22;  /// Lora Tx Lookup Table (entry 7) SupportedBy: MTC8XX 
+  optional LoraTxLut txLut_7         = 23;  /// Lora Tx Lookup Table (entry 8) SupportedBy: MTC8XX 
+  optional LoraTxLut txLut_8         = 24;  /// Lora Tx Lookup Table (entry 9) SupportedBy: MTC8XX 
+  optional LoraTxLut txLut_9         = 25;  /// Lora Tx Lookup Table (entry 10) SupportedBy: MTC8XX 
+  optional LoraTxLut txLut_10        = 26;  /// Lora Tx Lookup Table (entry 11) SupportedBy: MTC8XX 
+  optional LoraTxLut txLut_11        = 27;  /// Lora Tx Lookup Table (entry 12) SupportedBy: MTC8XX 
+  optional LoraTxLut txLut_12        = 28;  /// Lora Tx Lookup Table (entry 13) SupportedBy: MTC8XX 
+  optional LoraTxLut txLut_13        = 29;  /// Lora Tx Lookup Table (entry 14) SupportedBy: MTC8XX 
+  optional LoraTxLut txLut_14        = 30;  /// Lora Tx Lookup Table (entry 15) SupportedBy: MTC8XX 
+  optional LoraTxLut txLut_15        = 31;  /// Lora Tx Lookup Table (entry 16) SupportedBy: MTC8XX 
+}
+
+message LoraGatewayConf
+{
+  optional uint32 servPortUp         =  1;  /// Upload UDP port (Gateway -> Network Server), default = 1700 SupportedBy: MTC8XX
+  optional string serverAddress      =  2;  /// Network Server address, default = loragw.denox.com.br SupportedBy: MTC8XX
+  optional uint32 servPortDown       =  3;  /// Download UDP port (Network Server -> Gateway), default = 1700 SupportedBy: MTC8XX
+  optional string gatewayId          =  4; /// Lora Gateway ID, default = "FFFFFFFFFFFFFFFF" SupportedBy: MTC8XX
+  optional uint32 keepAliveInterval  =  5; /// Keep alive interval, 10 to 65535 sec, default = 10sec SupportedBy: MTC8XX
+  optional uint32 statInterval       =  6; /// Stats pkg interval, 10 to 65535 sec, default = 30sec SupportedBy: MTC8XX
+  optional uint32 pushTimeoutMs      =  7; /// Push timout interval, 100 to 65535 ms, default = 100msec SupportedBy: MTC8XX
+  optional bool   forwardCrcValid    =  8; /// Forward CRC valid pkgs, default = 1 SupportedBy: MTC8XX
+  optional bool   forwardCrcError    =  9; /// Forward CRC invalid pkgs, default = 0 SupportedBy: MTC8XX
+  optional bool   forwardCrcDisabled = 10; /// Forward CRC disabled pkgs, default = 0 SupportedBy: MTC8XX
+  optional bool   fakeGps            = 11; /// Use fake GPS (lat/long/alt) coordinates, default=0 SupportedBy: MTC8XX
+  optional double refLatitude        = 12; /// Fake GPS latitude corrdinate, -90o to +90o, default = 0o SupportedBy: MTC8XX
+  optional double refLongitude       = 13; /// Fake GPS longitude coordinate, -180o to +180o, default = 0o SupportedBy: MTC8XX
+  optional uint32 refAltitude        = 14; /// Fake GPS altitude coordinate, 0 to 8848 m, default = 0m SupportedBy: MTC8XX
+  optional uint32 upstreamTimeout    = 15; /// Inativity timout with no pkgs, 0 to 65535 sec, default = 60sec SupportedBy: MTC8XX
+  optional bool   logJson            = 16; /// Enable JSON log pkgs, default = 0 SupportedBy: MTC8XX
+  optional bool   useSystime         = 17; /// Use systime when GPS is disabled, default = 0 SupportedBy: MTC8XX
+  optional uint32 autoQuitThreshold  = 18; /// Autoquit after receiveind autoQuitThreshold non-acknowledged PULL_DATA SupportedBy: MTC8XX
+}
+
+
+message LoraGatewayConfig
+{
+  optional bool enabled                 = 1; /// Enabled service (run if = 1) SupportedBy: MTC8XX  
+  optional Sx1301Conf sx1301Conf        = 2;  /// Radio configuration parameters, reflected in file pktfwd_conf.json SupportedBy: MTC8XX 
+  optional LoraGatewayConf gatewayConf  = 3;  /// Gateway configuration parametres, reflected in file pktfwd_conf.json SupportedBy: MTC8XX
+}

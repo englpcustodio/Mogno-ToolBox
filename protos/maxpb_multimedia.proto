@@ -1,0 +1,130 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+enum AudioChannel {
+    AC_NONE                 = 0;  /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    AC_LINEOUT              = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    AC_SPEAKER              = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    AC_WIFI                 = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    AC_BLUETOOTH            = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    AC_GSM                  = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    AC_DATA_TERMINAL        = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    AC_HDMI_01              = 7;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    AC_HDMI_02              = 8;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    AC_RFU01                = 9;  /// $SUPPORTEDBY[]
+    AC_RFU02                = 10; /// $SUPPORTEDBY[]
+    AC_RFU03                = 11; /// $SUPPORTEDBY[]
+    AC_RFU04                = 12; /// $SUPPORTEDBY[]
+    AC_RFU05                = 13; /// $SUPPORTEDBY[]
+}
+enum VideoChannel {
+    VC_NONE                 = 0;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    VC_HDMI_01              = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    VC_HDMI_02              = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    VC_DATA_TERMINAL        = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    VC_RFU01                = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    VC_RFU02                = 5;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    VC_RFU03                = 6;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    VC_RFU04                = 7;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    VC_RFU05                = 8;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+enum TextFormat {
+    TF_NONE                 = 0;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    TF_STATIC               = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    TF_RIGHT_TO_LEFT        = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    TF_LEFT_TO_RIGHT        = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    TF_BLINK                = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    TF_RFU01                = 5;  /// $SUPPORTEDBY[]
+    TF_RFU02                = 6;  /// $SUPPORTEDBY[]
+    TF_RFU03                = 7;  /// $SUPPORTEDBY[]
+    TF_RFU04                = 8;  /// $SUPPORTEDBY[]
+    TF_RFU05                = 9;  /// $SUPPORTEDBY[]
+}
+enum TextChannel {
+    TC_NONE                 = 0;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    TC_HDMI_01              = 1;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    TC_HDMI_02              = 2;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    TC_DATA_TERMINAL        = 3;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    TC_EXTERNAL_PANEL       = 4;  /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    TC_RFU01                = 5;  /// $SUPPORTEDBY[]
+    TC_RFU02                = 6;  /// $SUPPORTEDBY[]
+    TC_RFU03                = 7;  /// $SUPPORTEDBY[]
+    TC_RFU04                = 8;  /// $SUPPORTEDBY[]
+    TC_RFU05                = 9;  /// $SUPPORTEDBY[]
+}
+enum PlaylistPriority {
+    PP_NONE                 = 0;  /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    PP_NOW_INTERRUPT        = 1;  /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    PP_NOW_NO_INTERRUPT     = 2;  /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    PP_END_OF_QUEUE         = 3;  /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    PP_RFU01                = 4;  /// $SUPPORTEDBY[]
+    PP_RFU02                = 5;  /// $SUPPORTEDBY[]
+    PP_RFU03                = 6;  /// $SUPPORTEDBY[]
+    PP_RFU04                = 7;  /// $SUPPORTEDBY[]
+    PP_RFU05                = 8;  /// $SUPPORTEDBY[]
+}
+message PlayAudio {
+    optional uint64 audioID                 = 1; /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional AudioChannel channel           = 2; /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 interval                = 3; /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 volume                  = 4; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message PlayVideo {
+    optional uint64 videoID                 = 1; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional VideoChannel channel           = 2; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 interval                = 3; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+} 
+message PlayText {
+    optional string text                    = 1; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 duration                = 2; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional TextChannel channel            = 3; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional TextFormat format              = 4; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message PlaylistAction {
+    optional PlayAudio audio                = 1; /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional PlayVideo video                = 2; /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional PlayText text                  = 3; /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional PlaylistPriority priority      = 4; /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+}
+message Playlist {
+    repeated PlaylistAction actions         = 1; /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 replayInterval          = 2; /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRITPION[Full replay interval of this group of messages - Unit seconds] $DESCRIPTION_ENGLISH[]
+}
+message AudioEntry {
+    optional uint64 audioID                 = 1; /// $SUPPORTEDBY[MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    optional string url                     = 2; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    optional bytes audioStream              = 3; /// $SUPPORTEDBY[MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 audioSize               = 4; /// $SUPPORTEDBY[MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 audioCrc32              = 5; /// $SUPPORTEDBY[MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+}
+message VideoEntry {
+    optional uint64 videoID                 = 1; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    optional string url                     = 2; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    optional uint64 videoSize               = 3; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 videoCrc32              = 4; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+}
+message MultimediaLibrary {
+    repeated AudioEntry audios              = 1; /// $SUPPORTEDBY[MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    repeated VideoEntry videos              = 2; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+}
+message AudioLibrayEdit {
+   repeated AudioEntry audioAdd             = 1; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+   repeated AudioEntry audioReplace         = 2; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+   repeated AudioEntry audioDelete          = 3; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+}
+message VideoLibrayEdit {
+   repeated VideoEntry videoAdd             = 1; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+   repeated VideoEntry videoReplace         = 2; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+   repeated VideoEntry videoDelete          = 3; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+}
+message MultimediaEdit {
+    optional AudioLibrayEdit audioEdit      = 1; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    optional VideoLibrayEdit videoEdit      = 2; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+}
+message MultiMediaStatus {
+    optional uint32 audioFilesCount         = 1; /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 audioFilesDownloaded    = 2; /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 audioFilesErrors        = 3; /// $SUPPORTEDBY[MTC8XX, DLR, A90] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 videoFilesCount         = 4; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 videoFilesDownloaded    = 5; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+    optional uint32 videoFilesErrors        = 6; /// $SUPPORTEDBY[MTC8XX, DLR] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+}

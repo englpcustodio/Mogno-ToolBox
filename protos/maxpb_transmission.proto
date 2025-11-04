@@ -1,0 +1,133 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+enum DischargeMode {
+   DM_DESCENDING                                   = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Decrescente]
+   DM_ASCENDING_NO_NEW_POSITION_OUT_OF_ORDER       = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Decrescente sem nova posição fora de ordem]
+   DM_ASCENDING_WITH_NEW_POSITION_WHILE_DISCHARGE  = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Crescente com nova posição enquanto descarrega]
+   DM_ONLY_NEW_POSITION                            = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Somente nova posição]
+   DM_DO_NOT_USE_THIS_CHANNEL                      = 4;  /// $SUPPORTEDBY[] $DESCRIPTION[Não use esse canal] 
+   DM_RFU_05                                       = 5;  /// $SUPPORTEDBY[]
+   DM_RFU_06                                       = 6;  /// $SUPPORTEDBY[]
+   DM_RFU_07                                       = 7;  /// $SUPPORTEDBY[]
+   DM_RFU_08                                       = 8;  /// $SUPPORTEDBY[]
+   DM_RFU_09                                       = 9;  /// $SUPPORTEDBY[]
+}
+enum TransportMode {
+   TM_TCP      = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[TCP]
+   TM_UDP      = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[UDP]
+   TM_RFU_02   = 2;  /// $SUPPORTEDBY[]
+   TM_RFU_03   = 3;  /// $SUPPORTEDBY[]
+   TM_RFU_04   = 4;  /// $SUPPORTEDBY[]
+   TM_RFU_05   = 5;  /// $SUPPORTEDBY[]
+   TM_RFU_06   = 6;  /// $SUPPORTEDBY[]
+}
+enum LBSConfig {
+   LC_DISABLED       = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Desabilitado]
+   LC_GPS_NOT_FIXED  = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Sem GPS] $DESCRIPTION_ENGLISH[Fill LBS info only if gps is not fixed]
+   LC_ALWAYS         = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Sempre] $DESCRIPTION_ENGLISH[Fill LBS info always]
+   LC_RFU_03         = 3;  /// $SUPPORTEDBY[]
+   LC_RFU_04         = 4;  /// $SUPPORTEDBY[]
+   LC_RFU_05         = 5;  /// $SUPPORTEDBY[]
+   LC_RFU_06         = 6;  /// $SUPPORTEDBY[]
+   LC_RFU_07         = 7;  /// $SUPPORTEDBY[]
+}
+enum BluetoothPower {
+   BP_ALWAYS_OFF  = 0;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Sempre desligado]
+   BP_HIDDEN      = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Escondido] $DESCRIPTION_ENGLISH[Guest must know BT MAC to connect]
+   BP_ALWAYS_ON   = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Sempre ligado]
+   BP_BEACON      = 3;  /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+   BP_RFU_04      = 4;  /// $SUPPORTEDBY[]
+   BP_RFU_05      = 5;  /// $SUPPORTEDBY[]
+   BP_RFU_06      = 6;  /// $SUPPORTEDBY[]
+   BP_RFU_07      = 7;  /// $SUPPORTEDBY[]
+   BP_RFU_08      = 8;  /// $SUPPORTEDBY[]
+}
+/// Interval timers in seconds
+message PositionInterval {
+   optional uint32 panic                     = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $UNIT[Segundos] $COMMENT[Valor 0 desabilita o tempo de transmissao configurado ] $DESCRIPTION[Tempo de transmissao em pânico] $DESCRIPTION_ENGLISH[Tranmission time during panic state] $DEFAULTVALUE[60] $VALIDATOR[]
+   optional uint32 jammer                    = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X] $UNIT[Segundos] $COMMENT[Jammer] $DESCRIPTION[Jammer] $VALIDATOR[] $DESCRIPTION_ENGLISH[Transmission time when detect jaimming signal]
+   optional uint32 battery                   = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $UNIT[Segundos] $COMMENT[Valor 0 desabilita o tempo configurado] $DESCRIPTION[Tempo de transmissao na bateria interna] $DESCRIPTION_TIME[Transmission time using intern battery]. Case 0, uses default time. $DEFAULTVALUE[60] $VALIDATOR[]
+   optional uint32 sleep                     = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $UNIT[Segundos] $COMMENT[Valor 0 desabilita o tempo de transmissao configurado] $DESCRIPTION[Tempo de transmissao em modo sleep] $DESCRIPTION_ENGLISH[Transmission time during sleep mode. Case 0, uses default time.] $DEFAULTVALUE[1800] $VALIDATOR[]
+   optional uint32 lowPower                  = 5;  /// $SUPPORTEDBY[] $UNIT[Segundos] $DESCRIPTION[Baixa energia] $DESCRIPTION_ENGLISH[Transmission time during low power] $VALIDATOR[]
+   optional uint32 ignitionOnMoving          = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $UNIT[Segundos] $COMMENT[Valor 0 desabilita o tempo configurado] $DESCRIPTION[Tempo movendo com ignição ligada] $DESCRIPTION_TIME[Transmission time when moving and ignition is on. Case 0, uses default time.] $DEFAULTVALUE[60] $VALIDATOR[]
+   optional uint32 ignitionOnStopped         = 7;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $UNIT[Segundos] $COMMENT[Valor 0 desabilita o tempo configurado] $DESCRIPTION[Tempo parado com ignição ligada] $DESCRIPTION_ENGLISH[Transmission time when stopped and ignition is on. Case 0, uses default time.] $DEFAULTVALUE[60] $VALIDATOR[]
+   optional uint32 ignitionOffMoving         = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $UNIT[Segundos] $COMMENT[Valor 0 desabilita o tempo configurado] $DESCRIPTION[Tempo movendo com ignicao desligada] $DESCRIPTION_TIME[Transmission time when moving and ignition is off. Case 0, uses default time.] $DEFAULTVALUE[60] $VALIDATOR[]
+   optional uint32 ignitionOffStopped        = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $UNIT[Segundos] $COMMENT[Valor 0 desabilita o tempo configurado] $DESCRIPTION[Tempo parado com ignicao desligada] $DESCRIPTION_ENGLISH[Transmission time when stopped and ignition is off. Case 0, uses default time.] $DEFAULTVALUE[60] $VALIDATOR[]
+   optional uint32 portableMoving            = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, A90, MAXIO2, MOBILE_PHONE] $UNIT[Segundos] $COMMENT[Valor 0 desabilita o tempo configurado] $DESCRIPTION[Tempo de transmissão com portatil movendo] $DESCRIPTION_ENGLISH[Transmission time while portable is moving. Case 0, uses default time.] $DEFAULTVALUE[0] $VALIDATOR[]
+   optional uint32 portableStopped           = 11; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, A90, MAXIO2, MOBILE_PHONE] $UNIT[Segundos] $COMMENT[Valor 0 desabilita o tempo configurado] $DESCRIPTION[Tempo de transmissão com portatil parado]  $DESCRIPTION_ENGLISH[Transmission time while portable is stopped. Case 0, uses default time.] $DEFAULTVALUE[0] $VALIDATOR[]
+   optional uint32 distanceThreshold         = 12; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $UNIT[Metros] $COMMENT[0 desabilita a funcionalidade] $DESCRIPTION[Limite de distância (20 a 4294967295 metros)] $DEFAULTVALUE[0] $DESCRIPTION_ENGLISH[(Meters)] 
+   optional uint32 directionAngleThreshold   = 13; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $UNIT[Graus] $COMMENT[0 desabilita a funcionalidade] $DESCRIPTION[Ângulo para análise de mudança de direção (10 a 180 graus)] $DEFAULTVALUE[0] $DESCRIPTION_ENGLISH[Angle for Direction Change Analysis (Degrees)]
+   optional uint32 portableMovingEmergency   = 14; /// $SUPPORTEDBY[MXT180, A6X, A90, MAXIO2] $DESCRIPTION[Emergência de portátil em movimento] $DESCRIPTION_ENGLISH[Transmission time while portable is moving on emergency state]
+   optional uint32 portableStoppedEmergency  = 15; /// $SUPPORTEDBY[MXT180, A6X, A90, MAXIO2] $DESCRIPTION[Emergência de portátil parado] $DESCRIPTION_ENGLISH[Transmission time while portable is stopped on emergency state]
+   optional bool   superlog                  = 16; /// $SUPPORTEDBY[MTC8XX, DLR, MOBILE_PHONE]
+}
+message ApnConfig {
+   optional string apn        = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Apn]
+   optional string user       = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Usuário]
+   optional string password   = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Senha]
+}
+message SimcardConfig {
+   optional ApnConfig apn     = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Apn]
+   optional string pin        = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Pin]
+   optional bool active       = 3;  /// $SUPPORTEDBY[] $COMMENT[0 ou 1] $DESCRIPTION[Ativo] $VALIDATOR[^(0|1)$]
+   optional bool preferential = 4;  /// $SUPPORTEDBY[] $COMMENT[0 ou 1]$DESCRIPTION[Preferencial] $VALIDATOR[^(0|1)$]
+}
+message AddressConfig {
+   optional string address                = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Endereço] 
+   optional uint32 addressPort            = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, TD80, AS80, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Porta do endereço]
+   optional TransportMode transportMode   = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Modo de transporte]
+   optional string networkMask            = 4;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR] $DESCRIPTION[Máscara de rede] $DESCRIPTION_ENGLISH[Network mask] $DEFAULTVALUE[255.255.255.0] $VALIDATOR[^([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9])$]
+   optional string defaultGateway         = 5;  /// $SUPPORTEDBY[A6X, MTC8XX, DLR] $DESCRIPTION[Gateway padrão] $DESCRIPTION_ENGLISH[Default gateway] 
+}
+message SmsConfig {
+   optional string positionNumber         = 1; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Número de posição]
+   optional string allowedReceiveNumber1  = 2; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Número de telefone permitido para o equipamento receber comandos SMS 1]
+   optional string allowedReceiveNumber2  = 3; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Número de telefone permitido para o equipamento receber comandos SMS 2]
+}
+message DischargeConfig {
+   optional DischargeMode mode   = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Modo de descarga]
+   optional uint32 limit         = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Limite] $DEFAULTVALUE[10000]
+}
+message GprsConnectivityConfig {
+   optional SimcardConfig simcard1  = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Configuração do Sim 1]
+   optional SimcardConfig simcard2  = 2;  /// $SUPPORTEDBY[MTC8XX] $DESCRIPTION[Configuração do Sim 2] 
+   optional AddressConfig address1  = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Endereço 1]
+   optional AddressConfig address2  = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Endereço 2]
+}
+message TransmissionSamples {
+   optional uint32 portableMoving      = 1; /// $SUPPORTEDBY[MXT180, A6X, A90]
+   optional uint32 portableStopped     = 2; /// $SUPPORTEDBY[MXT180, A6X, A90]
+}
+/// Sets connection address and interval of status of Maxtrack Cloud
+message MaxtrackCloudConfig {
+   optional AddressConfig address        = 1; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Configuração de endereço]
+   optional uint32 reportStatusInterval  = 2; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Tempo para reportar status] $UNIT[segundos] $DESCRIPTION_ENGLISH[Time to report status (Seconds).]
+}
+message GprsTransmissionConfig {
+   optional DischargeConfig discharge                 = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Tipo de descarga de posições em memoria]  $DESRIPTION_ENGLISH[Discharge type of positions in memory] $VALIDATOR[]
+   optional bool udpBindPort                          = 3;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $COMMENT[0 ou 1] $DESCRIPTION[Permanece com a mesma porta local udp] $DEFAULTVALUE[0] $VALIDATOR[^(0|1)$] $DESCRIPTION_ENGLISH[Keep the same udp local port]
+   optional uint32 udpKeepAlive                       = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $UNIT[segundos] $DESCRIPTION[Tempo para manter a conexão UDP ativa] $DEFAULTVALUE[0] $DESCRIPTION_ENGLISH[Seconds]
+   optional bool currentCellInfo                      = 5;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2] $COMMENT[(0: Desabilita; 1: Habilita) ] $DESCRIPTION[Informação da célula conectada no pacote de posição] $DESCRIPTION_ENGLISH[Connected cell infos in position package (0 - Deactive, 1 - Active)] $DEFAULTVALUE[1] $VALIDATOR[^(0|1)$]
+   optional LBSConfig LBSInfo                         = 6;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $DESCRIPTION[Informação de células próximas ao local] $DESCRIPTION_ENGLISH[Near cells info included on position package.]
+   optional TransmissionSamples transmissionSamples   = 7;  /// $SUPPORTEDBY[MXT180, A6X, A90] $DESCRIPTION[Amostras de transmissão] $DESCRIPTION_ENGLISH[Generates position package, but only send after x samples.]
+   optional bool useMaxtrackCloud                     = 8;  /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $COMMENT[Configuração do segundo socket para transmissão de status no Monitor Maxtrack (0:Desabilita; 1:Habilita)] $DESCRIPTION[Configuração para transmissão de status no Monitor Maxtrack] $DESCRIPTION_ENGLISH[Status transmission configuration for Maxtrack Monitor.] $DEFAULTVALUE[0] $VALIDATOR[^(0|1)$]
+   optional uint32 jammingDebounce                    = 9;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $UNIT[Segundos] $DESCRIPTION[Tempo para identificação de sinal jamming (Segundos)] $DESCRIPTION_ENGLISH[Debounce to report jamming state (Seconds)]
+   optional MaxtrackCloudConfig maxtrackCloudConfig   = 10; /// $SUPPORTEDBY[MXT13X, MXT16X, MXT180, A6X, MTC8XX, DLR, A90, MAXIO2, MOBILE_PHONE] $DESCRIPTION[Configuração da nuvem Maxtrack] $DESCRIPTION_ENGLISH[Maxtrack cloud configuration] $VALIDATOR[]
+   optional uint32 tcpConnectionTimeout               = 11; /// $SUPPORTEDBY[MXT13X, MXT16X] $DESCRIPTION_ENGLISH[Seconds - Time to tracker close TCP connection by inactivity] $VALIDATOR[]
+   optional uint32 timeOfflineToStartJamming          = 12; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $UNIT[Segundos] $DESCRIPTION[Tempo sem conexão GPRS para entrar em estado de Jamming  após ser detectado (Segundos)] $DESCRIPTION_ENGLISH[Seconds, Time without GPRS connection to enter jamming state after it is detected]
+   optional bool portableKeepModemON				  = 13; /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $UNIT[Segundos] $DESCRIPTION[] $DESCRIPTION_ENGLISH[]
+}
+message BluetoothConfig {
+   optional uint32 keepAlive          = 1;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, A90, MAXIO2, MTC8XX, DLR] $UNIT[Segundos] $DESCRIPTION[Tempo para manter a conexão Bluetooth ativa] $DEFAULTVALUE[5] $DESCRIPTION_ENGLISH[Time limit to connected device response tracker. Value format: Seconds * 5]
+   optional BluetoothPower power      = 2;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, A90, MAXIO2, MTC8XX, DLR] $DESCRIPTION[Modo de visualização do Bluetooth] $DESCRIPTION_ENGLISH[Bluetooh power (dB)]
+   optional uint32 keepWorkingTime    = 4;  /// $SUPPORTEDBY[MXT13X, MXT16X, A6X, MTC8XX, DLR, A90, MAXIO2] $UNIT[Segundos] $COMMENT[Tempo para manter o Bluetooth ligado após a ignicao ser desligada e status de acelerômetro parado] $DESCRIPTION[Tempo para manter o Bluetooth ligado] $DEFAULTVALUE[60] $DESCRIPTION_ENGLISH[Seconds to keep bluetooth on after tracker is stopped and ignition is off]
+   optional LBSConfig LBSInfo         = 5;  /// $SUPPORTEDBY[A6X, A90, MAXIO2] $DESCRIPTION[Localização dentro de área fechada] $DESCRIPTION_ENGLISH[Indoor location using beacon advertising package]
+}
+message AwsS3ClientConfig {
+  optional string keyID                      = 1; /// $SUPPORTEDBY[MTC8XX, DLR, DVR, WIFI] $DESCRIPTION_ENGLISH[]
+  optional string region                     = 2; /// $SUPPORTEDBY[MTC8XX, DLR, DVR, WIFI] $DESCRIPTION_ENGLISH[]
+  optional string securityKey                = 3; /// $SUPPORTEDBY[MTC8XX, DLR, DVR, WIFI] $DESCRIPTION_ENGLISH[]
+  optional string URL                        = 4; /// $SUPPORTEDBY[MTC8XX, DLR, DVR, WIFI] $DESCRIPTION_ENGLISH[]
+  optional string indexURL                   = 5; /// $SUPPORTEDBY[MTC8XX, DLR, DVR, WIFI] $DESCRIPTION_ENGLISH[]
+  optional uint32 daysToKeep                 = 6; /// $SUPPORTEDBY[MTC8XX, DLR, DVR, WIFI] $DESCRIPTION_ENGLISH[]
+}

@@ -1,0 +1,34 @@
+/*
+ * Vercao 1.0
+ * - Adicioando Pais e Pavimento Tipo
+ * Vercao 0.1
+ * - Definicao da mensagem 'RevGeo', com seus respectivos campos
+ * - Enum Resultados adicionado para verificar o tipo de retorno do servico de RevGeo.
+ */
+syntax = "proto2";
+
+message RevGeo
+{
+	enum Resultados
+	{
+		ENCONTRADO = 0;
+		NAO_ENCONTRADO = 1;
+		ERRO = 2;
+	}
+	required Resultados resultado = 1;
+	optional string logradouro = 2;
+	optional string faixa_numeracao = 3;
+	optional string cep = 4;
+	optional string municipio = 5;
+	optional string uf = 6;
+	optional string pais = 7;
+
+	enum PavimentoTipo
+	{
+		Urbano = 0;
+		Rodoviario = 1;
+	}
+	optional PavimentoTipo pavimentoTipo = 8;
+	optional int32 velocidade_maxima_via = 9;
+	optional int32 municipio_id = 10;
+}

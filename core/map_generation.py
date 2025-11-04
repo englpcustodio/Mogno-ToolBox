@@ -1,0 +1,193 @@
+# mogno_app/core/map_generation.py
+
+import datetime
+import os
+import pandas as pd
+import folium
+from folium.plugins import MarkerCluster
+from utils.logger import adicionar_log # Importa o logger da nova localização
+from config.settings import OUTPUT_DIR, MAP_PERIOD_COLORS # Importa configurações
+
+
+def extrair_coordenadas_do_excel(caminho_arquivo, aba="request_OK"):
+    """
+    Extrai as coordenadas válidas de um arquivo Excel para uso no mapa.
+    Esta função é mantida aqui no main.py pois é uma ponte entre o resultado
+    do Excel e a geração do mapa, e pode precisar de tratamento de erros na GUI.
+    """
+    try:
+        df = pd.read_excel(caminho_arquivo, sheet_name=aba)
+        if not {'latitude', 'longitude'}.issubset(df.columns):
+            adicionar_log(f"⚠️ Colunas 'latitude' ou 'longitude' não encontradas na aba '{aba}'.")
+            return []
+
+        result = df[
+            df['latitude'].notnull() & df['longitude'].notnull() &
+            (df['latitude'] != 0) & (df['longitude'] != 0)
+        ]
+        return result.to_dict('records')
+    except Exception as e:
+        adicionar_log(f"Erro ao extrair coordenadas do Excel da aba '{aba}': {e}")
+        return []
+
+
+
+
+def detectar_periodo(data_str, hoje=None):
+    """
+    Recebe data como string "%d/%m/%Y" e retorna a string do período correspondente.
+    """
+    if not data_str or pd.isnull(data_str):
+        return None
+
+    if hoje is None:
+        hoje = pd.Timestamp.now().normalize()
+
+    try:
+        data = pd.to_datetime(data_str, format="%d/%m/%Y", errors="coerce")
+    except Exception:
+        return None
+
+    if pd.isnull(data):
+        return None
+
+    diff = (hoje - data).days
+
+    if diff == 0:
+        return "periodo_hoje"
+    elif 0 < diff <= 6:
+        return "periodo_0_7"
+    elif 7 <= diff <= 14:
+        return "periodo_7_15"
+    elif 15 <= diff <= 29:
+        return "periodo_15_30"
+    elif diff >= 30:
+        return "periodo_30_cima"
+    else:
+        return None
+
+def formatar_tempo_sem_posicao(data_str, hoje=None):
+    """
+    Recebe data como string "%d/%m/%Y" e retorna uma string descrevendo
+    o tempo decorrido desde esta data até hoje.
+    """
+    if not data_str or pd.isnull(data_str):
+        return "—"
+
+    if hoje is None:
+        hoje = pd.Timestamp.now().normalize()
+
+    try:
+        data = pd.to_datetime(data_str, format="%d/%m/%Y", errors="coerce")
+    except Exception:
+        return "—"
+
+    if pd.isnull(data):
+        return "—"
+
+    # Calcular a diferença em dias
+    diff_dias = (hoje - data).days
+
+    # Se for hoje mesmo
+    if diff_dias == 0:
+        return "Hoje"
+
+    # Calcular anos, meses e dias
+    anos = diff_dias // 365
+    meses = (diff_dias % 365) // 30
+    dias = diff_dias % 30
+
+    # Construir a string de resposta
+    resultado = []
+
+    if anos > 0:
+        resultado.append(f"{anos} {'ano' if anos == 1 else 'anos'}")
+
+    if meses > 0:
+        resultado.append(f"{meses} {'mês' if meses == 1 else 'meses'}")
+
+    if dias > 0 or (anos == 0 and meses == 0):  # Garantir que mostra pelo menos os dias
+        resultado.append(f"{dias} {'dia' if dias == 1 else 'dias'}")
+
+    return ", ".join(resultado)
+
+def gerar_mapa(dados, nome_arquivo_mapa=None):
+    """
+    Gera um mapa de marcadores (Folium) com uma lista de dicts contendo
+    latitude, longitude, serial.
+    Retorna o caminho do arquivo HTML gerado ou None em caso de erro/sem dados.
+    """
+    # Garantir que o diretório de saída existe
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
+
+    # Se não for fornecido um nome para o arquivo, criar um baseado na data/hora
+    if not nome_arquivo_mapa:
+        nome_arquivo_mapa = f"Mapa_Posicoes_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+
+    # Construir o caminho completo para o arquivo
+    map_filepath = os.path.join(OUTPUT_DIR, nome_arquivo_mapa)
+
+    # Filtrar pontos válidos (com latitude e longitude)
+    pontos = [
+        d for d in dados
+        if "latitude" in d and "longitude" in d and
+        pd.notnull(d["latitude"]) and pd.notnull(d["longitude"]) and
+        float(d["latitude"]) != 0 and float(d["longitude"]) != 0
+    ]
+
+    if not pontos:
+        adicionar_log("⚠️ Nenhuma posição válida encontrada para gerar o mapa.")
+        return None
+
+    # Inicializar o mapa
+    lat_centro = float(pontos[0]['latitude'])
+    lon_centro = float(pontos[0]['longitude'])
+    mapa = folium.Map(location=[lat_centro, lon_centro], zoom_start=6)
+    marker_cluster = MarkerCluster().add_to(mapa)
+
+    # Adicionar os marcadores
+    for d in pontos:
+        lat = float(d["latitude"])
+        lon = float(d["longitude"])
+        data = d.get('data', '')
+        periodo = detectar_periodo(data)
+        tempo_sem_posicao = formatar_tempo_sem_posicao(data)
+        cor = MAP_PERIOD_COLORS.get(periodo, "gray") # Usa as cores das configurações
+        horario = d.get('horario', '')
+        cliente = d.get('cliente', '—')
+        placa = d.get('placa', '—')
+        modelo = d.get('versao_hardware', '')
+        serial = d.get('serial', '')
+        versao_fw = d.get('versaofirmware', '')
+        fixval = d.get('fix', None)
+        gps = "Fixado" if str(fixval).strip() == "1" else (fixval if fixval not in [None, ''] else "—")
+        tipoevento = d.get('tipoevento', '')
+
+        popup = (
+            f"<b>Data/hora:</b> {data} {horario}<br>"
+            f"<b>Cliente:</b> {cliente}<br>"
+            f"<b>Placa:</b> {placa}<br>"
+            f"<b>Modelo:</b> {modelo}<br>"
+            f"<b>Serial:</b> {serial}  "
+            f"<b>Versão FW:</b> {versao_fw}  "
+            f"<b>GPS:</b> {gps}<br>"
+            f"<b>Último evento:</b> {tipoevento}<br>"
+            f"<b>Última posição:</b> {tempo_sem_posicao}"
+        )
+
+        folium.Marker(
+            [lat, lon],
+            popup=popup,
+            tooltip=str(serial),
+            icon=folium.Icon(color=cor, icon="car", prefix="fa")
+        ).add_to(marker_cluster)
+
+    try:
+        mapa.save(map_filepath)
+        adicionar_log(f"🗺️ Mapa de últimas posições gerado: {map_filepath}")
+        return map_filepath
+    except Exception as e:
+        adicionar_log(f"Erro ao salvar o arquivo do mapa: {e}")
+        return None
+

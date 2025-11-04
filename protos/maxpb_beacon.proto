@@ -1,0 +1,150 @@
+syntax = "proto2";
+option java_package = "com.ceabs.protobuf.proto.maxtrack";
+enum BeaconInfoType {
+	BIT_NONE					= 0; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BIT_MANUFACTURE 			= 1; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BIT_PRODUCT_TYPE			= 2; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BIT_AREA_GROUP				= 3; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BIT_DEVICE_ID				= 4; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BIT_RFU_05					= 5;
+	BIT_RFU_06					= 6;
+	BIT_RFU_07					= 7;
+	BIT_RFU_08					= 8;
+	BIT_RFU_09					= 9;
+}
+enum BeaconProductType {
+	BPT_NONE					= 0; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BPT_BEACON					= 1; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BPT_PERSON					= 2; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BPT_RFU_03					= 3; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BPT_RFU_04					= 4; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BPT_RFU_05					= 5; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BPT_RFU_06					= 6; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BPT_RFU_07					= 7; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+}
+enum BeaconType {
+	BT_NONE 					= 0; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BT_BLE_EDDYSTONE_UID		= 1; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BT_BLE_IBEACON				= 2; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BT_BLE_ADV_BEACON			= 3; /// $SUPPORTEDBY[]
+	BT_BLE_RFU_04				= 4; /// $SUPPORTEDBY[]
+	BT_BLE_RFU_05				= 5; /// $SUPPORTEDBY[]
+	BT_BLE_RFU_06				= 6; /// $SUPPORTEDBY[]
+	BT_BLE_RFU_07				= 7; /// $SUPPORTEDBY[]
+	BT_BLE_RFU_08				= 8; /// $SUPPORTEDBY[]
+}
+enum ReportBeaconState {
+	RBS_NONE					= 0; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	RBS_FINISHED				= 1; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	RBS_VISIBLE 				= 2; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	RBS_RFU_03      			= 3; /// $SUPPORTEDBY[]
+	RBS_RFU_04   				= 4; /// $SUPPORTEDBY[]
+	RBS_RFU_05   				= 5; /// $SUPPORTEDBY[]
+	RBS_RFU_06   				= 6; /// $SUPPORTEDBY[]
+	RBS_RFU_07   				= 7; /// $SUPPORTEDBY[]
+	RBS_RFU_08   				= 8; /// $SUPPORTEDBY[]
+}
+enum BeaconEvent {
+	BE_NONE						= 0; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BE_CROWD_START				= 1; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	BE_CROWD_END				= 2; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+}
+message BeaconData {
+	optional BeaconInfoType infoType 		= 1; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes info						= 2; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+}
+message ReportBeacons {
+	optional BeaconType type 				= 1;  /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes id 						= 2;  /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	repeated BeaconData infos 				= 3;  /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional sint32 rssi					= 4;  /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional uint32 distance 				= 5;  /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional uint32 major					= 6;  /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional uint32 minor					= 7;  /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional BeaconProductType product 		= 8;  /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional uint32 aging 					= 9;  /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional uint32 visibleTime 			= 10; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional ReportBeaconState state 	    = 11; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+}
+message BeaconInfo {
+	optional bool crowd 					=  1; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional uint32 peopleCount 			=  2; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+}
+message BeaconEventsTransmissionMask {
+   optional uint32 crowd   					= 1;   /// $SUPPORTEDBY[A6X, A90, MAXIO2] $DESCRIPTION[] $DESCRIPTION_ENGLISH[] $BITMASK[ReportEvents]
+}
+message BeaconEvents {
+	optional BeaconEvent id 				= 1; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+}
+message BeaconManufactureConfig {
+	optional bytes idMask					=  1; /// $SUPPORTEDBY[A6X, A90, MAXIO2] $DESCRIPTION[Configurar mascara de filtro para o fabricante]
+	optional bytes filter01					=  2; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter02					=  3; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter03					=  4; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter04					=  5; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter05					=  6; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter06					=  7; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter07					=  8; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter08					=  9; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter09					= 10; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter10					= 11; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+}
+message BeaconProductTypeConfig {
+	optional bytes idMask					=  1; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter01					=  2; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter02					=  3; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter03					=  4; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter04					=  5; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter05					=  6; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter06					=  7; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter07					=  8; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter08					=  9; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter09					= 10; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter10					= 11; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional sint32 maxRssi					= 12; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional uint32 maxDistance				= 13; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional uint32 maxReportQty 			= 14; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional uint32 minQtyCrowd				= 15; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional uint32 minVisibleIntervalCrowd = 16; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+}
+message BeaconAreaConfig {
+	optional bytes idMask					=  1; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter01					=  2; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter02					=  3; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter03					=  4; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter04					=  5; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter05					=  6; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter06					=  7; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter07					=  8; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter08					=  9; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter09					= 10; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes filter10					= 11; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+}
+message BeaconScanConfig {
+	optional uint32 intervalMoving		    =  1; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional uint32 durationMoving          =  2; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional uint32 intervalStopped 	    =  3; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional uint32 durationStopped 	    =  4; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional uint32 visibleDebounce         =  5; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+}
+message BeaconIdConfig {
+	optional bytes idMask					=  1; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+}
+message BeaconTransmissionConfig {
+	optional uint32 interval    			=  1; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional bytes uuid						=  2; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional sint32 rssiReference 			=  3; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional uint32 windowDuration 			=  4; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional uint32 windowInterval 			=  5; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional int32 power 					=  6; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+}
+message BeaconsConfig {
+	optional BeaconManufactureConfig manufacture    = 1; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional BeaconAreaConfig area 					= 2; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional BeaconIdConfig id 						= 3; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional BeaconProductTypeConfig productBeacon  = 4; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional BeaconProductTypeConfig productPerson  = 5; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional BeaconScanConfig scan 					= 6; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional BeaconTransmissionConfig transmission  = 7; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+	optional BeaconEventsTransmissionMask mask      = 8; /// $SUPPORTEDBY[A6X, A90, MAXIO2]
+}
