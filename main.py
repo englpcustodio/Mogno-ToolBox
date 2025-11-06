@@ -1,9 +1,10 @@
 # mogno_app/main.py
 
+import os
 import sys
 import datetime
 from PyQt5.QtWidgets import QApplication, QMessageBox
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import qRegisterMetaType, QTimer
 
 # Importações da GUI
 from gui.main_window import MognoMainWindow
@@ -17,6 +18,8 @@ from core.report_handlers import ReportHandler
 # Importações de utilitários
 from utils.logger import adicionar_log, configurar_componente_logs_qt, limpar_logs
 from config.settings import APP_NAME, APP_VERSION
+
+os.system('cls')  # Limpa o terminal com registros anteriores.
 
 # Estado global da aplicação
 app_state = {
@@ -38,6 +41,7 @@ def main():
     # Criar aplicação PyQt
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
+
     # Suprimir avisos não-críticos do Qt no console
     import warnings
     warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -54,44 +58,13 @@ def main():
     report_handler = ReportHandler(app_state, signal_manager, main_window)
     
     # ========== CONECTAR SINAIS DE LOGIN ==========
-    adicionar_log("🔍 [DEBUG] Iniciando conexão dos sinais de login")
-    adicionar_log(f"🔍 [DEBUG] main_window.login_tab existe: {hasattr(main_window, 'login_tab')}")
-    adicionar_log(f"🔍 [DEBUG] login_tab.login_requested existe: {hasattr(main_window.login_tab, 'login_requested')}")
-    adicionar_log(f"🔍 [DEBUG] gui_handler.handle_login_request existe: {hasattr(gui_handler, 'handle_login_request')}")
-
     try:
-        adicionar_log("🔍 [DEBUG] Conectando login_requested...")
         main_window.login_tab.login_requested.connect(gui_handler.handle_login_request)
-        adicionar_log("✅ [DEBUG] Sinal login_requested conectado")
-    except Exception as e:
-        adicionar_log(f"❌ [DEBUG] Erro ao conectar login_requested: {e}")
-        import traceback
-        adicionar_log(f"❌ [DEBUG] Traceback: {traceback.format_exc()}")
-
-    try:
-        adicionar_log("🔍 [DEBUG] Conectando login_successful...")
         signal_manager.login_successful.connect(gui_handler.handle_login_successful)
-        adicionar_log("✅ [DEBUG] Sinal login_successful conectado")
-    except Exception as e:
-        adicionar_log(f"❌ [DEBUG] Erro ao conectar login_successful: {e}")
-
-    try:
-        adicionar_log("🔍 [DEBUG] Conectando login_failed...")
         signal_manager.login_failed.connect(gui_handler.handle_login_failed)
-        adicionar_log("✅ [DEBUG] Sinal login_failed conectado")
-    except Exception as e:
-        adicionar_log(f"❌ [DEBUG] Erro ao conectar login_failed: {e}")
-
-    try:
-        adicionar_log("🔍 [DEBUG] Conectando token_status_updated...")
         signal_manager.token_status_updated.connect(main_window.login_tab.update_token_status)
-        adicionar_log("✅ [DEBUG] Sinal token_status_updated conectado")
     except Exception as e:
-        adicionar_log(f"❌ [DEBUG] Erro ao conectar token_status_updated: {e}")
-
-    # Verificar se a conexão foi bem-sucedida
-    adicionar_log(f"✅ [DEBUG] Todas as conexões de sinais de login concluídas")
-
+        adicionar_log(f"❌ Erro ao conectar sinais de login: {e}")
     
     # ========== CONECTAR SINAIS DA EQUIPMENTTAB ==========
     signal_manager.request_last_position_api.connect(request_handler.execute_last_position_api)
@@ -107,25 +80,18 @@ def main():
     main_window.logs_tab.clear_logs_requested.connect(limpar_logs)
     
     # ========== INICIALIZAÇÃO ==========
-    adicionar_log("="*60)
+    adicionar_log("=" * 60)
     adicionar_log(f"🚀 {APP_NAME} - {APP_VERSION}")
     adicionar_log(f"📅 Iniciado em: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
-    adicionar_log("="*60)
+    adicionar_log("=" * 60)
     
     # Iniciar timer de verificação de token
     gui_handler.start_token_check_timer()
     
     # Login automático se configurado
-#    if main_window.login_tab.is_auto_login_checked():
-#        QTimer.singleShot(500, lambda: gui_handler.handle_login_request(
-#            main_window.login_tab.entry_login.text().strip(),
-#            main_window.login_tab.entry_senha.text().strip(),
-#            main_window.login_tab.chk_manter_navegador.isChecked()
-#        ))
-    
     if main_window.login_tab.is_auto_login_checked():
         user, pwd, keep = main_window.login_tab.get_login_credentials()
-        if user and pwd:  # só tenta se houver credenciais preenchidas
+        if user and pwd:
             QTimer.singleShot(500, lambda: gui_handler.handle_login_request(user, pwd, keep))
     
     # Exibir a janela

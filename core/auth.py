@@ -30,12 +30,9 @@ def realizar_login_selenium(login_input, senha_input, manter_aberto=False):
     driver = webdriver.Chrome(options=options)
     selenium_driver = driver
 
-    adicionar_log("🔍 [DEBUG] realizar_login_selenium chamada")
     adicionar_log(f"🔍 [DEBUG] Parâmetros - Login: {login_input}, Manter aberto: {manter_aberto}")
 
-
     try:
-        adicionar_log("🔍 [DEBUG] Configurando ChromeDriver")
         adicionar_log(f"🔑 Tentando realizar login com usuário: {login_input}")
         driver.get(MOGNO_BASE_URL) # Usa a URL base das configurações
         wait = WebDriverWait(driver, 10)

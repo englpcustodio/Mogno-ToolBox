@@ -25,7 +25,6 @@ from reports.gerar_relatorio_trafegodados import relatorio_trafegodados_excel
 class MognoMainWindow(QMainWindow):
     def __init__(self, signal_manager):
         super().__init__()
-        print("🟦 [CONSOLE] MognoMainWindow.__init__ chamado")
 
         self.signal_manager = signal_manager
         self.setWindowTitle(f"{APP_NAME} - {APP_VERSION}")
@@ -40,7 +39,6 @@ class MognoMainWindow(QMainWindow):
         self.tab_widget = QTabWidget()
         main_layout.addWidget(self.tab_widget)
 
-        print("🟦 [CONSOLE] Criando abas...")
         self.login_tab = LoginTab()
         self.equipment_tab = EquipmentTab()
         self.scheduler_tab = SchedulerTab()  
@@ -58,7 +56,6 @@ class MognoMainWindow(QMainWindow):
         }
 
         # Conectar sinais
-        print("🟦 [CONSOLE] Conectando sinais...")
         self.signal_manager.token_status_updated.connect(self.login_tab.update_token_status)
         
         # Sinais da EquipmentTab
@@ -83,8 +80,6 @@ class MognoMainWindow(QMainWindow):
         self.scheduler_tab.scheduler_enabled_changed.connect(self.handle_scheduler_enabled_changed)
 
         self.requisicoes_concluidas = False # garantir que as requisições foram concluídas
-
-        adicionar_log("✅ Interface principal inicializada")
 
     def show_tabs_after_login(self):
         """Exibe todas as abas após login"""

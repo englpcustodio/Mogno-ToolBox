@@ -1,5 +1,5 @@
 # mogno_app/gui/login_tab.py
-
+import traceback
 from PyQt5.QtWidgets import (
     QWidget, QLabel, QLineEdit, QPushButton, QCheckBox,
     QVBoxLayout, QHBoxLayout, QGridLayout, QFormLayout, QSizePolicy
@@ -16,9 +16,7 @@ class LoginTab(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
-        adicionar_log("🔍 [DEBUG] LoginTab.__init__ chamado")
         self.setup_ui()
-        adicionar_log("🔍 [DEBUG] LoginTab.setup_ui concluído")
         
     def setup_ui(self):
         """Configura os widgets da aba de login com centralização."""
@@ -44,7 +42,6 @@ class LoginTab(QWidget):
             lbl_logo.setPixmap(pixmap)
             lbl_logo.setAlignment(Qt.AlignCenter)
             layout.addWidget(lbl_logo, 1, 0, 1, 2, Qt.AlignCenter)
-            adicionar_log("🔍 [DEBUG] Logo CEABS carregada com sucesso")
         except Exception as e:
             adicionar_log(f"⚠️ [DEBUG] Erro ao carregar logo: {e}")
             layout.addWidget(QLabel("[Logo CEABS não encontrada]"), 1, 0, 1, 2, Qt.AlignCenter)
@@ -99,10 +96,9 @@ class LoginTab(QWidget):
         button_layout.addWidget(self.btn_login)
 
         # TESTE: Conectar com lambda para verificar se o botão funciona
-        adicionar_log("🔍 [DEBUG] Conectando botão de login (TESTE COM LAMBDA)")
-        self.btn_login.clicked.connect(lambda: adicionar_log("🔍 [DEBUG] *** BOTÃO CLICADO (LAMBDA) ***"))
+
         self.btn_login.clicked.connect(self._emit_login_request)
-        adicionar_log("🔍 [DEBUG] Botão de login conectado com sucesso")
+
 
         layout.addWidget(button_container, 4, 0, 1, 2, Qt.AlignCenter)
 
@@ -129,42 +125,32 @@ class LoginTab(QWidget):
         self.show_password_toggled.emit(checked) # Emite sinal para a janela principal se necessário
         
     def _emit_login_request(self):
-        """Emite o sinal de requisição de login com os dados dos campos."""
-        adicionar_log("🔍 [DEBUG] Botão de login clicado (_emit_login_request chamado)")
-        
+        """Emite o sinal de requisição de login com os dados dos campos."""      
         login = self.entry_login.text().strip()
         senha = self.entry_senha.text().strip()
         manter_aberto = self.chk_manter_navegador.isChecked()
-        
         adicionar_log(f"🔍 [DEBUG] Login: {login}, Senha: {'*' * len(senha)}, Manter aberto: {manter_aberto}")
-        adicionar_log(f"🔍 [DEBUG] Emitindo sinal login_requested")
         
         try:
             self.login_requested.emit(login, senha, manter_aberto)
-            adicionar_log(f"🔍 [DEBUG] Sinal login_requested emitido com sucesso")
+
         except Exception as e:
             adicionar_log(f"❌ [DEBUG] Erro ao emitir sinal login_requested: {e}")
-            import traceback
+           
             adicionar_log(f"❌ [DEBUG] Traceback: {traceback.format_exc()}")
         
     def update_token_status(self, text, color):
-        """Atualiza o status do token na UI."""
-        print(f"🟨 [CONSOLE] update_token_status chamado: {text} (cor: {color})")
-        adicionar_log(f"🔍 [DEBUG] update_token_status chamado: {text} (cor: {color})")
-        
+        """Atualiza o status do token na UI."""      
         try:
             self.lbl_token_status.setText(text)
             self.lbl_token_status.setStyleSheet(f"color: {color}; font-weight: bold;")
-            print(f"🟨 [CONSOLE] update_token_status concluído")
         except Exception as e:
             print(f"❌ [CONSOLE] Erro em update_token_status: {e}")
-            import traceback
             print(traceback.format_exc())
 
         
     def set_login_button_enabled(self, enabled):
         """Habilita/desabilita o botão de login."""
-        adicionar_log(f"🔍 [DEBUG] set_login_button_enabled chamado: {enabled}")
         self.btn_login.setEnabled(enabled)
         if enabled:
             self.btn_login.setText("Realizar Login")
