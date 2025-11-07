@@ -30,6 +30,7 @@ def ler_arquivo_serials(filepath):
         if df.empty:
             raise ValueError("Arquivo vazio ou sem dados válidos.")
 
+        # Procura no cabeçalho por palavras-chaves para identificar qual pertence aos números de série para as consultas
         palavras_chave = ["seriais", "serial", "numero_serial", "serial_device", "serial_number", "rastreador_numero_serie"]
         coluna_serial = next((col for col in df.columns if any(kw in str(col).lower() for kw in palavras_chave)), df.columns[0])
 

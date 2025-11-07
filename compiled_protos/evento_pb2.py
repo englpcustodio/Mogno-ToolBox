@@ -21,8 +21,9 @@ _runtime_version.ValidateProtobufRuntimeVersion(
 
 _sym_db = _symbol_database.Default()
 
-
 import rev_geo_pb2 as rev__geo__pb2
+
+#import rev_geo_pb2 as rev__geo__pb2
 import evento_regras_violacoes_pb2 as evento__regras__violacoes__pb2
 import ultimo_motorista_identificado_pb2 as ultimo__motorista__identificado__pb2
 

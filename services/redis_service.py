@@ -10,24 +10,38 @@ import binascii
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from utils.logger import adicionar_log
 from utils.helpers import epoch_to_datetime
-from config.settings import REDIS_HOST, REDIS_PORT, REDIS_DB_STATUS, REDIS_DB_LAST_POSITION
+from config.settings import REDIS_HOST, REDIS_PORT, REDIS_DB_2, REDIS_DB_4
 
-# Tentar importar os protos compilados
-try:
-    from compiled_protos import evento_pb2, maxpb_report_pb2
-    PROTOS_AVAILABLE = True
-except ImportError:
-    # Se não encontrar, usar stubs
-    adicionar_log("⚠️ Aviso: Usando stubs de protos. Funcionalidades Redis limitadas.")
-    from compiled_protos import evento_pb2, maxpb_report_pb2
-    PROTOS_AVAILABLE = False
+import os
+import sys
+
+# === DEPURAÇÃO DE CAMINHOS ===
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROTO_DIR = os.path.join(BASE_DIR, "compiled_protos")
+
+print("📂 Diretório base:", BASE_DIR)
+print("📦 Pasta dos protos:", PROTO_DIR)
+
+# Adiciona a pasta compiled_protos ao sys.path se ainda não estiver
+if PROTO_DIR not in sys.path:
+    sys.path.insert(0, PROTO_DIR)
+    print(f"✅ Adicionado ao sys.path: {PROTO_DIR}")
+else:
+    print(f"ℹ️ Pasta já presente no sys.path")
+
+print("🔍 sys.path final:")
+for p in sys.path:
+    print("   ", p)
+print("===============================")
+
+from compiled_protos import evento_pb2, maxpb_report_pb2
 
 def conectar_redis(db):
     """
     Estabelece a conexão com o Redis e retorna a conexão.
     """
+    redis_conn = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=db, decode_responses=False)
     try:
-        redis_conn = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=db, decode_responses=False)
         redis_conn.ping()
         adicionar_log(f"✅ Conexão com Redis (DB {db}) estabelecida.")
         return redis_conn
@@ -38,12 +52,8 @@ def conectar_redis(db):
 def ultima_posicao_tipo(seriais):
     """
     Obtém a última posição para uma lista de seriais.
-    """
-    if not PROTOS_AVAILABLE:
-        adicionar_log("⚠️ Protos não disponíveis. Retornando lista vazia.")
-        return []
-    
-    redis_conn = conectar_redis(REDIS_DB_LAST_POSITION)
+    """   
+    redis_conn = conectar_redis(REDIS_DB_4)
     if not redis_conn:
         return []
     
@@ -58,7 +68,8 @@ def ultima_posicao_tipo(seriais):
                 valor_decodificado = base64.b64decode(valor)
                 ultima_posicao = evento_pb2.Evento()
                 ultima_posicao.ParseFromString(valor_decodificado)
-                
+                #print(ultima_posicao) #DEBUG
+
                 datahoraevento = None
                 if hasattr(ultima_posicao, 'data_hora_evento') and ultima_posicao.data_hora_evento:
                     datahoraevento = epoch_to_datetime(ultima_posicao.data_hora_evento / 1000)
@@ -98,12 +109,8 @@ def ultima_posicao_tipo(seriais):
 def status_equipamento(seriais):
     """
     Obtém o status dos equipamentos para uma lista de seriais.
-    """
-    if not PROTOS_AVAILABLE:
-        adicionar_log("⚠️ Protos não disponíveis. Retornando lista vazia.")
-        return []
-    
-    redis_conn = conectar_redis(REDIS_DB_STATUS)
+    """  
+    redis_conn = conectar_redis(REDIS_DB_2)
     if not redis_conn:
         return []
     
@@ -142,7 +149,7 @@ def obter_dados_consumo(mes, ano):
     """
     Obtém dados de consumo GSM para um mês e ano específicos.
     """
-    redis_conn = conectar_redis(REDIS_DB_STATUS)
+    redis_conn = conectar_redis(REDIS_DB_4)
     if not redis_conn:
         return {}
     

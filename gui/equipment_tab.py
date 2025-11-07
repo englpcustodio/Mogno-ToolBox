@@ -13,6 +13,8 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, pyqtSignal, QDate
 from PyQt5.QtGui import QFont
 
+from core.serial_management import ler_arquivo_serials
+
 from utils.logger import adicionar_log
 from utils.ui_helpers import (
     create_group_box, create_column_frame, create_section_title,
@@ -315,8 +317,6 @@ class EquipmentTab(QWidget):
             self.csv_filepath = filepath
             self.entry_csv_nome.setText(os.path.basename(filepath))
             self.file_selected.emit(filepath)
-            self.update_serial_status()
-            adicionar_log(f"📁 Arquivo selecionado: {os.path.basename(filepath)}")
 
     def update_serial_count(self):
         """Atualiza contagem de seriais manuais, removendo duplicados."""
@@ -429,3 +429,13 @@ class EquipmentTab(QWidget):
             self.generate_consolidated_report.emit(opcoes)
         else:
             self.generate_separate_reports.emit(opcoes)
+
+    def handle_file_selected(self, filepath):
+        """Processa seleção de arquivo CSV com seriais"""
+        try:
+            result = ler_arquivo_serials(filepath)
+            self.current_serials = result["unicos"]
+            self.update_serial_status()
+        except Exception as e:
+            adicionar_log(f"❌ Erro ao carregar arquivo: {e}")
+            QMessageBox.critical(self, "Erro", f"Erro ao carregar arquivo:\n{e}")

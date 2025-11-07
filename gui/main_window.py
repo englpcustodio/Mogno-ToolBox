@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QTimer
 
+from config.settings import APP_NAME, APP_VERSION
+from core.serial_management import ler_arquivo_serials
 from gui.login_tab import LoginTab
 from gui.equipment_tab import EquipmentTab
 from gui.events_tab import EventsTab
@@ -12,12 +14,9 @@ from gui.health_tab import HealthTab
 from gui.scheduler_tab import SchedulerTab
 from gui.logs_tab import LogsTab
 from gui.about_tab import AboutTab
-
 from gui.signals import SignalManager
-from config.settings import APP_NAME, APP_VERSION
 from utils.logger import adicionar_log
 from utils.gui_utils import log_message, update_progress, set_execution_complete
-
 from reports.gerar_relatorio_ultima_pos import relatorio_ultimaposicao_excel
 from reports.gerar_relatorio_status_maxtrack import relatorio_status_excel
 from reports.gerar_relatorio_trafegodados import relatorio_trafegodados_excel
@@ -29,7 +28,7 @@ class MognoMainWindow(QMainWindow):
         self.signal_manager = signal_manager
         self.setWindowTitle(f"{APP_NAME} - {APP_VERSION}")
         self.resize(1200, 900)
-        self.setMinimumSize(1100, 850)
+        self.setMinimumSize(1000, 800)
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -92,18 +91,15 @@ class MognoMainWindow(QMainWindow):
         self.tab_widget.addTab(self.scheduler_tab, "⏱️ Agendador de Tarefas")
         self.tab_widget.addTab(self.logs_tab, "📋 Logs")
         self.tab_widget.addTab(self.about_tab, "ℹ️ Sobre")
-        self.tab_widget.setCurrentIndex(1)
-        adicionar_log("✅ Abas habilitadas após login")
+        self.tab_widget.setCurrentIndex(1) # Aba Análise de Equipamentos
 
     # ========== Handlers ==========
     def handle_file_selected(self, filepath):
         """Processa arquivo CSV/Excel selecionado"""
-        from core.serial_management import ler_arquivo_serials
         try:
             result = ler_arquivo_serials(filepath)
             self.equipment_tab.current_serials = result["unicos"]
             self.equipment_tab.update_serial_status()
-            adicionar_log(f"📁 Arquivo carregado: {len(result['unicos'])} seriais únicos")
             log_message(
                 self.scheduler_tab.logs_text,
                 f"✅ {len(result['unicos'])} seriais únicos carregados (duplicados removidos: {result['duplicados']})"

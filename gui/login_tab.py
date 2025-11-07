@@ -1,166 +1,187 @@
-# mogno_app/gui/login_tab.py
 import traceback
+from datetime import datetime
 from PyQt5.QtWidgets import (
     QWidget, QLabel, QLineEdit, QPushButton, QCheckBox,
-    QVBoxLayout, QHBoxLayout, QGridLayout, QFormLayout, QSizePolicy
+    QVBoxLayout, QHBoxLayout, QGridLayout, QFormLayout, QSizePolicy, QSpacerItem
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QObject
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QPixmap, QFont
-from config.settings import LOGO_CEABS_PATH # Importa o caminho da logo das configurações
+from config.settings import LOGO_CEABS_PATH, BACKGROUND_IMAGE_PATH 
 from utils.logger import adicionar_log
 
 class LoginTab(QWidget):
-    # Sinais para comunicação com a janela principal ou outras partes da aplicação
-    login_requested = pyqtSignal(str, str, bool) # user, pass, keep_browser_open
+    login_requested = pyqtSignal(str, str, bool)  # user, pass, keep_browser_open
     show_password_toggled = pyqtSignal(bool)
-    
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setup_ui()
-        
+
     def setup_ui(self):
-        """Configura os widgets da aba de login com centralização."""
+        """Configura os widgets da aba de login com fundo e centralização."""
+
+        # === Label de background ===
+        self.background_label = QLabel(self)
+        pixmap_bg = QPixmap(BACKGROUND_IMAGE_PATH)
+        if pixmap_bg.isNull():
+            adicionar_log(f"⚠️ [DEBUG] Background não encontrado em: {BACKGROUND_IMAGE_PATH}")
+        else:
+            self.background_label.setPixmap(pixmap_bg)
+            self.background_label.setScaledContents(True)
+        self.background_label.lower()  # garante que fique atrás de todos os widgets
+
+        # === Layout principal ===
         main_layout = QVBoxLayout(self)
         main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setContentsMargins(40, 40, 40, 40)
 
+        main_layout.addSpacerItem(QSpacerItem(0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+
+        # Container central com todo o conteúdo
         container = QWidget()
-        container.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
-        layout = QGridLayout(container)
-        layout.setAlignment(Qt.AlignCenter)
+        # Container levemente translúcido
+        container.setStyleSheet("background: rgba(255, 255, 255, 0.7); border-radius: 12px;")
+        container_layout = QVBoxLayout(container)
+        container_layout.setAlignment(Qt.AlignCenter)
+        container_layout.setSpacing(15)
 
-        lbl_instrucao = QLabel(
-            "Para iniciar, insira seu login e senha do servidor Mogno-CEABS [VPN ligada/Cabo de rede]:"
-        )
-        lbl_instrucao.setFont(QFont("Segoe UI", 10))
-        lbl_instrucao.setStyleSheet("font-style: italic;")
-        lbl_instrucao.setAlignment(Qt.AlignCenter)
-        layout.addWidget(lbl_instrucao, 0, 0, 1, 2, Qt.AlignCenter)
-
+        # === Logo CEABS ===
         try:
-            pixmap = QPixmap(LOGO_CEABS_PATH).scaled(360, 180, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            pixmap = QPixmap(LOGO_CEABS_PATH)
+            if not pixmap.isNull():
+                pixmap = pixmap.scaledToWidth(360, Qt.SmoothTransformation)
             lbl_logo = QLabel()
             lbl_logo.setPixmap(pixmap)
             lbl_logo.setAlignment(Qt.AlignCenter)
-            layout.addWidget(lbl_logo, 1, 0, 1, 2, Qt.AlignCenter)
+            container_layout.addWidget(lbl_logo)
         except Exception as e:
             adicionar_log(f"⚠️ [DEBUG] Erro ao carregar logo: {e}")
-            layout.addWidget(QLabel("[Logo CEABS não encontrada]"), 1, 0, 1, 2, Qt.AlignCenter)
+            lbl_logo = QLabel("[Logo CEABS não encontrada]")
+            lbl_logo.setAlignment(Qt.AlignCenter)
+            container_layout.addWidget(lbl_logo)
 
-        form_container = QWidget()
-        form_layout = QFormLayout(form_container)
+        # === Texto de instrução ===
+        lbl_instrucao = QLabel("Para iniciar, insira seu login e senha do servidor Mogno-CEABS:")
+        lbl_instrucao.setFont(QFont("Segoe UI", 10))
+        lbl_instrucao.setStyleSheet("font-style: italic; color: #333;")
+        lbl_instrucao.setAlignment(Qt.AlignCenter)
+        container_layout.addWidget(lbl_instrucao)
+
+        # === Campos de Login ===
+        form_layout = QFormLayout()
         form_layout.setLabelAlignment(Qt.AlignRight)
         form_layout.setFormAlignment(Qt.AlignCenter)
-        form_layout.setContentsMargins(20, 10, 20, 10)
+        form_layout.setContentsMargins(0, 0, 0, 0)
+        form_layout.setSpacing(10)
 
         self.entry_login = QLineEdit()
         self.entry_login.setFixedWidth(250)
+        self.entry_login.setPlaceholderText("Usuário")
         form_layout.addRow("Usuário:", self.entry_login)
 
         self.entry_senha = QLineEdit()
         self.entry_senha.setEchoMode(QLineEdit.Password)
         self.entry_senha.setFixedWidth(250)
-        # Permitir login ao pressionar Enter no campo de senha
+        self.entry_senha.setPlaceholderText("Senha")
         self.entry_senha.returnPressed.connect(self._emit_login_request)
         form_layout.addRow("Senha:", self.entry_senha)
 
-        layout.addWidget(form_container, 2, 0, 1, 2, Qt.AlignCenter)
+        container_layout.addLayout(form_layout)
 
-        options_container = QWidget()
-        options_layout = QVBoxLayout(options_container)
+        # === Opções ===
+        options_layout = QVBoxLayout()
         options_layout.setAlignment(Qt.AlignCenter)
         options_layout.setContentsMargins(0, 0, 0, 0)
 
         self.chk_show_password = QCheckBox("Mostrar senha")
-        self.chk_show_password.setStyleSheet("margin-left: 50px;")
-        options_layout.addWidget(self.chk_show_password)
         self.chk_show_password.toggled.connect(self.toggle_senha)
+        options_layout.addWidget(self.chk_show_password)
 
         self.chk_manter_navegador = QCheckBox("Manter janela do navegador aberta após login")
-        self.chk_manter_navegador.setStyleSheet("margin-left: 50px;")
         options_layout.addWidget(self.chk_manter_navegador)
 
         self.chk_login_automatico = QCheckBox("Login automático")
-        self.chk_login_automatico.setStyleSheet("margin-left: 50px;")
         self.chk_login_automatico.setChecked(True)
         options_layout.addWidget(self.chk_login_automatico)
 
-        layout.addWidget(options_container, 3, 0, 1, 2, Qt.AlignCenter)
+        container_layout.addLayout(options_layout)
 
-        button_container = QWidget()
-        button_layout = QHBoxLayout(button_container)
-        button_layout.setContentsMargins(0, 10, 0, 10)
-        button_layout.setAlignment(Qt.AlignCenter)
-
+        # === Botão de Login ===
         self.btn_login = QPushButton("Realizar Login")
-        self.btn_login.setFixedWidth(180)
-        button_layout.addWidget(self.btn_login)
-
-        # TESTE: Conectar com lambda para verificar se o botão funciona
-
+        self.btn_login.setFixedWidth(200)
+        self.btn_login.setStyleSheet("""
+            QPushButton {
+                background-color: #0078D7;
+                color: white;
+                font-weight: bold;
+                border-radius: 6px;
+                padding: 6px;
+            }
+            QPushButton:hover { background-color: #005EA6; }
+            QPushButton:disabled { background-color: #999; }
+        """)
         self.btn_login.clicked.connect(self._emit_login_request)
+        container_layout.addWidget(self.btn_login, alignment=Qt.AlignCenter)
 
-
-        layout.addWidget(button_container, 4, 0, 1, 2, Qt.AlignCenter)
-
-        status_container = QWidget()
-        status_layout = QHBoxLayout(status_container)
-        status_layout.setAlignment(Qt.AlignCenter)
-
-        self.lbl_token_status = QLabel("Gerar token ao realizar Login.")
-        self.lbl_token_status.setStyleSheet("color: blue; font-style: italic;")
+        # === Status do Token ===
+        self.lbl_token_status = QLabel("Realize o login.")
+        self.lbl_token_status.setStyleSheet("color: #0044cc; font-style: italic;")
         self.lbl_token_status.setWordWrap(True)
-        self.lbl_token_status.setFixedWidth(350)
         self.lbl_token_status.setAlignment(Qt.AlignCenter)
-        status_layout.addWidget(self.lbl_token_status)
+        container_layout.addWidget(self.lbl_token_status)
 
-        layout.addWidget(status_container, 5, 0, 1, 2, Qt.AlignCenter)
+        # Ajusta a largura do container dinamicamente
+        container.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
 
+        # Adiciona o container centralizado
         main_layout.addWidget(container)
-        main_layout.addStretch(1)
+        main_layout.addSpacerItem(QSpacerItem(0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
 
-        
+    # Ajusta o tamanho do background quando o widget for redimensionado
+    def resizeEvent(self, event):
+        self.background_label.setGeometry(self.rect())
+        super().resizeEvent(event)
+
+    # === Funções internas ===
     def toggle_senha(self, checked):
-        """Alterna a visibilidade da senha e emite sinal."""
         self.entry_senha.setEchoMode(QLineEdit.Normal if checked else QLineEdit.Password)
-        self.show_password_toggled.emit(checked) # Emite sinal para a janela principal se necessário
-        
+        self.show_password_toggled.emit(checked)
+
     def _emit_login_request(self):
-        """Emite o sinal de requisição de login com os dados dos campos."""      
         login = self.entry_login.text().strip()
         senha = self.entry_senha.text().strip()
         manter_aberto = self.chk_manter_navegador.isChecked()
-        adicionar_log(f"🔍 [DEBUG] Login: {login}, Senha: {'*' * len(senha)}, Manter aberto: {manter_aberto}")
-        
-        try:
-            self.login_requested.emit(login, senha, manter_aberto)
 
+        if not login or not senha:
+            self.update_token_status("Por favor, preencha usuário e senha.", "red")
+            return
+
+        try:
+            self.update_token_status("Realizando o login, por favor aguarde...", "orange")
+            self.set_login_button_enabled(False)
+            self.login_requested.emit(login, senha, manter_aberto)
         except Exception as e:
             adicionar_log(f"❌ [DEBUG] Erro ao emitir sinal login_requested: {e}")
-           
-            adicionar_log(f"❌ [DEBUG] Traceback: {traceback.format_exc()}")
-        
+            adicionar_log(traceback.format_exc())
+
     def update_token_status(self, text, color):
-        """Atualiza o status do token na UI."""      
         try:
             self.lbl_token_status.setText(text)
             self.lbl_token_status.setStyleSheet(f"color: {color}; font-weight: bold;")
         except Exception as e:
-            print(f"❌ [CONSOLE] Erro em update_token_status: {e}")
-            print(traceback.format_exc())
+            adicionar_log(f"❌ [DEBUG] Erro em update_token_status: {e}")
+            adicionar_log(traceback.format_exc())
 
-        
     def set_login_button_enabled(self, enabled):
-        """Habilita/desabilita o botão de login."""
         self.btn_login.setEnabled(enabled)
-        if enabled:
-            self.btn_login.setText("Realizar Login")
-        else:
-            self.btn_login.setText("⏳ Autenticando...")
-        
+        self.btn_login.setText("Realizar Login" if enabled else "⏳ Autenticando...")
+
+    def registrar_login_sucesso(self):
+        hora = datetime.now().strftime("%H:%M:%S")
+        self.update_token_status(f"✅ Login realizado com sucesso às {hora}.", "green")
+
     def get_login_credentials(self):
-        """Retorna as credenciais de login e a opção de manter navegador."""
         return self.entry_login.text().strip(), self.entry_senha.text().strip(), self.chk_manter_navegador.isChecked()
-        
+
     def is_auto_login_checked(self):
-        """Retorna se o login automático está marcado."""
         return self.chk_login_automatico.isChecked()
