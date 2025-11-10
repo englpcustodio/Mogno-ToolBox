@@ -48,6 +48,10 @@ class SignalManager(QObject):
     # Progresso detalhado de execução
     equipment_progress_updated = pyqtSignal(int, int, str)  # (current, total, status_text)
 
-
+    # ========== TOAST NOTIFICATIONS ==========
+    show_toast = pyqtSignal(str, str)
+    show_toast_success = pyqtSignal(str)                    # mensagem de sucesso
+    show_toast_warning = pyqtSignal(str)                    # mensagem de aviso
+    show_toast_error = pyqtSignal(str)                      # mensagem de erro
 
     

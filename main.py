@@ -6,23 +6,11 @@ import datetime
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QTextCursor
-
-# Tentativa de registrar QTextCursor, dependendo da versão do PyQt5
-try:
-    from PyQt5.QtCore import qRegisterMetaType
-    qRegisterMetaType(QTextCursor)
-except Exception:
-    pass
-
-# Importações da GUI
+from gui.toast import ToastNotification
 from gui.main_window import MognoMainWindow
 from gui.signals import SignalManager
-
-# Importações dos handlers
 from core.request_handlers import RequestHandler
 from core.report_handlers import ReportHandler
-
-# Importações de utilitários
 from utils.logger import adicionar_log, configurar_componente_logs_qt, limpar_logs
 from config.settings import APP_NAME, APP_VERSION
 
@@ -55,6 +43,7 @@ app_state = {
     "scheduler": None
 }
 
+
 def main():
     """Função principal da aplicação"""
     app = QApplication(sys.argv)
@@ -71,25 +60,51 @@ def main():
 
     # ========== CONECTAR SINAIS DE LOGIN ==========
     try:
+        adicionar_log("🧩 [MAIN] Conectando sinais de login...")
+
+        # Sinal emitido pela LoginTab quando o usuário clica em “Realizar Login”
         main_window.login_tab.login_requested.connect(
             lambda login, senha, manter_aberto: iniciar_login_thread(
                 login, senha, manter_aberto, signal_manager, main_window, app_state
             )
         )
+
         signal_manager.login_successful.connect(
             lambda jwt, user_login, user_id, cookie_dict: handle_login_successful(
                 jwt, user_login, user_id, cookie_dict, signal_manager, main_window, app_state
             )
         )
+
         signal_manager.login_failed.connect(
-            lambda message: handle_login_failed(message, signal_manager)
+            lambda message: handle_login_failed(message, signal_manager, main_window)
         )
+
         signal_manager.token_status_updated.connect(
             main_window.login_tab.update_token_status
         )
-    except Exception as e:
-        adicionar_log(f"❌ Erro ao conectar sinais de login: {e}")
 
+        # ✅ NOVO: controla o botão de login de forma thread-safe
+        signal_manager.enable_start_button.connect(
+            main_window.login_tab.set_login_button_enabled
+        )
+
+        adicionar_log("✅ [MAIN] Todos os sinais de login conectados com sucesso")
+
+    except Exception as e:
+        adicionar_log(f"❌ [MAIN] Erro ao conectar sinais de login: {e}")
+
+    # ========== CONECTAR SINAIS DE TOASTS ==========  
+    signal_manager.show_toast_success.connect(
+        lambda msg: ToastNotification(main_window, msg, type="success")
+    )
+    signal_manager.show_toast_warning.connect(
+        lambda msg: ToastNotification(main_window, msg, type="warning")
+    )
+    signal_manager.show_toast_error.connect(
+        lambda msg: ToastNotification(main_window, msg, type="error")
+    )
+    
+   
     # ========== CONECTAR SINAIS DA EQUIPMENTTAB ==========
     signal_manager.request_last_position_api.connect(request_handler.execute_last_position_api)
     signal_manager.request_last_position_redis.connect(request_handler.execute_last_position_redis)
@@ -116,6 +131,7 @@ def main():
     if main_window.login_tab.is_auto_login_checked():
         user, pwd, keep = main_window.login_tab.get_login_credentials()
         if user and pwd:
+            adicionar_log("🧠 [MAIN] Login automático ativado — agendando tentativa em 500ms")
             QTimer.singleShot(500, lambda: iniciar_login_thread(
                 user, pwd, keep, signal_manager, main_window, app_state
             ))
@@ -123,8 +139,14 @@ def main():
     # Exibir a janela
     main_window.show()
 
+    # Auto disparo do login (se marcado)
+    #QTimer.singleShot(2000, lambda: main_window.login_tab._emit_login_request())
+
+    adicionar_log("🟢 [MAIN] Interface exibida — aguardando interações do usuário")
+
     # Iniciar loop de eventos
     sys.exit(app.exec_())
+
 
 if __name__ == "__main__":
     main()

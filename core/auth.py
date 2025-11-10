@@ -2,6 +2,7 @@
 
 import datetime
 import traceback
+import jwt
 from threading import Thread
 from PyQt5.QtCore import QTimer
 from selenium import webdriver
@@ -16,8 +17,6 @@ selenium_driver = None
 
 def realizar_login_selenium(login_input, senha_input, manter_aberto=False):
     global selenium_driver
-    adicionar_log("🧪 [DEBUG] Iniciando função realizar_login_selenium()")
-
     options = Options()
     options.add_argument("--disable-logging")
     options.add_argument("--log-level=3")
@@ -28,93 +27,92 @@ def realizar_login_selenium(login_input, senha_input, manter_aberto=False):
         options.add_argument("--disable-gpu")
         options.add_argument("--window-size=1920,1080")
 
+    driver = webdriver.Chrome(options=options)
+    selenium_driver = driver
+
     try:
-        adicionar_log("🧪 [DEBUG] Criando driver do Chrome")
-        driver = webdriver.Chrome(options=options)
-        selenium_driver = driver
-
-        adicionar_log(f"🔑 Tentando login com usuário: {login_input}")
+        adicionar_log(f"🔑 Tentando realizar login com usuário: {login_input}")
         driver.get(MOGNO_BASE_URL)
-        adicionar_log("🧪 [DEBUG] Página carregada")
-
         wait = WebDriverWait(driver, 10)
-        adicionar_log("🧪 [DEBUG] Esperando campo de login")
         wait.until(EC.presence_of_element_located((By.ID, "Login"))).send_keys(login_input)
-
-        adicionar_log("🧪 [DEBUG] Preenchendo senha")
         driver.find_element(By.ID, "password").send_keys(senha_input)
-
-        adicionar_log("🧪 [DEBUG] Clicando no botão de login")
         driver.find_element(By.ID, "btn-entrar").click()
-
-        adicionar_log("🧪 [DEBUG] Aguardando redirecionamento")
         wait.until(EC.url_contains("pesquisaeventos.html"))
 
-        adicionar_log("🧪 [DEBUG] Coletando cookies")
         cookies = driver.get_cookies()
         cookie_dict = {cookie['name']: cookie['value'] for cookie in cookies}
-        jwt = cookie_dict.get('Authorization', '')
+        token = cookie_dict.get('Authorization', '')
 
-        if jwt.startswith("Bearer "):
-            jwt = jwt[7:]
+        if token.startswith("Bearer "):
+            token = token[7:]
 
-        adicionar_log("✅ Login via Selenium realizado com sucesso")
-        return jwt, cookie_dict.get("login"), cookie_dict.get("userId"), cookie_dict
+        return token, cookie_dict.get("login"), cookie_dict.get("userId"), cookie_dict
 
     except Exception as e:
-        adicionar_log(f"❌ [ERRO] Falha no login Selenium: {e}")
+        adicionar_log(f"❌ Erro ao tentar realizar login: {e}")
         adicionar_log(traceback.format_exc())
         return None, None, None, None
 
     finally:
-        if not manter_aberto and selenium_driver:
-            adicionar_log("🧪 [DEBUG] Fechando driver")
-            selenium_driver.quit()
+        if not manter_aberto and driver:
+            driver.quit()
             selenium_driver = None
 
 def iniciar_login_thread(login, senha, manter_aberto, signal_manager, main_window, app_state):
-    adicionar_log("🧪 [DEBUG] Iniciando login thread")
-
     if not login or not senha:
+        signal_manager.show_toast_error.emit("❌ Preencha usuário e senha")
         signal_manager.token_status_updated.emit("Preencha usuário e senha para autenticar.", "red")
         adicionar_log("❌ Login ou senha vazios")
         return
 
-    main_window.login_tab.set_login_button_enabled(False)
+    # Desabilita botão de login via sinal (seguro)
+    signal_manager.enable_start_button.emit(False)
 
     def login_thread():
         try:
-            adicionar_log("🧪 [DEBUG] Entrando na thread de login")
-            jwt, user_login, user_id, cookie_dict = realizar_login_selenium(login, senha, manter_aberto)
-
-            if jwt:
-                adicionar_log("🧪 [DEBUG] Login bem-sucedido, chamando handle_login_successful")
-                handle_login_successful(jwt, user_login, user_id, cookie_dict, signal_manager, main_window, app_state)
+            token, user_login, user_id, cookie_dict = realizar_login_selenium(login, senha, manter_aberto)
+            if token:
+                signal_manager.login_successful.emit(token, user_login, user_id, cookie_dict)
             else:
-                adicionar_log("🧪 [DEBUG] Login falhou, chamando handle_login_failed")
-                handle_login_failed("Erro no login: confira usuário, senha e/ou conexão CEABS (VPN/cabo)", signal_manager)
-
+                signal_manager.login_failed.emit("Erro no login: confira usuário, senha e/ou conexão CEABS (VPN/cabo)")
         except Exception as e:
-            adicionar_log(f"❌ [ERRO] Exceção na thread de login: {e}")
+            adicionar_log(f"❌ Erro na thread de login: {e}")
             adicionar_log(traceback.format_exc())
-            handle_login_failed(f"Erro na thread de login: {e}", signal_manager)
-
+            signal_manager.login_failed.emit(f"Erro na thread de login: {e}")
         finally:
-            adicionar_log("🧪 [DEBUG] Finalizando thread de login")
-            main_window.login_tab.set_login_button(True)
+            signal_manager.enable_start_button.emit(True)
 
     Thread(target=login_thread, daemon=True).start()
 
-def handle_login_successful(jwt, user_login, user_id, cookie_dict, signal_manager, main_window, app_state):
-    adicionar_log("🧪 [DEBUG] Executando handle_login_successful")
-    app_state["jwt_token"] = jwt
+
+def handle_login_successful(token, user_login, user_id, cookie_dict, signal_manager, main_window, app_state):
+    app_state["jwt_token"] = token
     app_state["user_login"] = user_login
     app_state["user_id"] = user_id
     app_state["cookie_dict"] = cookie_dict
-    app_state["token_expiry"] = datetime.datetime.now() + datetime.timedelta(hours=3)
 
-    expiry_str = app_state["token_expiry"].strftime("%d/%/%Y %H:%M:%S")
+    try:
+        if token.count('.') != 2:
+            raise ValueError("Formato inválido de JWT")
+
+        payload = jwt.decode(token, options={"verify_signature": False})
+        exp_timestamp = payload.get("exp")
+
+        if exp_timestamp:
+            expiry = datetime.datetime.fromtimestamp(exp_timestamp)
+            app_state["token_expiry"] = expiry
+            adicionar_log(f"🕒 Token expira em: {expiry.strftime('%d/%m/%Y %H:%M:%S')}")
+        else:
+            raise ValueError("Campo 'exp' ausente no token")
+
+    except Exception as e:
+        adicionar_log(f"⚠️ Erro ao decodificar JWT: {e}")
+        app_state["token_expiry"] = datetime.datetime.now() + datetime.timedelta(hours=3)
+
+    expiry_str = app_state["token_expiry"].strftime("%d/%m/%Y %H:%M:%S")
     signal_manager.token_status_updated.emit(f"✅ Token válido até {expiry_str}", "green")
+    signal_manager.show_toast.emit("✅ Login realizado com sucesso!", "success")
+
 
     try:
         main_window.show_tabs_after_login()
@@ -123,7 +121,37 @@ def handle_login_successful(jwt, user_login, user_id, cookie_dict, signal_manage
 
     adicionar_log(f"✅ Login realizado com sucesso! Usuário: {user_login}")
 
-def handle_login_failed(message, signal_manager):
-    adicionar_log("🧪 [DEBUG] Executando handle_login_failed")
+def handle_login_failed(message, signal_manager, main_window):
     signal_manager.token_status_updated.emit(message, "red")
     adicionar_log(f"❌ Falha no login: {message}")
+    signal_manager.show_toast.emit(message, "error")
+
+def iniciar_token_check_timer(main_window, app_state, signal_manager):
+    if not hasattr(main_window, "_token_check_timer"):
+        main_window._token_check_timer = QTimer()
+        main_window._token_check_timer.timeout.connect(
+            lambda: verificar_token_periodicamente(app_state, signal_manager, main_window)
+        )
+        main_window._token_check_timer.start(60000)
+        adicionar_log("⏰ Timer de verificação de token iniciado")
+
+def verificar_token_periodicamente(app_state, signal_manager, main_window):
+    token = app_state.get("jwt_token")
+    expiry = app_state.get("token_expiry")
+
+    if not token or not expiry:
+        signal_manager.token_status_updated.emit("Token ausente. Faça login.", "red")
+        return
+
+    agora = datetime.datetime.now()
+    restante = expiry - agora
+
+    if restante.total_seconds() > 0:
+        horas, resto = divmod(int(restante.total_seconds()), 3600)
+        minutos, _ = divmod(resto, 60)
+        signal_manager.token_status_updated.emit(
+            f"Token expira em: {horas}h {minutos}min", "green"
+        )
+    else:
+        signal_manager.token_status_updated.emit("Token expirou. Faça login novamente.", "red")
+        signal_manager.show_toast.emit("⚠️ Sessão expirada. Faça login novamente.", "warning")

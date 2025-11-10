@@ -148,6 +148,8 @@ class LoginTab(QWidget):
         self.show_password_toggled.emit(checked)
 
     def _emit_login_request(self):
+        adicionar_log("🧪 [DEBUG] Botão de login clicado")
+        
         login = self.entry_login.text().strip()
         senha = self.entry_senha.text().strip()
         manter_aberto = self.chk_manter_navegador.isChecked()
@@ -157,6 +159,7 @@ class LoginTab(QWidget):
             return
 
         try:
+            adicionar_log("🧪 [DEBUG] Emitindo sinal login_requested")
             self.update_token_status("Realizando o login, por favor aguarde...", "orange")
             self.set_login_button_enabled(False)
             self.login_requested.emit(login, senha, manter_aberto)
