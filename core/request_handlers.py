@@ -1,165 +1,108 @@
-# mogno_app/core/request_handlers.py
-
+# core/request_handlers.py
 """
-Handlers para processamento de requisições de equipamentos.
-Encapsula toda a lógica de execução de consultas (API, Redis, etc.).
+Gerenciador centralizado de requisições (API, Redis, Consumo de Dados).
+Responsável por orquestrar chamadas assíncronas, logs, progressos e sinais.
 """
 
-import time
 import traceback
-from threading import Thread
+from threading import Thread, Lock
+from utils.logger import adicionar_log
 from services.api_requests import modo_requisitar_lotes
 from services.redis_service import ultima_posicao_tipo, status_equipamento, obter_dados_consumo
-from utils.logger import adicionar_log
-from utils.helpers import formatar_tempo
 
 
 class RequestHandler:
-    """Gerenciador de requisições de equipamentos"""
-    
+    """Gerencia todas as requisições da aplicação (API e Redis) de forma otimizada."""
+
     def __init__(self, app_state, signal_manager):
         self.app_state = app_state
         self.signal_manager = signal_manager
+        self._lock = Lock()
+        self._active_count = 0
 
-    # ========================================================
-    # Últimas posições via API
-    # ========================================================
+        # Mapeamento genérico de tipos → funções e sinais correspondentes
+        self.REQ_MAP = {
+            "last_position_api": (modo_requisitar_lotes, self.signal_manager.last_position_completed),
+            "last_position_redis": (ultima_posicao_tipo, self.signal_manager.last_position_completed),
+            "status_equipment": (status_equipamento, self.signal_manager.status_equipment_completed),
+            "data_consumption": (obter_dados_consumo, self.signal_manager.data_consumption_completed),
+        }
+
+        # Conecta sinais de término às funções internas
+        self.signal_manager.last_position_completed.connect(self._handle_finished)
+        self.signal_manager.status_equipment_completed.connect(self._handle_finished)
+        self.signal_manager.data_consumption_completed.connect(self._handle_finished)
+
+    # ------------------------------------------------------------------
+    # Controle de requisições ativas
+    # ------------------------------------------------------------------
+    def _inc(self):
+        with self._lock:
+            self._active_count += 1
+
+    def _dec(self):
+        with self._lock:
+            if self._active_count > 0:
+                self._active_count -= 1
+            if self._active_count == 0:
+                self.signal_manager.all_requests_finished.emit()
+
+    def _handle_finished(self, *_):
+        """Chamado quando uma requisição específica emite seu sinal de término."""
+        self._dec()
+
+    # ------------------------------------------------------------------
+    # Execução genérica com threading
+    # ------------------------------------------------------------------
+    def _exec_async(self, tipo, func, *args, **kwargs):
+        """Executa qualquer função de requisição em thread separada."""
+        self._inc()
+
+        def run():
+            try:
+                result = func(*args, **kwargs)
+                self.app_state["dados_atuais"][tipo] = result
+                self.REQ_MAP[tipo][1].emit(result)
+                adicionar_log(f"✅ Requisição [{tipo}] concluída ({len(result) if result else 0} registros).")
+            except Exception as e:
+                adicionar_log(f"❌ Erro em [{tipo}]: {e}")
+                adicionar_log(traceback.format_exc())
+                self.REQ_MAP[tipo][1].emit([])
+                self.signal_manager.show_toast_error.emit(f"Erro em {tipo}: {e}")
+
+        Thread(target=run, daemon=True).start()
+
+    # ------------------------------------------------------------------
+    # Chamadas públicas específicas
+    # ------------------------------------------------------------------
     def execute_last_position_api(self, api_type, serials, config=None):
-        """Executa requisição de últimas posições via API Mogno"""
-        adicionar_log(f"🚀 Iniciando requisição via API ({api_type})")
+        """Executa requisição de últimas posições via API Mogno."""
+        step = config.get("step", 20) if config else 20
+        max_workers = config.get("max_workers", 4) if config else 4
 
-        def execute_thread():
-            try:
-                step = config.get("step", 20) if config else 20
-                max_workers = config.get("max_workers", 4) if config else 4
-                modo = config.get("mode", "paralelo") if config else "paralelo"
+        self._exec_async(
+            "last_position_api",
+            modo_requisitar_lotes,
+            serials,
+            self.app_state,
+            tipo_api=api_type,
+            step=step,
+            max_workers=max_workers,
+            ajuste_step=10,
+            tentativas_timeout=3,
+            progress_callback=lambda cur, tot: self.signal_manager.equipment_progress_updated.emit(
+                cur, tot, f"API Mogno ({api_type}) - {cur}/{tot}"
+            ),
+        )
 
-                resultados = modo_requisitar_lotes(
-                    serials,
-                    self.app_state,
-                    tipo_api=api_type,
-                    step=step,
-                    max_workers=max_workers,
-                    ajuste_step=10,
-                    tentativas_timeout=3,
-                    progress_callback=lambda current, total: self.signal_manager.equipment_progress_updated.emit(
-                        current, total, f"API Mogno ({api_type}) - {current}/{total}"
-                    ),
-                    modo=modo
-                )
-
-                self.app_state["dados_atuais"]["last_position_api"] = resultados
-                adicionar_log(f"✅ {len(resultados)} posições obtidas via API ({api_type})")
-
-                # Emite o sinal de conclusão explicitamente
-                self.signal_manager.last_position_completed.emit(resultados)
-
-            except Exception as e:
-                error_msg = f"Erro na requisição API ({api_type}): {e}"
-                adicionar_log(f"❌ {error_msg}")
-                adicionar_log(traceback.format_exc())
-
-                # Mesmo com erro, emitir sinal de conclusão para destravar UI
-                self.signal_manager.last_position_completed.emit([])
-                self.signal_manager.request_failed.emit(error_msg)
-
-        Thread(target=execute_thread, daemon=True).start()
-
-    # ========================================================
-    # Últimas posições via Redis
-    # ========================================================
     def execute_last_position_redis(self, serials):
-        self.execute_redis_generic(
-            serials,
-            tipo="last_position_redis",
-            redis_func=ultima_posicao_tipo,
-            signal_complete=self.signal_manager.last_position_completed,
-            progress_label="Últimas Posições Redis"
-        )
+        """Executa requisição de últimas posições via Redis."""
+        self._exec_async("last_position_redis", ultima_posicao_tipo, serials)
 
-    # ========================================================
-    # Status dos Equipamentos
-    # ========================================================
     def execute_status_equipment(self, serials):
-        self.execute_redis_generic(
-            serials,
-            tipo="status_equipment",
-            redis_func=status_equipamento,
-            signal_complete=self.signal_manager.status_equipment_completed,
-            progress_label="Status Maxtrack"
-        )
+        """Executa requisição de status de equipamentos via Redis."""
+        self._exec_async("status_equipment", status_equipamento, serials)
 
-    # ========================================================
-    # Consumo de Dados
-    # ========================================================
-    def execute_data_consumption(self, serials, month, year):
-        """Executa requisição de consumo de dados"""
-        adicionar_log(f"🚀 Iniciando requisição de consumo ({month}/{year})")
-
-        def execute_thread():
-            try:
-                all_consumption = obter_dados_consumo(month, year)
-
-                # Filtra apenas os seriais solicitados
-                filtered_consumption = {
-                    serial: consumo
-                    for serial, consumo in all_consumption.items()
-                    if serial in serials
-                }
-
-                self.app_state["dados_atuais"]["data_consumption"] = filtered_consumption
-                adicionar_log(f"✅ {len(filtered_consumption)} registros de consumo obtidos")
-
-                # Emite sinal de conclusão
-                self.signal_manager.data_consumption_completed.emit(filtered_consumption)
-
-            except Exception as e:
-                error_msg = f"Erro na requisição de consumo ({month}/{year}): {e}"
-                adicionar_log(f"❌ {error_msg}")
-                adicionar_log(traceback.format_exc())
-
-                # Emite sinal mesmo com erro
-                self.signal_manager.data_consumption_completed.emit({})
-                self.signal_manager.request_failed.emit(error_msg)
-
-        Thread(target=execute_thread, daemon=True).start()
-
-    # ========================================================
-    # Requisições genéricas Redis
-    # ========================================================
-    def execute_redis_generic(self, serials, tipo, redis_func, signal_complete, progress_label):
-        adicionar_log(f"🚀 Iniciando requisição Redis ({tipo})")
-
-        def execute_thread():
-            try:
-                total = len(serials)
-                batch_size = 50
-                batches = [serials[i:i + batch_size] for i in range(0, len(serials), batch_size)]
-                all_results = []
-                current = 0
-
-                for i, batch in enumerate(batches):
-                    self.signal_manager.equipment_progress_updated.emit(
-                        current, total, f"{progress_label} - Lote {i + 1}/{len(batches)}"
-                    )
-                    batch_results = redis_func(batch)
-                    all_results.extend(batch_results)
-                    current += len(batch)
-                    time.sleep(0.5)
-
-                self.app_state["dados_atuais"][tipo] = all_results
-                adicionar_log(f"✅ {len(all_results)} registros obtidos via Redis ({tipo})")
-
-                # Emite sinal de conclusão explícito
-                signal_complete.emit(all_results)
-
-            except Exception as e:
-                error_msg = f"Erro na requisição Redis ({tipo}): {e}"
-                adicionar_log(f"❌ {error_msg}")
-                adicionar_log(traceback.format_exc())
-
-                # Mesmo com erro, emitir sinal para liberar UI
-                signal_complete.emit([])
-                self.signal_manager.request_failed.emit(error_msg)
-
-        Thread(target=execute_thread, daemon=True).start()
+    def execute_data_consumption(self, month, year):
+        """Executa requisição de consumo de dados (não requer seriais)."""
+        self._exec_async("data_consumption", obter_dados_consumo, month, year)

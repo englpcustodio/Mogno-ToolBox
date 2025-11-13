@@ -13,8 +13,10 @@ class LoginTab(QWidget):
     login_requested = pyqtSignal(str, str, bool)  # user, pass, keep_browser_open
     show_password_toggled = pyqtSignal(bool)
 
-    def __init__(self, parent=None):
+    def __init__(self, signal_manager, app_state=None, parent=None):
         super().__init__(parent)
+        self.signal_manager = signal_manager
+        self.app_state = app_state
         self.setup_ui()
 
     def setup_ui(self):
@@ -34,11 +36,11 @@ class LoginTab(QWidget):
         main_layout = QVBoxLayout(self)
         main_layout.setAlignment(Qt.AlignCenter)
         main_layout.setContentsMargins(40, 40, 40, 40)
-
         main_layout.addSpacerItem(QSpacerItem(0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
 
         # Container central com todo o conteúdo
         container = QWidget()
+
         # Container levemente translúcido
         container.setStyleSheet("background: rgba(255, 255, 255, 0.7); border-radius: 12px;")
         container_layout = QVBoxLayout(container)
@@ -75,13 +77,13 @@ class LoginTab(QWidget):
         form_layout.setSpacing(10)
 
         self.entry_login = QLineEdit()
-        self.entry_login.setFixedWidth(250)
+        self.entry_login.setFixedWidth(180)
         self.entry_login.setPlaceholderText("Usuário")
         form_layout.addRow("Usuário:", self.entry_login)
 
         self.entry_senha = QLineEdit()
         self.entry_senha.setEchoMode(QLineEdit.Password)
-        self.entry_senha.setFixedWidth(250)
+        self.entry_senha.setFixedWidth(180)
         self.entry_senha.setPlaceholderText("Senha")
         self.entry_senha.returnPressed.connect(self._emit_login_request)
         form_layout.addRow("Senha:", self.entry_senha)
@@ -120,11 +122,12 @@ class LoginTab(QWidget):
             QPushButton:hover { background-color: #005EA6; }
             QPushButton:disabled { background-color: #999; }
         """)
+        # Login é iniciado ao clicar no botão, emitindo o sinal [self.login_requested.emit(login, senha, manter_aberto)]
         self.btn_login.clicked.connect(self._emit_login_request)
         container_layout.addWidget(self.btn_login, alignment=Qt.AlignCenter)
 
         # === Status do Token ===
-        self.lbl_token_status = QLabel("Realize o login.")
+        self.lbl_token_status = QLabel("Realize o login para acessar as funcionalidades.")
         self.lbl_token_status.setStyleSheet("color: #0044cc; font-style: italic;")
         self.lbl_token_status.setWordWrap(True)
         self.lbl_token_status.setAlignment(Qt.AlignCenter)
@@ -147,8 +150,9 @@ class LoginTab(QWidget):
         self.entry_senha.setEchoMode(QLineEdit.Normal if checked else QLineEdit.Password)
         self.show_password_toggled.emit(checked)
 
+    # Função que é chamada para iniciar o login
     def _emit_login_request(self):
-        adicionar_log("🧪 [DEBUG] Botão de login clicado")
+        #adicionar_log("🧪 [DEBUG] Botão de login clicado")
         
         login = self.entry_login.text().strip()
         senha = self.entry_senha.text().strip()
@@ -159,7 +163,7 @@ class LoginTab(QWidget):
             return
 
         try:
-            adicionar_log("🧪 [DEBUG] Emitindo sinal login_requested")
+            #adicionar_log("🧪 [DEBUG] Emitindo sinal login_requested")
             self.update_token_status("Realizando o login, por favor aguarde...", "orange")
             self.set_login_button_enabled(False)
             self.login_requested.emit(login, senha, manter_aberto)

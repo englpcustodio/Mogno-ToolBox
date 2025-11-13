@@ -1,169 +1,231 @@
 # mogno_app/services/redis_service.py
-
 """
-Serviço de integração com Redis para consultas de status e últimas posições.
+Serviços Redis refatorados:
+- Todas as requisições são feitas em paralelo via ThreadPoolExecutor
+- Adiciona retries com backoff exponencial
+- Tratamento de erros e logs consistentes
+- Compatível com RequestHandler otimizado
 """
-
+import os
+import sys
 import redis
 import base64
 import binascii
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import List, Dict, Any, Optional
 from utils.logger import adicionar_log
 from utils.helpers import epoch_to_datetime
 from config.settings import REDIS_HOST, REDIS_PORT, REDIS_DB_2, REDIS_DB_4
-
-import os
-import sys
 
 # === DEPURAÇÃO DE CAMINHOS ===
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROTO_DIR = os.path.join(BASE_DIR, "compiled_protos")
 
-print("📂 Diretório base:", BASE_DIR)
-print("📦 Pasta dos protos:", PROTO_DIR)
-
 # Adiciona a pasta compiled_protos ao sys.path se ainda não estiver
 if PROTO_DIR not in sys.path:
     sys.path.insert(0, PROTO_DIR)
-    print(f"✅ Adicionado ao sys.path: {PROTO_DIR}")
 else:
     print(f"ℹ️ Pasta já presente no sys.path")
 
-print("🔍 sys.path final:")
-for p in sys.path:
-    print("   ", p)
-print("===============================")
-
 from compiled_protos import evento_pb2, maxpb_report_pb2
 
-def conectar_redis(db):
-    """
-    Estabelece a conexão com o Redis e retorna a conexão.
-    """
-    redis_conn = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=db, decode_responses=False)
+def conectar_redis(db: int) -> Optional[redis.Redis]:
+    """Estabelece conexão com Redis, com verificação de saúde."""
     try:
+        redis_conn = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=db, decode_responses=False)
         redis_conn.ping()
         adicionar_log(f"✅ Conexão com Redis (DB {db}) estabelecida.")
         return redis_conn
     except redis.ConnectionError as e:
-        adicionar_log(f"❌ Não foi possível conectar ao Redis (DB {db}): {e}")
+        adicionar_log(f"❌ Falha ao conectar Redis (DB {db}): {e}")
         return None
 
-def ultima_posicao_tipo(seriais):
+def _retry(func, *args, retries: int = 2, backoff: float = 0.5, **kwargs):
+    """Executa função com retries e backoff exponencial simples."""
+    for attempt in range(retries + 1):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            if attempt >= retries:
+                raise
+            adicionar_log(f"⚠️ Tentativa {attempt+1}/{retries} falhou: {e}. Retentando em {backoff*(2**attempt):.1f}s...")
+            time.sleep(backoff * (2 ** attempt))
+    return None
+
+
+# =========================================================
+# Última Posição
+# =========================================================
+
+def ultima_posicao_tipo(seriais: List[str]) -> List[Dict[str, Any]]:
     """
-    Obtém a última posição para uma lista de seriais.
-    """   
+    Obtém a última posição para cada serial em paralelo.
+    """ 
     redis_conn = conectar_redis(REDIS_DB_4)
     if not redis_conn:
         return []
-    
+
     resultados = []
-    tipos = ['gsm', 'lorawan', 'p2p']
+    tipos = ["gsm", "lorawan", "p2p"]
 
-    def obter_dados(chave, serial, tipo):
+    def obter_dados(serial: str, tipo: str):
         try:
+            chave = f"storage:ultima_posicao_{tipo}:{serial}"
             valor = redis_conn.get(chave)
-            if valor:
-                adicionar_log(f"✅ Dados encontrados para serial {serial} ({tipo})")
-                valor_decodificado = base64.b64decode(valor)
-                ultima_posicao = evento_pb2.Evento()
-                ultima_posicao.ParseFromString(valor_decodificado)
-                #print(ultima_posicao) #DEBUG
+            if not valor:
+                return None
 
-                datahoraevento = None
-                if hasattr(ultima_posicao, 'data_hora_evento') and ultima_posicao.data_hora_evento:
-                    datahoraevento = epoch_to_datetime(ultima_posicao.data_hora_evento / 1000)
-                
-                versao_hw = None
-                if hasattr(ultima_posicao, 'rastreador') and hasattr(ultima_posicao.rastreador, 'versao_hardware'):
-                    versao_hw = ultima_posicao.rastreador.versao_hardware
-                
-                return {
-                    'Serial': serial,
-                    'Modelo de HW': versao_hw,
-                    'Tipo': tipo,
-                    'DataHora Evento': datahoraevento,
-                    'Dados': ultima_posicao
-                }
+            valor_decodificado = base64.b64decode(valor)
+            ultima_posicao = evento_pb2.Evento()
+            ultima_posicao.ParseFromString(valor_decodificado)
+
+            datahoraevento = None
+
+            print(ultima_posicao.rastreador.numero_serie, {tipo})
+
+
+            if hasattr(ultima_posicao, "data_hora_evento") and ultima_posicao.data_hora_evento:
+                datahoraevento = epoch_to_datetime(ultima_posicao.data_hora_evento / 1000)
+
+            versao_hw = None
+            if hasattr(ultima_posicao, "rastreador") and hasattr(ultima_posicao.rastreador, "versao_hardware"):
+                versao_hw = ultima_posicao.rastreador.versao_hardware
+
+            return {
+                "Serial": serial,
+                "Modelo de HW": versao_hw,
+                "Tipo": tipo,
+                "DataHora Evento": datahoraevento,
+                "Dados": ultima_posicao,
+            }
+
         except Exception as e:
-            adicionar_log(f"⚠️ Erro ao decodificar última posição (serial {serial}, tipo {tipo}): {e}")
-        return None
+            adicionar_log(f"⚠️ Erro ao processar serial {serial} ({tipo}): {e}")
+            return None
 
+    futures = []
     with ThreadPoolExecutor(max_workers=100) as executor:
-        futures = []
         for serial in seriais:
             for tipo in tipos:
-                chave = f'storage:ultima_posicao_{tipo}:{serial}'
-                futures.append(executor.submit(obter_dados, chave, serial, tipo))
+                futures.append(executor.submit(_retry, obter_dados, serial, tipo))
 
-        for future in as_completed(futures):
-            resultado = future.result()
-            if resultado:
-                resultados.append(resultado)
-    
-    redis_conn.close()
-    adicionar_log(f"📊 Total de posições obtidas via Redis: {len(resultados)}")
+        for fut in as_completed(futures):
+            try:
+                resultado = fut.result()
+                if resultado:
+                    resultados.append(resultado)
+            except Exception as e:
+                adicionar_log(f"⚠️ Erro em futuro Redis (ultima_posicao): {e}")
+
+    try:
+        redis_conn.close()
+    except Exception:
+        pass
 
     return resultados
 
-def status_equipamento(seriais):
+
+# =========================================================
+# Status dos Equipamentos
+# =========================================================
+
+def status_equipamento(seriais: List[str]) -> List[Dict[str, Any]]:
     """
-    Obtém o status dos equipamentos para uma lista de seriais.
-    """  
+    Obtém status dos equipamentos (mxtstatus) em paralelo.
+    """
+    adicionar_log(f"🚀 Consultando status de {len(seriais)} equipamentos no Redis DB {REDIS_DB_2}...")
     redis_conn = conectar_redis(REDIS_DB_2)
     if not redis_conn:
         return []
-    
+
     resultados = []
 
-    def obter_dados(chave, serial):
+    def obter_dados(serial: str):
         try:
+            chave = f"mxtstatus:{serial}"
             valor = redis_conn.get(chave)
-            if valor:
-                status_equipamento_proto = maxpb_report_pb2.ReportStatus()
-                status_equipamento_proto.ParseFromString(binascii.unhexlify(valor))
-                
-                return {
-                    'Serial': serial,
-                    'Dados': status_equipamento_proto
-                }
+            if not valor:
+                return None
+
+            status_proto = maxpb_report_pb2.ReportStatus()
+            status_proto.ParseFromString(binascii.unhexlify(valor))
+
+            return {"Serial": serial, "Dados": status_proto}
+
         except Exception as e:
-            adicionar_log(f"⚠️ Erro ao decodificar status (serial {serial}): {e}")
-        return None
+            adicionar_log(f"⚠️ Erro ao processar status do serial {serial}: {e}")
+            return None
 
-    with ThreadPoolExecutor(max_workers=100) as executor:
-        futures = []
+    futures = []
+    with ThreadPoolExecutor(max_workers=80) as executor:
         for serial in seriais:
-            chave = f'mxtstatus:{serial}'
-            futures.append(executor.submit(obter_dados, chave, serial))
+            futures.append(executor.submit(_retry, obter_dados, serial))
 
-        for future in as_completed(futures):
-            resultado = future.result()
-            if resultado:
-                resultados.append(resultado)
-    
-    redis_conn.close()
+        for fut in as_completed(futures):
+            try:
+                resultado = fut.result()
+                if resultado:
+                    resultados.append(resultado)
+            except Exception as e:
+                adicionar_log(f"⚠️ Erro em futuro Redis (status_equipamento): {e}")
+
+    try:
+        redis_conn.close()
+    except Exception:
+        pass
+
+    adicionar_log(f"📊 Total de status obtidos via Redis: {len(resultados)}")
     return resultados
 
-def obter_dados_consumo(mes, ano):
+
+# =========================================================
+# Consumo de Dados no Servidor
+# =========================================================
+
+def obter_dados_consumo(mes: int, ano: int) -> Dict[str, Any]:
     """
-    Obtém dados de consumo GSM para um mês e ano específicos.
+    Obtém dados de consumo GSM (hash gateway:consumo_gsm:mes_ano).
     """
+    try:
+        mes_int = int(mes)  # ✅ Normaliza o mês para remover zeros à esquerda
+    except ValueError:
+        adicionar_log(f"⚠️ Mês inválido recebido: {mes}. Valor ajustado para 1.")
+        mes_int = 1
+
+    adicionar_log(f"🚀 Obtendo consumo de dados para {mes_int}/{ano} no Redis DB {REDIS_DB_4}...")
     redis_conn = conectar_redis(REDIS_DB_4)
     if not redis_conn:
         return {}
-    
-    chave = f"gateway:consumo_gsm:{mes}_{ano}"
-    
+
+    # ✅ Chave com mês sem zero à esquerda
+    chave = f"gateway:consumo_gsm:{mes_int}_{ano}"
+
     try:
-        trafego_dados_bytes = redis_conn.hgetall(chave)
-        redis_conn.close()
-        
-        if trafego_dados_bytes:
-            return {serial.decode('utf-8'): valor.decode('utf-8') for serial, valor in trafego_dados_bytes.items()}
+        trafego_dados_bytes = _retry(redis_conn.hgetall, chave, retries=2, backoff=0.5)
+        if not trafego_dados_bytes:
+            adicionar_log(f"⚠️ Nenhum dado encontrado em {chave}")
+            return {}
+
+        resultado = {}
+        for serial, valor in trafego_dados_bytes.items():
+            try:
+                serial_str = serial.decode("utf-8") if isinstance(serial, bytes) else str(serial)
+                valor_str = valor.decode("utf-8") if isinstance(valor, bytes) else str(valor)
+                resultado[serial_str] = valor_str
+            except Exception:
+                continue
+
+        adicionar_log(f"📶 {len(resultado)} registros de consumo obtidos.")
+        return resultado
+
     except Exception as e:
-        adicionar_log(f"❌ Erro ao obter dados de consumo: {e}")
-        if redis_conn:
+        adicionar_log(f"❌ Erro ao obter consumo GSM ({mes_int}/{ano}): {e}")
+        return {}
+
+    finally:
+        try:
             redis_conn.close()
-    
-    return {}
+        except Exception:
+            pass
+

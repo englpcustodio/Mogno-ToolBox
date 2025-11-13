@@ -12,18 +12,7 @@ def toggle_widget_enabled(widgets, enabled):
     for widget in widgets:
         widget.setEnabled(enabled)
 
-def log_message(text_edit, message):
-    """Adiciona mensagem ao QTextEdit de logs com timestamp."""
-    timestamp = datetime.now().strftime("%H:%M:%S")
-    text_edit.append(f"[{timestamp}] {message}")
-    cursor = text_edit.textCursor()
-    cursor.movePosition(cursor.End)
-    text_edit.setTextCursor(cursor)
 
-def clear_logs(text_edit):
-    """Limpa logs e adiciona mensagem de confirmação."""
-    text_edit.clear()
-    log_message(text_edit, "📋 Logs limpos")
 
 def update_progress(progress_bar, status_label, value, max_value=100, status_text="Processando..."):
     """Atualiza barra de progresso e label."""

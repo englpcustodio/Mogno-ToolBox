@@ -53,7 +53,6 @@ def ler_arquivo_serials(filepath):
         _arquivo_carregado = True
         _origem_serials = "arquivo"
 
-        adicionar_log(f"📄 '{nome_arquivo}' carregado: {total_lidos} lidos, {duplicados} duplicados removidos.")
         return {'unicos': serials_unicos, 'total_lidos': total_lidos, 'duplicados': duplicados}
 
     except Exception as e:
