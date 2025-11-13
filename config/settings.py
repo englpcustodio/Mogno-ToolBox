@@ -59,9 +59,3 @@ MAP_PERIOD_COLORS = {
     "periodo_15_30": "orange",
     "periodo_30_cima": "red"
 }
-
-# --- Configurações de Saída de Arquivos ---
-OUTPUT_DIR = "output_files_mogno"
-# Garante que o diretório de saída exista
-if not os.path.exists(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
