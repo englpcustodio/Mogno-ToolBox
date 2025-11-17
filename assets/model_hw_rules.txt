@@ -1,0 +1,10 @@
+# modelos_hw_rules.txt
+# Cada linha: Modelo | required: xxx,yyy | optional: a,b,c
+# Comentários iniciam com '#'
+# Exemplo de novo modelo:
+# ModelX | required: lorawan | optional: p2p
+
+MXT-130 | required: gsm | optional: p2p, lorawan
+GS10G   | required: gsm | optional:
+IoTracking | required: p2p | optional: lorawan
+IoTracking-1 | required: p2p | optional: lorawan
