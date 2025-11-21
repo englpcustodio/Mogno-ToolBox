@@ -4,7 +4,7 @@
 # Exemplo de novo modelo:
 # ModelX | required: lorawan | optional: p2p
 
-MXT-130 | required: gsm | optional: p2p, lorawan
+MXT-130 | required: gsm, p2p, lorawan | optional: 
 GS10G   | required: gsm | optional:
-IOTracking | required: p2p | optional: lorawan
-IOTracking-1 | required: p2p | optional: lorawan
+IOTracking | required: p2p, lorawan | optional:
+IOTracking-1 | required: p2p, lorawan | optional:
