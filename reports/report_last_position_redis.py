@@ -30,7 +30,16 @@ from utils.helpers import epoch_to_datetime
 from utils.logger import adicionar_log
 
 # Path para regras de modelos (arquivo editável pelo usuário)
-PATH_MODEL_RULES = os.path.join(os.getcwd(), "assets", "modelos_hw_rules.txt")
+# OLD: PATH_MODEL_RULES = os.path.join(os.getcwd(), "assets", "modelos_hw_rules.txt")
+# NEW:
+# Obtém o diretório do arquivo atual (report_last_position_redis.py)
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+# Navega para a raiz do projeto (assumindo que 'reports' está na raiz) e depois para 'assets'
+# Se 'reports' está em 'seu_projeto/reports', então a raiz é 'seu_projeto'
+# e 'assets' está em 'seu_projeto/assets'
+PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, "..", "assets")) # Sobe um nível (de 'reports' para 'seu_projeto') e entra em 'assets'
+PATH_MODEL_RULES = os.path.join(PROJECT_ROOT, "modelos_hw_rules.txt")
+
 
 # ----------------------------
 # Leitura de regras de HW
@@ -43,7 +52,7 @@ def carregar_regras_hw(path=PATH_MODEL_RULES):
     """
     regras = {}
     if not os.path.exists(path):
-        adicionar_log(f"⚠ Arquivo de regras HW não encontrado: {path}")
+        adicionar_log(f"⚠ Arquivo de regras HW não encontrado: {path}. O relatório não usará validação por modelo de HW.")
         return regras
 
     try:
@@ -110,13 +119,8 @@ def parse_dados(dados_str):
             if ":" in linha:
                 try:
                     chave, valor = linha.split(":", 1)
-                    chave = chave.strip()
-                    valor = valor.strip().strip('"')
-
-                    # conversões
-                    if isinstance(valor, str) and valor.lower() in ("true", "false"):
-                        valor = valor.lower() == "true"
-                    elif re.match(r"^-?\d+(\.\d+)?$", valor):
+                    valor.lower() == "true"
+                    if re.match(r"^-?\d+(\.\d+)?$", valor):
                         num = float(valor) if "." in valor else int(valor)
                         chave_l = chave.lower()
                         # detectar timestamps
@@ -153,14 +157,13 @@ def _formatar_planilha(ws):
         zebra = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid")
         border = Border(left=Side(style="thin"), right=Side(style="thin"),
                         top=Side(style="thin"), bottom=Side(style="thin"))
-        # Cabeçalho
-        if ws.max_row < 1:
-            return
-        for c in ws[1]:
-            c.font = bold
-            c.fill = header_fill
-            c.border = border
-            c.alignment = Alignment(horizontal="center", vertical="center")
+        # Cabeçalho (apenas a primeira linha da planilha)
+        if ws.max_row >= 1:
+            for c in ws[1]:
+                c.font = bold
+                c.fill = header_fill
+                c.border = border
+                c.alignment = Alignment(horizontal="center", vertical="center")
         # Linhas
         for i, row in enumerate(ws.iter_rows(min_row=2), start=2):
             for c in row:
@@ -189,6 +192,25 @@ def _formatar_planilha(ws):
             pass
     except Exception as e:
         adicionar_log(f"⚠️ Erro em _formatar_planilha: {e}")
+
+def _formatar_cabecalho_especifico(ws, row_num, num_cols):
+    """Aplica formatação de cabeçalho e autofilter a uma linha específica."""
+    bold = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="305496", end_color="305496", fill_type="solid")
+    border = Border(left=Side(style="thin"), right=Side(style="thin"),
+                    top=Side(style="thin"), bottom=Side(style="thin"))
+
+    for col_idx in range(1, num_cols + 1):
+        cell = ws.cell(row=row_num, column=col_idx)
+        cell.font = bold
+        cell.fill = header_fill
+        cell.border = border
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+
+    # Aplica autofilter apenas a este cabeçalho
+    last_col_letter = get_column_letter(num_cols)
+    ws.auto_filter.ref = f"A{row_num}:{last_col_letter}{row_num}"
+    ws.freeze_panes = f"A{row_num + 1}" # Congela a linha abaixo do cabeçalho
 
 def _parse_date_value(val):
     """
@@ -296,8 +318,8 @@ def gerar_relatorio(serials_list, resultados, output_path, separado=True):
     """
     try:
         adicionar_log("📍 [report_last_position_redis] iniciando geração...")
-        if not resultados:
-            adicionar_log("⚠️ Nenhum resultado disponível para gerar relatório.")
+        if not resultados and not serials_list: # Se não há resultados e nem seriais para processar
+            adicionar_log("⚠️ Nenhum resultado ou serial disponível para gerar relatório.")
             return None
 
         # workbook
@@ -307,13 +329,34 @@ def gerar_relatorio(serials_list, resultados, output_path, separado=True):
 
         # estruturas intermediárias
         contagem = {"gsm": 0, "lorawan": 0, "p2p": 0}
-        serial_data = {}     # info por serial: modelo, datas e flags
-        dados_gsm = {}       # raw string or parsed dict by serial
+        # serial_data armazena info por serial: modelo, datas e flags de "Tem X"
+        serial_data = {}
+        # dados_proto armazena o raw_data ou parsed_dict por serial para as abas detalhadas
+        dados_gsm = {}
         dados_lorawan = {}
         dados_p2p = {}
+        # modelo_counts armazena a contagem de cada modelo de HW presente nos seriais_list
         modelo_counts = {}
+        # serial_model_map para mapear serial -> modelo_hw
+        serial_model_map = {}
 
-        adicionar_log(f"ℹ️ Processando {len(resultados)} registros...")
+        adicionar_log(f"ℹ️ Processando {len(resultados)} registros para {len(serials_list)} seriais solicitados...")
+
+        # Inicializa serial_data para TODOS os seriais da lista original
+        # Isso garante que todos os seriais sejam considerados para o cálculo de 'expected'
+        for s in serials_list:
+            serial_data[s] = {
+                "Modelo de HW": "N/A", # Será atualizado se encontrado nos resultados
+                "Data GSM": None,
+                "Data LoRaWAN": None,
+                "Data P2P": None,
+                "Tem GSM": False,
+                "Tem LOR": False,
+                "Tem P2P": False
+            }
+            # Inicializa contagem de modelos para seriais que ainda não têm modelo definido
+            modelo_counts["N/A"] = modelo_counts.get("N/A", 0) + 1
+            serial_model_map[s] = "N/A" # Mapeia inicialmente para N/A
 
         # Processar registros (mantendo parser/interpretacao original)
         for idx, resultado in enumerate(resultados):
@@ -328,135 +371,158 @@ def gerar_relatorio(serials_list, resultados, output_path, separado=True):
                 tipo = str(tipo_raw).lower().strip()
 
                 modelo_hw = resultado.get("Modelo de HW") or resultado.get("modelo_hw") or resultado.get("rastreador_versao_hardware") or "N/A"
-                # normaliza modelo para uso em regras (mantém original para exibição)
-                modelo_display = modelo_hw
+                modelo_display = modelo_hw # Mantém original para exibição
 
                 dados_raw = resultado.get("Dados", "") or resultado.get("raw_package") or resultado.get("raw") or ""
-                # Data/hora evento: pode vir em 'DataHora Evento' ou 'data_hora_evento' etc.
                 data_evt = resultado.get("DataHora Evento") or resultado.get("data_hora_evento") or resultado.get("data_hora_recebimento") or resultado.get("data_hora_armazenamento") or None
 
                 if serial is None:
                     continue
 
-                # if not present in serial_data, init
+                # Se o serial não estava na lista original, adiciona-o (caso raro, mas para robustez)
                 if serial not in serial_data:
                     serial_data[serial] = {
-                        "Modelo de HW": modelo_display,
-                        "Data GSM": None,
-                        "Data LoRaWAN": None,
-                        "Data P2P": None,
-                        "Tem GSM": False,
-                        "Tem LOR": False,
-                        "Tem P2P": False
+                        "Modelo de HW": "N/A",
+                        "Data GSM": None, "Data LoRaWAN": None, "Data P2P": None,
+                        "Tem GSM": False, "Tem LOR": False, "Tem P2P": False
                     }
+                    # Adiciona ao total de seriais se não estava na lista original
+                    serials_list.append(serial) # Isso pode inflar total_seriais se não for desejado
+                    adicionar_log(f"ℹ️ Serial '{serial}' encontrado nos resultados mas não na lista original. Adicionado para processamento.")
+
+
+                # Atualiza o modelo de HW para o serial, se for diferente de N/A e mais específico
+                current_model_for_serial = serial_data[serial]["Modelo de HW"]
+                if modelo_display != "N/A" and current_model_for_serial == "N/A":
+                    # Remove a contagem de "N/A" e adiciona a do modelo real
+                    modelo_counts["N/A"] = modelo_counts.get("N/A", 1) - 1
+                    if modelo_counts["N/A"] <= 0:
+                        del modelo_counts["N/A"]
+
+                    serial_data[serial]["Modelo de HW"] = modelo_display
+                    serial_model_map[serial] = modelo_display
+                    modelo_counts[modelo_display] = modelo_counts.get(modelo_display, 0) + 1
+                elif modelo_display != "N/A" and current_model_for_serial != "N/A" and current_model_for_serial != modelo_display:
+                    # Se já tinha um modelo e agora encontrou outro (e não é N/A), atualiza e ajusta contagem
+                    modelo_counts[current_model_for_serial] = modelo_counts.get(current_model_for_serial, 1) - 1
+                    if modelo_counts[current_model_for_serial] <= 0:
+                        del modelo_counts[current_model_for_serial]
+
+                    serial_data[serial]["Modelo de HW"] = modelo_display
+                    serial_model_map[serial] = modelo_display
                     modelo_counts[modelo_display] = modelo_counts.get(modelo_display, 0) + 1
 
+
                 # normalize event date
-                if isinstance(data_evt, (int, float)):
-                    dt_obj = epoch_to_datetime(data_evt)
-                    if dt_obj:
-                        data_evt_fmt = dt_obj.strftime("%d/%m/%Y - %H:%M:%S")
-                    else:
-                        data_evt_fmt = str(data_evt)
-                elif isinstance(data_evt, str):
-                    # if parser already formatted the date, keep it; otherwise try to parse numeric inside
-                    data_evt_fmt = data_evt
-                elif isinstance(data_evt, datetime):
-                    data_evt_fmt = data_evt.strftime("%d/%m/%Y - %H:%M:%S")
-                else:
-                    data_evt_fmt = None
+                dt_obj = _parse_date_value(data_evt)
+                data_evt_fmt = dt_obj.strftime("%d/%m/%Y - %H:%M:%S") if dt_obj else None
 
                 # classify by tipo (gsm / lora / p2p)
                 if "gsm" in tipo:
-                    serial_data[serial]["Data GSM"] = data_evt_fmt or serial_data[serial]["Data GSM"]
+                    # Atualiza a data GSM apenas se for mais recente
+                    current_dt_gsm = _parse_date_value(serial_data[serial]["Data GSM"])
+                    if not current_dt_gsm or (dt_obj and dt_obj > current_dt_gsm):
+                        serial_data[serial]["Data GSM"] = data_evt_fmt
                     serial_data[serial]["Tem GSM"] = True
-                    # Prefer guardar dados brutos; parse later para detalhado
-                    dados_gsm[serial] = dados_raw
+                    dados_gsm[serial] = dados_raw # Guarda o último raw data para detalhamento
                     contagem["gsm"] += 1
-                elif "lora" in tipo or "lorawan" in tipo or "lora" in tipo:
-                    serial_data[serial]["Data LoRaWAN"] = data_evt_fmt or serial_data[serial]["Data LoRaWAN"]
+                elif "lora" in tipo or "lorawan" in tipo:
+                    current_dt_lora = _parse_date_value(serial_data[serial]["Data LoRaWAN"])
+                    if not current_dt_lora or (dt_obj and dt_obj > current_dt_lora):
+                        serial_data[serial]["Data LoRaWAN"] = data_evt_fmt
                     serial_data[serial]["Tem LOR"] = True
                     dados_lorawan[serial] = dados_raw
                     contagem["lorawan"] += 1
                 elif "p2p" in tipo:
-                    serial_data[serial]["Data P2P"] = data_evt_fmt or serial_data[serial]["Data P2P"]
+                    current_dt_p2p = _parse_date_value(serial_data[serial]["Data P2P"])
+                    if not current_dt_p2p or (dt_obj and dt_obj > current_dt_p2p):
+                        serial_data[serial]["Data P2P"] = data_evt_fmt
                     serial_data[serial]["Tem P2P"] = True
                     dados_p2p[serial] = dados_raw
                     contagem["p2p"] += 1
                 else:
-                    # tipo não identificado: armazenar no campo P2P como fallback (não contamos para contagem)
-                    # optar por não contar para evitar inflar métricas
-                    serial_data[serial]["Data P2P"] = serial_data[serial].get("Data P2P") or data_evt_fmt
-                    dados_p2p.setdefault(serial, dados_raw)
+                    # Tipo não identificado, mas pode ter data. Armazenar em P2P como fallback se não tiver outro
+                    current_dt_p2p = _parse_date_value(serial_data[serial]["Data P2P"])
+                    if not current_dt_p2p or (dt_obj and dt_obj > current_dt_p2p):
+                        serial_data[serial]["Data P2P"] = data_evt_fmt
+                    # Não setamos Tem P2P como True para tipos não identificados, para não inflar métricas
+                    # dados_p2p.setdefault(serial, dados_raw) # Manter para detalhamento se for o único dado
 
             except Exception as e:
                 adicionar_log(f"⚠️ Erro processando registro #{idx}: {e}")
                 adicionar_log(traceback.format_exc())
                 continue
 
-        total_seriais = len(serials_list)
-        adicionar_log(f"ℹ️ Total de seriais solicitados: {total_seriais}. Seriais com qualquer informação: {len(serial_data)}")
+        total_seriais = len(serials_list) # Agora inclui seriais encontrados que não estavam na lista original
+        adicionar_log(f"ℹ️ Total de seriais considerados: {total_seriais}.")
 
         # -----------------------------------------
         # Resumo Inteligente por Modelo (Regra A)
         # -----------------------------------------
-        # Para cada modelo, calcula quantos 'expected' (esperados) de cada tipo
-        # Ex.: se modelo MXT-130 required: gsm, expected_gsm += count(modelo)
+        # Calcular 'expected' para cada protocolo com base nas regras 'required'
         expected = {"gsm": 0, "lorawan": 0, "p2p": 0}
-        # Calcular expected por modelo usando REGRAS_HW
-        for modelo, qtd in modelo_counts.items():
+        for serial in serials_list: # Itera sobre TODOS os seriais considerados
+            modelo = serial_data.get(serial, {}).get("Modelo de HW", "N/A")
             regras = REGRAS_HW.get(modelo)
             if regras:
                 for req in regras.get("required", []):
                     if req in expected:
-                        expected[req] += qtd
-                # optional não contribui para expected
-            else:
-                # sem regra: assume que todos modelos podem ter todos — não incrementa expected (conservador)
-                pass
-
-        # If expected remains zero for a protocol, set expected to number of serials (fallback)
-        for proto in ("gsm", "lorawan", "p2p"):
-            if expected[proto] == 0:
-                # fallback conservador: esperamos que todos possam ter (but this may be adjusted)
-                expected[proto] = sum(modelo_counts.values())
+                        expected[req] += 1 # Cada serial que *deveria* ter o protocolo
+            # Se não há regras para o modelo, ou o modelo é "N/A", não contribui para o "esperado" por padrão.
 
         # -----------------------------------------
         # Montar aba Resumo_Tipos
         # -----------------------------------------
-        def pct_str(found, expect):
-            try:
-                return f"{found} | {expect} | { (found/expect*100):.1f}%"
-            except Exception:
-                return f"{found} | {expect} | 0.0%"
-
         # Top lines: Total de Seriais
-        ws_main.append(["Total de Seriais", total_seriais])
-        # blank line for readability
-        ws_main.append([])
+        ws_main.append(["Total de Seriais Inseridos", total_seriais])
+        # Mensagem se regras HW não foram carregadas
+        if not REGRAS_HW:
+            ws_main.append(["Tabela de modelo de HW não encontrada ou vazia. Validação de 'Valor Esperado' pode estar comprometida."])
+            ws_main.cell(row=ws_main.max_row, column=1).font = Font(color="FF0000", italic=True) # Vermelho e itálico
+
+        ws_main.append([]) # blank line for readability
 
         # Header for Tipo table
-        ws_main.append(["Tipo", "Encontrado", "Esperado", "Cobertura (%)"])
+        ws_main.append(["Tipo de Comunicação", "Encontrado", "Valor Esperado", "Valor Relativo (%)", "Valor Absoluto (%)"])
+
+        # Funções auxiliares para cálculos
+        def calcular_valor_relativo(found, expect):
+            try:
+                return (found / expect * 100) if expect else 0.0
+            except Exception:
+                return 0.0
+
+        # total_serials_with_model_info: Seriais que tiveram um modelo de HW identificado (não "N/A")
+        # para o cálculo do Valor Absoluto, que é uma relação ponderada.
+        # Se todos são N/A, usamos o total de seriais para evitar divisão por zero e ter uma base.
+        count_serials_with_known_model = len([s for s in serials_list if serial_data.get(s, {}).get("Modelo de HW") != "N/A"])
+        total_serials_for_abs_calc = count_serials_with_known_model if count_serials_with_known_model > 0 else total_seriais
+
+        def calcular_valor_absoluto(found, total_base):
+            try:
+                return (found / total_base * 100) if total_base else 0.0
+            except Exception:
+                return 0.0
+
         # GSM
-        try:
-            cov_gsm = (contagem["gsm"] / expected["gsm"] * 100) if expected["gsm"] else 0
-        except Exception:
-            cov_gsm = 0
-        ws_main.append(["GSM", contagem["gsm"], expected["gsm"], f"{cov_gsm:.1f}%"])
-        try:
-            cov_lor = (contagem["lorawan"] / expected["lorawan"] * 100) if expected["lorawan"] else 0
-        except Exception:
-            cov_lor = 0
-        ws_main.append(["LoRaWAN", contagem["lorawan"], expected["lorawan"], f"{cov_lor:.1f}%"])
-        try:
-            cov_p2p = (contagem["p2p"] / expected["p2p"] * 100) if expected["p2p"] else 0
-        except Exception:
-            cov_p2p = 0
-        ws_main.append(["P2P", contagem["p2p"], expected["p2p"], f"{cov_p2p:.1f}%"])
+        val_rel_gsm = calcular_valor_relativo(contagem["gsm"], expected["gsm"])
+        val_abs_gsm = calcular_valor_absoluto(contagem["gsm"], total_serials_for_abs_calc)
+        ws_main.append(["GSM", contagem["gsm"], expected["gsm"], f"{val_rel_gsm:.1f}%", f"{val_abs_gsm:.1f}%"])
+
+        # LoRaWAN
+        val_rel_lor = calcular_valor_relativo(contagem["lorawan"], expected["lorawan"])
+        val_abs_lor = calcular_valor_absoluto(contagem["lorawan"], total_serials_for_abs_calc)
+        ws_main.append(["LoRaWAN", contagem["lorawan"], expected["lorawan"], f"{val_rel_lor:.1f}%", f"{val_abs_lor:.1f}%"])
+
+        # P2P
+        val_rel_p2p = calcular_valor_relativo(contagem["p2p"], expected["p2p"])
+        val_abs_p2p = calcular_valor_absoluto(contagem["p2p"], total_serials_for_abs_calc)
+        ws_main.append(["P2P", contagem["p2p"], expected["p2p"], f"{val_rel_p2p:.1f}%", f"{val_abs_p2p:.1f}%"])
 
         # Sem comunicação (count serials which have none of the flags)
         sem_comunic = len([s for s in serials_list if not serial_data.get(s, {}).get("Tem GSM") and not serial_data.get(s, {}).get("Tem LOR") and not serial_data.get(s, {}).get("Tem P2P")])
-        ws_main.append(["Sem comunicação", sem_comunic, "-", f"{(sem_comunic/total_seriais*100) if total_seriais else 0:.1f}%"])
+        val_abs_sem_comunic = (sem_comunic / total_seriais * 100) if total_seriais else 0.0
+        ws_main.append(["Sem comunicação", sem_comunic, "-", "-", f"{val_abs_sem_comunic:.1f}%"])
 
         ws_main.append([])
 
@@ -470,17 +536,38 @@ def gerar_relatorio(serials_list, resultados, output_path, separado=True):
         headers = ["Serial", "Modelo de HW", "Posição GSM", "Data/Hora GSM", "Posição LoRaWAN", "Data/Hora LoRaWAN", "Posição P2P", "Data/Hora P2P"]
         ws_main.append(headers)
 
-        # Preencher linhas: ordenadas por Modelo de HW (alfabética)
-        # Construir lista de tuples (modelo, serial) e ordenar
-        serials_sorted = sorted(serials_list, key=lambda s: (str(serial_data.get(s, {}).get("Modelo de HW", "")).lower(), str(s)))
-        for s in serials_sorted:
+        # Guarda o número da linha onde o cabeçalho da tabela principal foi inserido
+        main_table_header_row = ws_main.max_row
+
+        # Preencher linhas: ordenadas SOMENTE por Modelo de HW (alfabética)
+        def get_sort_key_model_only(s):
+            info = serial_data.get(s, {})
+            return str(info.get("Modelo de HW", "N/A")).lower()
+
+        # Ordenar os seriais_list usando a chave de ordenação
+        serials_sorted_by_model = sorted(serials_list, key=get_sort_key_model_only)
+
+        for s in serials_sorted_by_model:
             info = serial_data.get(s, {"Modelo de HW": "N/A", "Data GSM": None, "Data LoRaWAN": None, "Data P2P": None})
-            pos_gsm = "SIM" if info.get("Tem GSM") else "NÃO"
-            pos_lor = "SIM" if info.get("Tem LOR") else "NÃO"
-            pos_p2p = "SIM" if info.get("Tem P2P") else "NÃO"
+            modelo_hw_serial = info.get("Modelo de HW", "N/A")
+            regras_modelo = REGRAS_HW.get(modelo_hw_serial)
+
+            # Lógica para "Posição X": SIM / NÃO / NÃO POSSUI
+            def get_pos_status(has_data_flag, proto_name_lower):
+                if has_data_flag:
+                    return "SIM"
+                if regras_modelo:
+                    if proto_name_lower in regras_modelo.get("required", []) or proto_name_lower in regras_modelo.get("optional", []):
+                        return "NÃO" # Deveria ter, mas não trouxe
+                return "NÃO POSSUI" # Modelo não suporta
+
+            pos_gsm = get_pos_status(info.get("Tem GSM"), "gsm")
+            pos_lor = get_pos_status(info.get("Tem LOR"), "lorawan")
+            pos_p2p = get_pos_status(info.get("Tem P2P"), "p2p")
+
             row = [
                 s,
-                info.get("Modelo de HW", "N/A"),
+                modelo_hw_serial,
                 pos_gsm,
                 info.get("Data GSM") or "N/A",
                 pos_lor,
@@ -490,8 +577,13 @@ def gerar_relatorio(serials_list, resultados, output_path, separado=True):
             ]
             ws_main.append(row)
 
-        # Formatar a aba principal
-        _formatar_planilha(ws_main)
+        # Formatar o cabeçalho da tabela principal especificamente
+        _formatar_cabecalho_especifico(ws_main, main_table_header_row, len(headers))
+
+        # Aplicar formatação geral (zebra, bordas, ajuste de colunas) para o restante da planilha
+        # Começa a partir da linha abaixo do cabeçalho principal
+        _formatar_planilha_restante(ws_main, min_row=main_table_header_row + 1)
+
 
         # -----------------------------------------
         # Aba Equip_sem_posicao (segunda aba) - sem coluna Modelo de HW
@@ -554,7 +646,7 @@ def gerar_relatorio(serials_list, resultados, output_path, separado=True):
                     if dt is None:
                         # check serial_data collected earlier
                         info = serial_data.get(serial, {})
-                        dt_str = info.get(f"Data {proto_name}") if proto_name in ("GSM","LoRaWAN","P2P") else None
+                        dt_str = info.get(f"Data {proto_name}") if proto_name in ("GSM", "LoRaWAN", "P2P") else None
                         dt = _parse_date_value(dt_str)
                     entries.append({"serial": serial, "parsed": parsed, "dt": dt})
 
@@ -659,3 +751,31 @@ def gerar_relatorio(serials_list, resultados, output_path, separado=True):
         adicionar_log(f"❌ Erro grave em gerar_relatorio(): {e}")
         adicionar_log(traceback.format_exc())
         return None
+
+# Nova função para formatar o restante da planilha (após o cabeçalho principal)
+def _formatar_planilha_restante(ws, min_row=1):
+    """Aplica zebra, bordas e ajusta colunas para linhas a partir de min_row."""
+    try:
+        zebra = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid")
+        border = Border(left=Side(style="thin"), right=Side(style="thin"),
+                        top=Side(style="thin"), bottom=Side(style="thin"))
+
+        for i, row in enumerate(ws.iter_rows(min_row=min_row), start=min_row):
+            for c in row:
+                if i % 2 == 0: # Linhas pares (contando a partir de min_row)
+                    c.fill = zebra
+                c.border = border
+                if isinstance(c.value, str) and len(c.value) > 80:
+                    c.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+                else:
+                    c.alignment = Alignment(horizontal="center", vertical="center")
+
+        # Ajuste colunas (para todas as colunas da planilha)
+        for col in ws.columns:
+            try:
+                tamanho = max(len(str(c.value)) if c.value is not None else 0 for c in col)
+                ws.column_dimensions[get_column_letter(col[0].column)].width = max(10, min(tamanho + 3, 80))
+            except Exception:
+                pass
+    except Exception as e:
+        adicionar_log(f"⚠️ Erro em _formatar_planilha_restante: {e}")

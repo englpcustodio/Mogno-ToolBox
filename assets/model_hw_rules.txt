@@ -6,5 +6,5 @@
 
 MXT-130 | required: gsm | optional: p2p, lorawan
 GS10G   | required: gsm | optional:
-IoTracking | required: p2p | optional: lorawan
-IoTracking-1 | required: p2p | optional: lorawan
+IOTracking | required: p2p | optional: lorawan
+IOTracking-1 | required: p2p | optional: lorawan

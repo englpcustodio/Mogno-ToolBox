@@ -34,3 +34,5 @@ def set_execution_complete(start_btn, pause_btn, cancel_btn, report_btn, status_
     else:
         status_label.setText("❌ Execução com erros")
         status_label.setStyleSheet("color: red; font-weight: bold;")
+
+

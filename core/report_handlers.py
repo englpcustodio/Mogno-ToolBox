@@ -13,6 +13,7 @@ from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from utils.logger import adicionar_log
 import importlib
 
+
 # Importa módulos de relatório
 from reports import (
     report_last_position_API,

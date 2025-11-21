@@ -22,6 +22,7 @@ from utils.logger import adicionar_log
 class MognoMainWindow(QMainWindow):
     """Janela principal que integra GUI e backend da aplicação."""
     def __init__(self, signal_manager: SignalManager, app_state: AppState):
+    
         super().__init__()
         self.setWindowTitle("Mogno Toolbox")
         self.setGeometry(100, 100, 1200, 800)
