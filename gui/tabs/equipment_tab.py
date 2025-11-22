@@ -14,23 +14,20 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, pyqtSignal, QDate
 from PyQt5.QtGui import QFont
 
-# Importações de core e utils — ajuste se necessário
-from core.serial_management import (
-    ler_arquivo_serials,
-    carregar_seriais_manualmente,
-    get_seriais,
-    limpar_seriais,
-    get_info_serials
-)
+# Importações de core e utils
+from core.serial_management import ler_arquivo_serials
 from utils.logger import adicionar_log
-from utils.ui_helpers import (
-    create_group_box, create_column_frame, create_info_label, create_styled_button
+from gui.widgets.widgets import (
+    create_group_box,
+    create_column_frame,
+    create_info_label,
+    create_styled_button,
 )
-from utils.styles import (
+
+from gui.styles import (
     BUTTON_PRIMARY_STYLE, BUTTON_SECONDARY_STYLE, BUTTON_WARNING_STYLE,
     BUTTON_DANGER_STYLE, PROGRESS_BAR_STYLE
 )
-from utils.gui_utils import toggle_widget_enabled
 
 
 class EquipmentTab(QWidget):

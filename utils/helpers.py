@@ -1,11 +1,29 @@
 # mogno_app/utils/helpers.py
 
 import os
-import sys
+import shutil
 import json
 import datetime # Adicionado para epoch_to_datetime
 from time import time
 from utils.logger import adicionar_log # Importa o logger da nova localização
+
+
+
+# Exclui todos os dados de cache (__pycache__) das pastas ao iniciar a aplicação (evita dados em cache que podem comprometer alguma modificação recente)
+def clean_pycache():
+    root = "."  # ou o caminho do seu projeto
+
+    for dirpath, dirnames, filenames in os.walk(root):
+        if "__pycache__" in dirnames:
+            full_path = os.path.join(dirpath, "__pycache__")
+            #print(f"Removendo: {full_path}")
+            shutil.rmtree(full_path)
+    return()
+
+def parse_serials(text):
+    """Parseia string de seriais separados por ';' e retorna contagem e lista."""
+    serials = [s.strip() for s in text.split(";") if s.strip()]
+    return len(serials), serials
 
 # Achata um JSON aninhado (dict) em um dicionário plano
 def flatten_json(d, parent_key='', sep='_'):

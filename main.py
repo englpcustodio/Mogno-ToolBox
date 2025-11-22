@@ -3,20 +3,22 @@
 import os
 import sys
 import datetime
-import warnings
 from PyQt5.QtWidgets import QApplication
 
 # Imports da interface
-from gui.toast import ToastNotification
 from gui.main_window import MognoMainWindow
 from gui.signals import SignalManager
+from gui.widgets.widgets import ToastNotification
 
 # Núcleo do sistema
 from core.app_state import AppState
 from core.auth import AuthManager
 
 # Utilidades
-from utils.logger import adicionar_log, limpar_logs
+from utils.logger import adicionar_log
+from utils.helpers import clean_pycache
+
+# Configurações globais
 from config.settings import APP_NAME, APP_VERSION
 
 # -------------------------------------------------------------------------
@@ -27,11 +29,15 @@ from config.settings import APP_NAME, APP_VERSION
 os.system('cls')
 
 # Garante que o diretório raiz está no caminho de importação
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+#sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+
+#Exclui todos os dados de cache (__pycache__)
+clean_pycache()
 
 # Estado global da aplicação
 app_state = AppState()
 
+# -------------------------------------------------------------------------
 
 def main():
     """Função principal da aplicação Mogno Toolbox."""
@@ -39,7 +45,7 @@ def main():
     app.setStyle('Fusion')
 
     # Ignora warnings de depreciação
-    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    #warnings.filterwarnings("ignore", category=DeprecationWarning)
 
     # Inicializa gerenciadores principais
     signal_manager = SignalManager()
@@ -63,12 +69,15 @@ def main():
     signal_manager.show_toast_success.connect(
         lambda msg: ToastNotification(main_window, msg, type="success")
     )
+
     signal_manager.show_toast_warning.connect(
         lambda msg: ToastNotification(main_window, msg, type="warning")
     )
+
     signal_manager.show_toast_error.connect(
         lambda msg: ToastNotification(main_window, msg, type="error")
     )
+
     signal_manager.show_toast.connect(
         lambda msg, tipo: ToastNotification(main_window, msg, type=tipo)
     )

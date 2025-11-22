@@ -11,8 +11,8 @@ import sys
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QTabWidget)
 
 # Importações principais
-from gui.login_tab import LoginTab
-from gui.equipment_tab import EquipmentTab
+from gui.tabs.login_tab import LoginTab
+from gui.tabs.equipment_tab import EquipmentTab
 from gui.signals import SignalManager
 from core.app_state import AppState
 from core.request_handlers import RequestHandler
