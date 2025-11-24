@@ -5,20 +5,20 @@ Inclui formatação automática, aba de resumo com hiperlinks clicáveis e cabe�
 """
 
 import os
+import importlib
 import traceback
 from datetime import datetime
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
-from utils.logger import adicionar_log
-import importlib
 
+from utils.logger import adicionar_log
 
 # Importa módulos de relatório
 from reports import (
-    report_last_position_API,
-    report_device_status_maxtrack_redis,
-    report_last_position_redis,
+    report_device_status_maxtrack_redis, 
+    report_last_position_API, 
+    report_last_position_redis, 
     report_traffic_data_redis
 )
 
@@ -124,7 +124,7 @@ class ReportHandler:
     # -------------------------------------------------------------------------
     def generate_consolidated_report(self, options: dict):
         try:
-            adicionar_log("📊 Iniciando geração do relatório consolidado...")
+            adicionar_log("📁 Iniciando geração do relatório consolidado...")
 
             serials = options.get("serials", [])
             enabled = options.get("enabled_queries", [])

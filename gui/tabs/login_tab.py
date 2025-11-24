@@ -6,18 +6,23 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QPixmap, QFont
-from config.settings import LOGO_CEABS_PATH, BACKGROUND_IMAGE_PATH 
+from config.settings import LOGO_CEABS_PATH, BACKGROUND_IMAGE_PATH
 from utils.logger import adicionar_log
+from core.credential_manager import CredentialManager # Importar o novo manager
 
 class LoginTab(QWidget):
-    login_requested = pyqtSignal(str, str, bool)  # user, pass, keep_browser_open
+    login_requested = pyqtSignal(str, str, bool, bool, bool)  # user, pass, keep_browser_open, remember_user, remember_password
     show_password_toggled = pyqtSignal(bool)
 
     def __init__(self, signal_manager, app_state=None, parent=None):
         super().__init__(parent)
         self.signal_manager = signal_manager
         self.app_state = app_state
+        self.first_load = True
+        self.credential_manager = CredentialManager() # Instanciar o CredentialManager
         self.setup_ui()
+        self._connect_internal_signals() # Conectar sinais internos e do SignalManager
+        self._load_saved_credentials() # Carregar credenciais ao iniciar
 
     def setup_ui(self):
         """Configura os widgets da aba de login com fundo e centralização."""
@@ -102,9 +107,17 @@ class LoginTab(QWidget):
         self.chk_manter_navegador = QCheckBox("Manter janela do navegador aberta após login")
         options_layout.addWidget(self.chk_manter_navegador)
 
-        self.chk_login_automatico = QCheckBox("Login automático")
-        self.chk_login_automatico.setChecked(True)
-        options_layout.addWidget(self.chk_login_automatico)
+        self.chk_remember_user = QCheckBox("Lembrar usuário")
+        self.chk_remember_user.setChecked(True) # Padrão para lembrar usuário
+        options_layout.addWidget(self.chk_remember_user)
+
+        self.chk_remember_password = QCheckBox("Lembrar senha")
+        self.chk_remember_password.setChecked(False) # Padrão para NÃO lembrar senha
+        options_layout.addWidget(self.chk_remember_password)
+
+        self.chk_auto_login = QCheckBox("Login automático")
+        self.chk_auto_login.setChecked(True) # Padrão para login automático
+        options_layout.addWidget(self.chk_auto_login)
 
         container_layout.addLayout(options_layout)
 
@@ -140,6 +153,47 @@ class LoginTab(QWidget):
         main_layout.addWidget(container)
         main_layout.addSpacerItem(QSpacerItem(0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
 
+    def _connect_internal_signals(self):
+        """Conecta sinais internos e do SignalManager."""
+        self.signal_manager.token_status_updated.connect(self.update_token_status)
+        self.signal_manager.enable_start_button.connect(self.set_login_button_enabled)
+        # Adicionar conexão para reauthentication_required para resetar a UI de login
+        self.signal_manager.reauthentication_required.connect(self._handle_reauthentication_required)
+
+        # Conectar chk_remember_user para desabilitar chk_remember_password se desmarcado
+        self.chk_remember_user.toggled.connect(self._toggle_remember_password_checkbox)
+
+    def _toggle_remember_password_checkbox(self, checked):
+        """Desabilita/habilita o checkbox de lembrar senha com base no lembrar usuário."""
+        self.chk_remember_password.setEnabled(checked)
+        if not checked:
+            self.chk_remember_password.setChecked(False) # Desmarcar se usuário não for lembrado
+
+    def _load_saved_credentials(self):
+        """Carrega credenciais salvas e preenche os campos."""
+        username, password, remember_user, remember_password = self.credential_manager.load_credentials()
+
+        if username:
+            self.entry_login.setText(username)
+            self.chk_remember_user.setChecked(remember_user)
+            self.chk_remember_password.setChecked(remember_password)
+            if password and remember_password:
+                self.entry_senha.setText(password)
+
+            adicionar_log("📂 Credenciais pré-preenchidas na tela de login.")
+        else:
+            # Primeira execução → mostrar mensagem azul normal
+            self.lbl_token_status.setText("Realize o login para acessar as funcionalidades.")
+            self.lbl_token_status.setStyleSheet("color: #0044cc; font-style: italic;")
+
+            self.chk_remember_user.setChecked(False)
+            self.chk_remember_password.setChecked(False)
+            self.chk_remember_password.setEnabled(False)
+
+        # Finaliza o carregamento inicial
+        self.first_load = False
+
+
     # Ajusta o tamanho do background quando o widget for redimensionado
     def resizeEvent(self, event):
         self.background_label.setGeometry(self.rect())
@@ -152,24 +206,28 @@ class LoginTab(QWidget):
 
     # Função que é chamada para iniciar o login
     def _emit_login_request(self):
-        #adicionar_log("🧪 [DEBUG] Botão de login clicado")
-        
         login = self.entry_login.text().strip()
         senha = self.entry_senha.text().strip()
         manter_aberto = self.chk_manter_navegador.isChecked()
+        remember_user = self.chk_remember_user.isChecked()
+        remember_password = self.chk_remember_password.isChecked()
 
         if not login or not senha:
             self.update_token_status("Por favor, preencha usuário e senha.", "red")
+            self.signal_manager.show_toast_error.emit("Por favor, preencha usuário e senha.")
             return
 
         try:
-            #adicionar_log("🧪 [DEBUG] Emitindo sinal login_requested")
             self.update_token_status("Realizando o login, por favor aguarde...", "orange")
             self.set_login_button_enabled(False)
-            self.login_requested.emit(login, senha, manter_aberto)
+            # Emitir o sinal com as novas opções de salvamento
+            self.login_requested.emit(login, senha, manter_aberto, remember_user, remember_password)
         except Exception as e:
             adicionar_log(f"❌ [DEBUG] Erro ao emitir sinal login_requested: {e}")
             adicionar_log(traceback.format_exc())
+            self.update_token_status("Erro ao iniciar o login.", "red")
+            self.set_login_button_enabled(True)
+            self.signal_manager.show_toast_error.emit("Erro ao iniciar o login.")
 
     def update_token_status(self, text, color):
         try:
@@ -187,8 +245,29 @@ class LoginTab(QWidget):
         hora = datetime.now().strftime("%H:%M:%S")
         self.update_token_status(f"✅ Login realizado com sucesso às {hora}.", "green")
 
+    def _handle_reauthentication_required(self):
+        """Reseta a UI de login quando a reautenticação é necessária."""
+    
+        # Se for primeira execução → NÃO mostrar erro de sessão expirada
+        if self.first_load:
+            adicionar_log("Ignorando reauthentication_required na primeira inicialização.")
+            return
+    
+        self.update_token_status("Sessão expirada ou inválida. Por favor, faça login novamente.", "red")
+        self.set_login_button_enabled(True)
+    
+        if not self.chk_remember_password.isChecked():
+            self.entry_senha.clear()
+    
+        adicionar_log("UI de login resetada devido à necessidade de reautenticação.")
+
+
+    # Métodos para obter o estado dos checkboxes (agora usados pelo AuthManager)
     def get_login_credentials(self):
-        return self.entry_login.text().strip(), self.entry_senha.text().strip(), self.chk_manter_navegador.isChecked()
+        return self.entry_login.text().strip(), self.entry_senha.text().strip()
 
     def is_auto_login_checked(self):
-        return self.chk_login_automatico.isChecked()
+        return self.chk_auto_login.isChecked()
+
+    def get_remember_options(self):
+        return self.chk_remember_user.isChecked(), self.chk_remember_password.isChecked()

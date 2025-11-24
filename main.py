@@ -2,7 +2,6 @@
 
 import os
 import sys
-import datetime
 from PyQt5.QtWidgets import QApplication
 
 # Imports da interface
@@ -15,15 +14,12 @@ from core.app_state import AppState
 from core.auth import AuthManager
 
 # Utilidades
-from utils.logger import adicionar_log
+from utils.logger import initialization_message
 from utils.helpers import clean_pycache
 
-# Configurações globais
-from config.settings import APP_NAME, APP_VERSION
-
-# -------------------------------------------------------------------------
+# ---------------------------------------------------------------------
 # Inicialização
-# -------------------------------------------------------------------------
+# ---------------------------------------------------------------------
 
 # Limpa terminal
 os.system('cls')
@@ -82,13 +78,8 @@ def main():
         lambda msg, tipo: ToastNotification(main_window, msg, type=tipo)
     )
 
-    # ---------------------------------------------------------------------
     # Inicialização visual
-    # ---------------------------------------------------------------------
-    adicionar_log("=" * 60)
-    adicionar_log(f"🚀 {APP_NAME} - {APP_VERSION}")
-    adicionar_log(f"📅 Iniciado em: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
-    adicionar_log("=" * 60)
+    initialization_message()
 
     # Exibir a janela
     main_window.show()

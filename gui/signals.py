@@ -20,6 +20,9 @@ class SignalManager(QObject):
     update_timer_label = pyqtSignal(str)
     csv_file_selected = pyqtSignal(str)
 
+    # Novo sinal para indicar que o login é necessário (token expirado, etc.)
+    reauthentication_required = pyqtSignal()
+
     # ========== Requisições de equipamentos ==========
     request_last_position_api = pyqtSignal(str, list)       # tipo_api, serials
     request_last_position_redis = pyqtSignal(list)          # serials
