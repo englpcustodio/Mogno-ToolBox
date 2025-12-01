@@ -21,7 +21,7 @@ def adicionar_log(texto):
     Adiciona uma entrada de log com timestamp, no widget registrado ou no console.
     """
     timestamp = datetime.datetime.now().strftime("[%d/%m/%Y %H:%M:%S]")
-    mensagem = f"{timestamp} {texto}\n"
+    mensagem = f"{timestamp} {texto}"
     if _progress_text_widget:
         _progress_text_widget.append(mensagem)
         # Rolar para o final

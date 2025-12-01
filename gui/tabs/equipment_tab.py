@@ -22,6 +22,7 @@ from gui.widgets.widgets import (
     create_column_frame,
     create_info_label,
     create_styled_button,
+    SheetSelectionDialog
 )
 
 from gui.styles import (
@@ -38,7 +39,6 @@ class EquipmentTab(QWidget):
     start_last_position_redis = pyqtSignal(list)         # serials
     start_status_equipment = pyqtSignal(list)            # serials
     start_data_consumption = pyqtSignal(str, str)        # month, year
-    generate_consolidated_report = pyqtSignal(dict)
     generate_separate_reports = pyqtSignal(dict)
     file_selected = pyqtSignal(str)
     serial_entry_changed = pyqtSignal()
@@ -389,13 +389,6 @@ class EquipmentTab(QWidget):
         layout.addSpacing(30)
         layout.addWidget(self.btn_generate_report)
 
-        self.radio_consolidated = QRadioButton("Consolidado")
-        self.radio_separate = QRadioButton("Separado")
-        self.radio_separate.setChecked(True)
-        layout.addWidget(QLabel("Formato:"))
-        layout.addWidget(self.radio_consolidated)
-        layout.addWidget(self.radio_separate)
-        layout.addStretch()
         return group
 
     def _create_progress_section(self):
@@ -570,47 +563,103 @@ class EquipmentTab(QWidget):
         self.progress_status_label.setText("✅ Requisições concluídas.")
         adicionar_log("✅ Todas as requisições foram concluídas.")
 
+    # gui/tabs/equipment_tab.py (método generate_report atualizado)
+
     def generate_report(self):
         """Gera relatório (emitir sinal com opções)."""
         adicionar_log("DEBUG: [EQUIP_TAB] Botão 'Gerar Relatório' clicado.")
+
         if not self.requisicoes_concluidas:
             QMessageBox.warning(self, "Aviso", "As requisições ainda não foram concluídas.")
             return
 
         serials = self.get_selected_serials()
-        # A lógica de permitir sem seriais para consumo já está em update_serial_status
-        if not serials and not (self.chk_data_consumption.isChecked() and not (self.chk_last_position.isChecked() or self.chk_status_equipment.isChecked())):
+
+        # Valida se há seriais (exceto para consumo de dados isolado)
+        apenas_consumo = (
+            self.chk_data_consumption.isChecked() and 
+            not (self.chk_last_position.isChecked() or self.chk_status_equipment.isChecked())
+        )
+
+        if not serials and not apenas_consumo:
             QMessageBox.warning(self, "Aviso", "Nenhum serial selecionado para gerar relatório.")
             return
 
-        # Monta enabled_queries com nomes padronizados (compatíveis com ReportHandler.REPORT_MAP)
+        # Monta enabled_queries
         enabled_queries = []
+
         if self.chk_last_position.isChecked():
             if self.radio_api_mogno.isChecked():
                 enabled_queries.append("last_position_api")
             elif self.radio_redis.isChecked():
                 enabled_queries.append("last_position_redis")
+
         if self.chk_status_equipment.isChecked():
             enabled_queries.append("status_equipment")
+
         if self.chk_data_consumption.isChecked():
             enabled_queries.append("data_consumption")
 
-        opcoes = {
-            "serials": serials,
-            "consolidated": self.radio_consolidated.isChecked(),
-            "enabled_queries": enabled_queries
-        }
-
-        if not opcoes["enabled_queries"]:
+        if not enabled_queries:
             QMessageBox.warning(self, "Aviso", "Nenhuma consulta executada para gerar relatório.")
             return
 
-        if self.radio_consolidated.isChecked():
-            adicionar_log("DEBUG: [EQUIP_TAB] Emitindo sinal 'generate_consolidated_report'.")
-            self.generate_consolidated_report.emit(opcoes)
-        else:
-            adicionar_log("DEBUG: [EQUIP_TAB] Emitindo sinal 'generate_separate_reports'.")
-            self.generate_separate_reports.emit(opcoes)
+        # ========================================================================
+        # NOVO: Diálogo de seleção de tipos de comunicação e períodos
+        # ========================================================================
+
+        #sheet_config = None
+        has_last_position = any(
+            q in enabled_queries for q in ["last_position_api", "last_position_redis"]
+        )
+
+        if has_last_position:
+            
+            config, accepted = SheetSelectionDialog.get_sheet_config(self.app_state, self)
+
+            if not accepted:
+                adicionar_log("ℹ️ Geração de relatório cancelada pelo usuário.")
+                return
+
+            comm_types = config.get("comm_types", [])
+            periods = config.get("periods", [])
+
+            # ✅ NOVO: Permite gerar sem períodos/tipos (apenas abas fixas)
+            if not comm_types and not periods:
+                reply = QMessageBox.question(
+                    self,
+                    "Confirmar Geração",
+                    "Nenhum tipo de comunicação ou período foi selecionado.\n\n"
+                    "O relatório conterá apenas as abas fixas:\n"
+                    "• Resumo_Tipos\n"
+                    "• Equip_sem_posicao\n"
+                    "• Detalhadas (GSM_Detalhado, LoRaWAN_Detalhado, P2P_Detalhado)\n\n"
+                    "Deseja continuar?",
+                    QMessageBox.Yes | QMessageBox.No,
+                    QMessageBox.No
+                )
+
+                if reply == QMessageBox.No:
+                    adicionar_log("ℹ️ Geração de relatório cancelada pelo usuário.")
+                    return
+            adicionar_log(f"📊 Tipos: {comm_types or 'Nenhum'}, Períodos: {periods or 'Nenhum'}")
+            
+            #sheet_config = config
+            #adicionar_log(f"📊 Tipos selecionados: {', '.join(comm_types) if comm_types else 'Nenhum'}")
+            #adicionar_log(f"📅 Períodos selecionados: {', '.join(periods) if periods else 'Nenhum'}")
+
+        # ========================================================================
+        # Monta opções finais e emite sinal
+        # ========================================================================
+
+        opcoes = {
+            "serials": serials,
+            "enabled_queries": enabled_queries
+        }
+
+        adicionar_log("DEBUG: [EQUIP_TAB] Emitindo sinal 'generate_separate_reports'.")
+        self.generate_separate_reports.emit(opcoes)
+
 
     # ----------------------------
     # Handlers de arquivo selecionado (chamado pelo sinal ou localmente)

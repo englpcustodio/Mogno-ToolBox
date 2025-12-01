@@ -1,47 +1,49 @@
-# mogno_app/core/report_handlers.py
+# core/report_handlers.py
 """
-Gerenciamento central de geração de relatórios (separados e consolidados).
-Inclui formatação automática, aba de resumo com hiperlinks clicáveis e cabeçalhos estilizados.
+Orquestrador central de geração de relatórios.
+Faz a ponte entre a GUI e os geradores específicos de cada tipo de relatório.
+
+ReportHandler (orquestrador)
+│
+├─ generate_reports()
+│  ├─ Valida opções
+│  ├─ Cria diretórios
+│  ├─ Gera timestamp
+│  ├─ Loop sobre enabled_queries
+│  │  └─ Chama _generate_single_report() para cada tipo
+│  ├─ Coleta erros
+│  └─ Emite toast de sucesso/erro
+│
+└─ _generate_single_report(query_type, serials, ...)
+   ├─ Obtém módulo correto via REPORT_MAP
+   ├─ Valida dados disponíveis
+   ├─ Define output_path
+   ├─ Chama module.gerar_relatorio(...)
+   └─ Trata retorno (sucesso/erro)
 """
 
 import os
-import importlib
 import traceback
 from datetime import datetime
-from openpyxl import Workbook
-from openpyxl.utils import get_column_letter
-from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
-
 from utils.logger import adicionar_log
-
-# Importa módulos de relatório
 from reports import (
-    report_device_status_maxtrack_redis, 
-    report_last_position_API, 
-    report_last_position_redis, 
+    report_device_status_maxtrack_redis,
+    report_last_position, 
     report_traffic_data_redis
 )
 
-# Evita cache antigo
-for m in [
-    report_last_position_API,
-    report_device_status_maxtrack_redis,
-    report_last_position_redis,
-    report_traffic_data_redis
-]:
-    importlib.reload(m)
-
-
 class ReportHandler:
-    """Gerencia a geração de relatórios (separados e consolidados)."""
+    """Gerencia a geração de relatórios por tipo de requisição."""
 
+    # Mapeamento: tipo de requisição → módulo gerador
     REPORT_MAP = {
-        "last_position_api": report_last_position_API,
-        "last_position_redis": report_last_position_redis,
+        "last_position_api": report_last_position,
+        "last_position_redis": report_last_position,
         "status_equipment": report_device_status_maxtrack_redis,
         "data_consumption": report_traffic_data_redis
     }
 
+    # Labels amigáveis
     REPORT_LABELS = {
         "last_position_api": "📡 Últimas Posições - API Mogno",
         "last_position_redis": "📍 Últimas Posições - Redis",
@@ -49,234 +51,146 @@ class ReportHandler:
         "data_consumption": "📶 Consumo de Dados no Servidor"
     }
 
+    # Subdiretórios
+    SUBDIRS = {
+        "last_position_api": "ultimas_posicoes",
+        "last_position_redis": "ultimas_posicoes",
+        "status_equipment": "status_equipamentos",
+        "data_consumption": "consumo_dados"
+    }
+
     def __init__(self, app_state, signal_manager, main_window):
         self.app_state = app_state
         self.signal_manager = signal_manager
         self.main_window = main_window
 
-    # -------------------------------------------------------------------------
-    # RELATÓRIO SEPARADO
-    # -------------------------------------------------------------------------
-    def generate_separate_reports(self, options: dict):
+    def generate_reports(self, options: dict):
+        """
+        Gera relatórios separados para cada tipo de requisição habilitado.
+        """
         try:
-            adicionar_log("📁 Iniciando geração de relatórios separados...")
+            adicionar_log("📁 Iniciando geração de relatórios...")
 
             serials = options.get("serials", [])
-            enabled = options.get("enabled_queries", [])
+            enabled_queries = options.get("enabled_queries", [])
+            #selected_periods = options.get("selected_periods")
+            sheet_config = options.get("sheet_config")
 
+            if not serials and not any(q == "data_consumption" for q in enabled_queries):
+                adicionar_log("⚠️ Nenhum serial fornecido para gerar relatórios.")
+                self.signal_manager.show_toast_warning.emit("⚠️ Nenhum serial selecionado!")
+                return
+
+            if not enabled_queries:
+                adicionar_log("⚠️ Nenhum tipo de relatório habilitado.")
+                self.signal_manager.show_toast_warning.emit("⚠️ Selecione ao menos um tipo de relatório!")
+                return
+#
+#            # Armazena configuração de abas no app_state
+            if sheet_config:
+                self.app_state.set("sheet_config", sheet_config)
+                comm_types = sheet_config.get("comm_types", [])
+                periods = sheet_config.get("periods", [])
+                adicionar_log(f"📊 Config de abas: Tipos={comm_types}, Períodos={periods}")
+
+            # ✅ LOGA A CONFIGURAÇÃO ATUAL (debug)
+            config = self.app_state.get("sheet_config", {})
+            if config:
+                adicionar_log(f"📊 Config de abas: {config}")
+
+            # Diretório base
             base_dir = os.path.join(os.getcwd(), "relatorios_gerados")
             os.makedirs(base_dir, exist_ok=True)
 
+            # Timestamp único
             timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-            subdir_map = {
-                "last_position_api": "ultimas_posicoes",
-                "last_position_redis": "ultimas_posicoes",
-                "status_equipment": "status_equipamentos",
-                "data_consumption": "consumo_dados"
-            }
+            # Rastreia erros
+            erros_encontrados = []
 
-            for query in enabled:
-                adicionar_log(f"📁 Solicitado relatório separado: {query}")
-
-                module = self.REPORT_MAP.get(query)
-                if not module:
-                    adicionar_log(f"⚠️ Tipo de relatório desconhecido: {query}")
-                    continue
-
-                adicionar_log(f"📂 Módulo carregado de: {getattr(module, '__file__', 'desconhecido')}")
-
-                if not hasattr(module, "gerar_relatorio"):
-                    adicionar_log(
-                        f"⚠️ O módulo '{module.__name__}' não possui a função gerar_relatorio. "
-                        f"Funções disponíveis: {', '.join([x for x in dir(module) if not x.startswith('_')])}"
-                    )
-                    continue
-
-                resultados = self.app_state.get("dados_atuais", {}).get(query, [])
-                if not resultados:
-                    adicionar_log(f"⚠️ Nenhum dado disponível para {query}. Ignorando.")
-                    continue
-
-                output_dir = os.path.join(base_dir, subdir_map.get(query, "outros"))
-                os.makedirs(output_dir, exist_ok=True)
-
-                filename = f"report_{query}_{timestamp}.xlsx"
-                output_path = os.path.join(output_dir, filename)
-
+            # Gera cada relatório
+            for query_type in enabled_queries:
                 try:
-                    adicionar_log(f"📁 Gerando '{filename}' em {os.path.relpath(output_dir)} ...")
-                    rpath = module.gerar_relatorio(serials, resultados, output_path)
-                    adicionar_log(f"✅ Relatório gerado: '{os.path.relpath(rpath or output_path)}'")
-
+                    self._generate_single_report(
+                        query_type=query_type,
+                        serials=serials,
+                        base_dir=base_dir,
+                        timestamp=timestamp
+                    )
                 except Exception as e:
-                    adicionar_log(f"❌ Erro ao gerar relatório '{filename}': {e}")
+                    erros_encontrados.append((query_type, str(e)))
+                    adicionar_log(f"❌ Erro ao gerar relatório '{query_type}': {e}")
                     adicionar_log(traceback.format_exc())
 
-            self.signal_manager.show_toast_success.emit("✅ Relatórios separados gerados com sucesso!")
+            # Emite toast apropriado
+            if erros_encontrados:
+                msg_erro = f"⚠️ {len(erros_encontrados)} relatório(s) falharam. Verifique o log."
+                self.signal_manager.show_toast_error.emit(msg_erro)
+                adicionar_log(f"⚠️ Relatórios com erro: {[q for q, _ in erros_encontrados]}")
+            else:
+                adicionar_log("✅ Todos os relatórios foram gerados com sucesso!")
+                self.signal_manager.show_toast_success.emit("✅ Relatórios gerados com sucesso!")
 
         except Exception as e:
-            adicionar_log(f"❌ Erro inesperado em generate_separate_reports: {e}")
+            adicionar_log(f"❌ Erro inesperado em generate_reports: {e}")
             adicionar_log(traceback.format_exc())
+            self.signal_manager.show_toast_error.emit(f"❌ Erro ao gerar relatórios: {e}")
 
-    # -------------------------------------------------------------------------
-    # RELATÓRIO CONSOLIDADO
-    # -------------------------------------------------------------------------
-    def generate_consolidated_report(self, options: dict):
+    def _generate_single_report(self, query_type, serials, base_dir, timestamp):
+        """
+        Gera um único relatório de um tipo específico.
+        """
         try:
-            adicionar_log("📁 Iniciando geração do relatório consolidado...")
+            adicionar_log(f"📄 Gerando relatório: {self.REPORT_LABELS.get(query_type, query_type)}")
 
-            serials = options.get("serials", [])
-            enabled = options.get("enabled_queries", [])
-
-            base_dir = os.path.join(os.getcwd(), "relatorios_consolidados")
-            os.makedirs(base_dir, exist_ok=True)
-
-            wb = Workbook()
-            summary_ws = wb.active
-            summary_ws.title = "Resumo"
-
-            # Cabeçalho
-            summary_ws.append(["Relatório", "Descrição", "Total de Registros", "Link"])
-            _formatar_cabecalho(summary_ws)
-
-            any_sheet = False
-
-            for query in enabled:
-                module = self.REPORT_MAP.get(query)
-
-                if not module:
-                    adicionar_log(f"⚠️ Tipo de relatório desconhecido: {query}")
-                    continue
-
-                resultados = self.app_state.get("dados_atuais", {}).get(query, [])
-                if not resultados:
-                    adicionar_log(f"⚠️ Nenhum dado para {query}. Ignorando.")
-                    continue
-
-                sheet_name = self.REPORT_LABELS.get(query, query).replace("📡","").replace("📍","").replace("⚙️","").replace("📶","").strip()
-
-                ws = wb.create_sheet(sheet_name[:31])
-
-                # Preenchimento com segurança
-                _preencher_aba(ws, resultados)
-
-                summary_ws.append([
-                    self.REPORT_LABELS.get(query, query),
-                    f"Relatório consolidado: {sheet_name}",
-                    len(resultados),
-                    f"=HYPERLINK(\"#{sheet_name}!A1\";\"Abrir Aba\")"
-                ])
-
-                any_sheet = True
-
-            if not any_sheet:
-                adicionar_log("⚠️ Nenhum dado disponível para consolidar.")
+            # Obtém módulo gerador
+            module = self.REPORT_MAP.get(query_type)
+            if not module:
+                adicionar_log(f"⚠️ Tipo de relatório desconhecido: {query_type}")
                 return
 
-            # Estiliza aba Resumo
-            _ajustar_colunas(summary_ws)
-            _aplicar_estilo_zebra(summary_ws)
-            summary_ws.freeze_panes = "A3"
+            # Verifica função
+            if not hasattr(module, "gerar_relatorio"):
+                adicionar_log(f"⚠️ Módulo '{module.__name__}' não possui função gerar_relatorio()")
+                return
 
-            summary_ws.insert_rows(1)
-            summary_ws["A1"] = "📘 Relatório Consolidado - Mogno Toolbox"
-            summary_ws["A1"].font = Font(bold=True, size=14, color="1F4E78")
-            summary_ws.merge_cells("A1:D1")
-            summary_ws["A1"].alignment = Alignment(horizontal="center")
+            # Obtém dados
+            resultados = self.app_state.get("dados_atuais", {}).get(query_type, [])
+            if not resultados:
+                adicionar_log(f"⚠️ Nenhum dado disponível para {query_type}. Pulando...")
+                return
 
-            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            output_path = os.path.join(base_dir, f"relatorio_consolidado_{timestamp}.xlsx")
-            wb.save(output_path)
+            # Define output_path
+            subdir = self.SUBDIRS.get(query_type, "outros")
+            output_dir = os.path.join(base_dir, subdir)
+            os.makedirs(output_dir, exist_ok=True)
 
-            adicionar_log(f"✅ Consolidado salvo em: {os.path.relpath(output_path)}")
-            self.signal_manager.show_toast_success.emit("✅ Relatório consolidado gerado com sucesso!")
+            filename = f"report_{query_type}_{timestamp}.xlsx"
+            output_path = os.path.join(output_dir, filename)
+
+            # Chama o gerador
+            adicionar_log(f"📁 Salvando em: {os.path.relpath(output_path)}")
+
+                # CHAMA O GERADOR (ele lê app_state internamente)
+            if query_type in ["last_position_redis", "last_position_api"]:
+                origem = 'redis' if query_type == "last_position_redis" else 'api'
+
+                result_path = module.gerar_relatorio(
+                    serials, 
+                    resultados, 
+                    output_path,
+                    origem=origem
+                )
+            else:
+                result_path = module.gerar_relatorio(serials, resultados, output_path)
+
+            if result_path:
+                adicionar_log(f"✅ Relatório '{filename}' gerado com sucesso!")
+            else:
+                adicionar_log(f"⚠️ Relatório '{filename}' retornou None (possível erro interno)")
+                raise Exception(f"Gerador de '{query_type}' retornou None")
 
         except Exception as e:
-            adicionar_log(f"❌ ERRO em generate_consolidated_report: {e}")
+            adicionar_log(f"❌ Erro ao gerar relatório '{query_type}': {e}")
             adicionar_log(traceback.format_exc())
-
-
-# =============================================================================
-# UTILITÁRIOS DE FORMATAÇÃO
-# =============================================================================
-
-def _preencher_aba(ws, resultados):
-    """
-    Insere dados na aba de forma segura SEM sobrescrever estilos criados
-    pelos módulos report_*.
-    """
-    try:
-        # Detecta se já há cabeçalho formatado pelo gerador
-        ja_tem_cabecalho = ws.max_row > 0
-
-        if not ja_tem_cabecalho:
-            # Geramos cabeçalhos somente se o módulo report_* NÃO gerou
-            if isinstance(resultados, list) and resultados and isinstance(resultados[0], dict):
-                ws.append(list(resultados[0].keys()))
-            else:
-                ws.append(["Dados"])
-
-            _formatar_cabecalho(ws)
-
-        # Insere linhas
-        if isinstance(resultados, dict):
-            for k, v in resultados.items():
-                ws.append([k, v])
-
-        elif isinstance(resultados, list):
-            if isinstance(resultados[0], dict):
-                for r in resultados:
-                    ws.append([r.get(k, "") for k in resultados[0].keys()])
-            else:
-                for r in resultados:
-                    ws.append([r])
-
-        # Ajuste visual somente se a aba é simples
-        if not ja_tem_cabecalho:
-            _aplicar_alinhamento(ws)
-            _ajustar_colunas(ws)
-            _aplicar_estilo_zebra(ws)
-
-        ws.freeze_panes = "A2"
-
-    except Exception as e:
-        adicionar_log(f"❌ Erro em _preencher_aba: {e}")
-        adicionar_log(traceback.format_exc())
-
-
-def _formatar_cabecalho(ws):
-    fill = PatternFill(start_color="305496", end_color="305496", fill_type="solid")
-    border = Border(
-        left=Side(style="thin", color="FFFFFF"),
-        right=Side(style="thin", color="FFFFFF"),
-        top=Side(style="thin", color="FFFFFF"),
-        bottom=Side(style="thin", color="FFFFFF")
-    )
-
-    for cell in ws[1]:
-        cell.font = Font(bold=True, color="FFFFFF")
-        cell.fill = fill
-        cell.border = border
-        cell.alignment = Alignment(horizontal="center")
-
-
-def _ajustar_colunas(ws):
-    for col in ws.columns:
-        max_len = max(len(str(c.value)) if c.value else 0 for c in col)
-        ws.column_dimensions[get_column_letter(col[0].column)].width = max(10, min(max_len + 3, 60))
-
-
-def _aplicar_alinhamento(ws):
-    for row in ws.iter_rows():
-        for cell in row:
-            cell.alignment = Alignment(horizontal="center")
-
-
-def _aplicar_estilo_zebra(ws):
-    fill_even = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid")
-
-    for i, row in enumerate(ws.iter_rows(min_row=2), start=2):
-        if i % 2 == 0:
-            for cell in row:
-                cell.fill = fill_even
+            raise

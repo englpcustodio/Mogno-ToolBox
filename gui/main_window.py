@@ -8,8 +8,8 @@ Responsável por conectar a interface gráfica (tabs) com a lógica de backend:
 - Geração de relatórios
 """
 import sys
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QTabWidget)
-from PyQt5.QtCore import QTimer # Para o login automático inicial
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget
+from PyQt5.QtCore import QTimer
 
 # Importações principais
 from gui.tabs.login_tab import LoginTab
@@ -19,27 +19,27 @@ from gui.signals import SignalManager
 from core.app_state import AppState
 from core.request_handlers import RequestHandler
 from core.report_handlers import ReportHandler
-from core.auth import AuthManager # Importar AuthManager
-from core.credential_manager import CredentialManager # Importar CredentialManager
+from core.auth import AuthManager
+from core.credential_manager import CredentialManager
 
 from utils.logger import adicionar_log
 
 class MognoMainWindow(QMainWindow):
     """Janela principal que integra GUI e backend da aplicação."""
-    def __init__(self, signal_manager: SignalManager, app_state: AppState):
 
+    def __init__(self, signal_manager: SignalManager, app_state: AppState):
         super().__init__()
         self.setWindowTitle("Mogno Toolbox")
         self.setGeometry(100, 100, 1200, 800)
 
         self.signal_manager = signal_manager
         self.app_state = app_state
-        self.credential_manager = CredentialManager() # Instanciar CredentialManager
+        self.credential_manager = CredentialManager()
 
         # Inicializa controladores principais
         self.request_handler = RequestHandler(self.app_state, self.signal_manager)
         self.report_handler = ReportHandler(self.app_state, self.signal_manager, self)
-        self.auth_manager = AuthManager(self.signal_manager, self, self.app_state) # Instanciar AuthManager AQUI
+        self.auth_manager = AuthManager(self.signal_manager, self, self.app_state)
 
         # Inicializa interface
         self._setup_ui()
@@ -48,9 +48,8 @@ class MognoMainWindow(QMainWindow):
         # Esconder abas de funcionalidade até o login
         self.hide_tabs_before_login()
 
-        # Tentar login automático ao iniciar, se configurado
+        # Tentar login automático ao iniciar
         QTimer.singleShot(100, self._attempt_auto_login_on_startup)
-
 
     # -------------------------------------------------------------------------
     # UI SETUP
@@ -60,11 +59,9 @@ class MognoMainWindow(QMainWindow):
         self.tabs = QTabWidget()
         self.setCentralWidget(self.tabs)
 
-        # Login e aba de equipamentos
         self.login_tab = LoginTab(self.signal_manager, self.app_state)
         self.equipment_tab = EquipmentTab(self.app_state)
 
-        # Adiciona abas
         self.tabs.addTab(self.login_tab, "🔐 Login")
         self.tabs.addTab(self.equipment_tab, "⚙️ Análise de Equipamentos")
 
@@ -80,7 +77,7 @@ class MognoMainWindow(QMainWindow):
         """Mostra e habilita as abas de funcionalidade após o login."""
         for i in range(self.tabs.count()):
             self.tabs.setTabEnabled(i, True)
-        self.tabs.setCurrentWidget(self.equipment_tab) # Mudar para a aba de equipamentos
+        self.tabs.setCurrentWidget(self.equipment_tab)
         adicionar_log("Abas de funcionalidade habilitadas após login bem-sucedido.")
 
     # -------------------------------------------------------------------------
@@ -90,28 +87,22 @@ class MognoMainWindow(QMainWindow):
         """Conecta todos os sinais da interface à lógica de backend."""
 
         # LOGIN ---------------------------------------------------------------
-        # O sinal login_requested agora inclui as opções de lembrar credenciais
         self.login_tab.login_requested.connect(self._handle_login_requested)
-        # Estes sinais são agora tratados pelo AuthManager e LoginTab diretamente via SignalManager
-        # self.signal_manager.login_successful.connect(self._handle_login_success) # AuthManager já escuta
-        # self.signal_manager.login_failed.connect(self._handle_login_failed)     # AuthManager já escuta
-
-        # A MainWindow ainda precisa reagir ao sucesso/falha para gerenciar o estado da aplicação
         self.signal_manager.login_successful.connect(self._handle_app_state_on_login_success)
         self.signal_manager.login_failed.connect(self._handle_app_state_on_login_failed)
         self.signal_manager.reauthentication_required.connect(self.hide_tabs_before_login)
-
 
         # EQUIPAMENTOS --------------------------------------------------------
         self.equipment_tab.start_last_position_api.connect(self.handle_last_position_api)
         self.equipment_tab.start_last_position_redis.connect(self.handle_last_position_redis)
         self.equipment_tab.start_status_equipment.connect(self.handle_status_equipment)
         self.equipment_tab.start_data_consumption.connect(self.handle_data_consumption)
+
+        # ✅ APENAS RELATÓRIOS SEPARADOS
         self.equipment_tab.generate_separate_reports.connect(self.handle_separate_reports)
-        # Reavaliar esta conexão: se a MainWindow não precisa saber, pode ser interna da EquipmentTab
-        # Por enquanto, manter, mas se não houver lógica na MainWindow, pode ser removida daqui.
+
         self.equipment_tab.file_selected.connect(self.equipment_tab.handle_file_selected)
-        self.signal_manager.all_requests_finished.connect(self._handle_all_requests_finished) # Conectar ao método da MainWindow
+        self.signal_manager.all_requests_finished.connect(self._handle_all_requests_finished)
 
         # Progresso geral
         self.signal_manager.equipment_progress_updated.connect(self.update_equipment_progress)
@@ -119,11 +110,13 @@ class MognoMainWindow(QMainWindow):
     # -------------------------------------------------------------------------
     # LOGIN HANDLERS
     # -------------------------------------------------------------------------
-    def _handle_login_requested(self, username: str, password: str, keep_browser_open: bool, remember_user: bool, remember_password: bool):
+    def _handle_login_requested(self, username: str, password: str, keep_browser_open: bool, 
+                                remember_user: bool, remember_password: bool):
         """Recebe o pedido de login da interface e o repassa ao AuthManager."""
         try:
             adicionar_log(f"🔐 Login solicitado para {username}")
-            self.auth_manager.start_login(username, password, keep_browser_open, remember_user, remember_password, is_auto_login=False)
+            self.auth_manager.start_login(username, password, keep_browser_open, 
+                                         remember_user, remember_password, is_auto_login=False)
         except Exception as e:
             adicionar_log(f"❌ Erro ao processar login: {e}")
             self.signal_manager.show_toast_error.emit(f"Erro ao iniciar o login: {e}")
@@ -131,46 +124,40 @@ class MognoMainWindow(QMainWindow):
             self.signal_manager.enable_start_button.emit(True)
 
     def _handle_app_state_on_login_success(self, token, user_login, user_id, cookie_dict):
-        """Atualiza o estado da aplicação e a UI da LoginTab após login bem-sucedido."""
+        """Atualiza o estado da aplicação após login bem-sucedido."""
         adicionar_log(f"✅ Login bem-sucedido — Usuário: {user_login}")
         self.login_tab.registrar_login_sucesso()
-        # O AuthManager já atualiza o app_state com token, user_login, user_id e cookie_dict
-        # e chama self.show_tabs_after_login()
-        # A LoginTab já atualiza seu status via signal_manager.token_status_updated
-        # Apenas garantir que o estado de login automático seja salvo
+
         remember_user, remember_password = self.login_tab.get_remember_options()
         is_auto_login = self.login_tab.is_auto_login_checked()
-        self.app_state.set("last_login_credentials", {"username": user_login, "password": self.login_tab.entry_senha.text().strip() if remember_password else "", "remember_user": remember_user, "remember_password": remember_password, "auto_login": is_auto_login})
 
+        self.app_state.set("last_login_credentials", {
+            "username": user_login,
+            "password": self.login_tab.entry_senha.text().strip() if remember_password else "",
+            "remember_user": remember_user,
+            "remember_password": remember_password,
+            "auto_login": is_auto_login
+        })
 
     def _handle_app_state_on_login_failed(self, msg):
-        """Lida com a falha de login, atualizando a UI e o estado da aplicação."""
+        """Lida com a falha de login."""
         adicionar_log(f"❌ Falha no login: {msg}")
-        # A LoginTab já atualiza seu status e botão via signal_manager.token_status_updated e enable_start_button
-        # A chamada para hide_tabs_before_login já é feita via reauthentication_required
 
     def _attempt_auto_login_on_startup(self):
         """Tenta realizar login automático ao iniciar a aplicação."""
         username, password, remember_user, remember_password = self.credential_manager.load_credentials()
         last_login_options = self.app_state.get("last_login_credentials", {})
-    
-        # 1) PRIMEIRA INICIALIZAÇÃO — sem credenciais salvas
+
         if not username and not password:
             adicionar_log("ℹ️ Nenhuma credencial salva. Aguardando login manual.")
-            # NÃO emitir reauthentication_required
-            # NÃO emitir token_status_updated em vermelho
             return
-    
-        # 2) AUTENTICAÇÃO AUTOMÁTICA CONFIGURADA
+
         if username and password and remember_user and remember_password and last_login_options.get("auto_login"):
             adicionar_log("🚀 Tentando login automático ao iniciar...")
             self.auth_manager.start_auto_login()
             return
-    
-        # 3) CREDENCIAIS INCOMPLETAS (usuário lembrou, mas senha não)
+
         adicionar_log("ℹ️ Credenciais incompletas. Aguardando login manual.")
-        # NÃO emitir reauthentication_required
-    
 
     # -------------------------------------------------------------------------
     # REQUISIÇÕES - API E REDIS
@@ -194,7 +181,7 @@ class MognoMainWindow(QMainWindow):
         self.request_handler.execute_status_equipment(serials)
 
     def handle_data_consumption(self, month: str, year: str):
-        """ Inicia a requisição de consumo de dados. Não requer seriais; usa apenas mês e ano. """
+        """Inicia a requisição de consumo de dados."""
         adicionar_log(f"🚀 Requisição de consumo de dados {month}/{year} iniciada.")
         self._mark_request_start("data_consumption")
         self.request_handler.execute_data_consumption(month, year)
@@ -205,16 +192,13 @@ class MognoMainWindow(QMainWindow):
     def handle_separate_reports(self, options: dict):
         """Gera relatórios separados por tipo de requisição."""
         adicionar_log("📁 Gerando relatórios separados...")
-        self.report_handler.generate_separate_reports(options)
+        self.report_handler.generate_reports(options)  # ← Chama o método unificado
 
     # -------------------------------------------------------------------------
     # PROGRESSO / CONTROLE DE EXECUÇÃO
     # -------------------------------------------------------------------------
     def update_equipment_progress(self, current: int, total: int, label: str):
-        """
-        Atualiza o progresso da aba de equipamentos.
-        Agora espera sempre 3 argumentos, conforme definido no sinal.
-        """
+        """Atualiza o progresso da aba de equipamentos."""
         try:
             self.equipment_tab.progress_bar.setValue(int((current / total) * 100))
             self.equipment_tab.progress_status_label.setText(f"{label} ({current}/{total})")
@@ -232,8 +216,7 @@ class MognoMainWindow(QMainWindow):
     def _handle_all_requests_finished(self):
         """Marca o término de todas as requisições."""
         self._mark_request_done("all_requests")
-        # A EquipmentTab já tem seu próprio handler para este sinal,
-        # então não precisamos chamar self.equipment_tab.mark_requests_finished() aqui.
+        self.equipment_tab.mark_requests_finished()  # ← HABILITA O BOTÃO
 
     def _mark_request_done(self, name: str):
         """Marca o término de uma requisição."""
@@ -241,17 +224,15 @@ class MognoMainWindow(QMainWindow):
         self.app_state.set("request_in_progress", False)
 
     def closeEvent(self, event):
-        """
-        Sobrescreve o evento de fechamento da janela para garantir
-        que o driver Selenium seja encerrado.
-        """
+        """Sobrescreve o evento de fechamento para encerrar o driver Selenium."""
         adicionar_log("Fechando aplicação. Encerrando driver Selenium, se ativo.")
         if hasattr(self, 'auth_manager'):
             self.auth_manager.close_driver()
         super().closeEvent(event)
 
+
 # -------------------------------------------------------------------------
-# EXECUÇÃO PRINCIPAL (opcional para testes)
+# EXECUÇÃO PRINCIPAL
 # -------------------------------------------------------------------------
 def main():
     app = QApplication(sys.argv)

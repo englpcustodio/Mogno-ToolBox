@@ -1,4 +1,4 @@
-# mogno_app/core/app_state.py
+# core/app_state.py
 
 from typing import Any, Dict, Optional
 from threading import RLock
@@ -6,11 +6,27 @@ from datetime import datetime
 
 class AppState:
     """
-    Estado global da aplicação, thread-safe.
-    Usa RLock para garantir operações atômicas onde necessário.
+    Estado global da aplicação, thread-safe e singleton.
+    Garante que todas as partes do código usam a mesma instância.
     """
 
+    _instance = None
+    _lock_class = RLock()  # Lock para criação do singleton
+
+    def __new__(cls):
+        """Garante que só existe uma instância de AppState."""
+        if cls._instance is None:
+            with cls._lock_class:
+                if cls._instance is None:  # Double-check locking
+                    cls._instance = super(AppState, cls).__new__(cls)
+                    cls._instance._initialized = False
+        return cls._instance
+
     def __init__(self):
+        """Inicializa o estado apenas uma vez."""
+        if self._initialized:
+            return
+
         self._lock = RLock()
         self._state: Dict[str, Any] = {
             "executando_requisicoes": False,
@@ -24,8 +40,14 @@ class AppState:
             "csv_filepath": None,
             "dados_atuais": {},
             "scheduler": None,
-            "active_requests_count": 0
+            "active_requests_count": 0,
+            # ✅ ADICIONA VALOR PADRÃO PARA sheet_config
+            "sheet_config": {
+                "comm_types": [],
+                "periods": []
+            }
         }
+        self._initialized = True
 
     def __getitem__(self, key: str) -> Any:
         with self._lock:

@@ -2,6 +2,7 @@
 
 import json
 import requests
+import time
 from time import sleep
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from utils.logger import adicionar_log
@@ -136,7 +137,7 @@ def modo_requisitar_lotes(
     Executa as requisições de lotes em modo paralelo.
     (Versão simplificada — modo sequencial removido.)
     """
-    import time
+
 
     total = len(serials)
     resultados = []

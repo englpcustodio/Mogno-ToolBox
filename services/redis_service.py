@@ -82,15 +82,14 @@ def ultima_posicao_tipo(seriais: List[str]) -> List[Dict[str, Any]]:
 
             datahoraevento = None
 
-            print(ultima_posicao.rastreador.numero_serie, {tipo})
-            #print(ultima_posicao)
-
             if hasattr(ultima_posicao, "data_hora_evento") and ultima_posicao.data_hora_evento:
                 datahoraevento = epoch_to_datetime(ultima_posicao.data_hora_evento / 1000)
 
             versao_hw = None
             if hasattr(ultima_posicao, "rastreador") and hasattr(ultima_posicao.rastreador, "versao_hardware"):
                 versao_hw = ultima_posicao.rastreador.versao_hardware
+
+            print(ultima_posicao.rastreador.numero_serie, {tipo}, datahoraevento)
 
             return {
                 "Serial": serial,
