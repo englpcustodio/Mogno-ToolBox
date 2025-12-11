@@ -15,13 +15,12 @@ from PyQt5.QtCore import QTimer
 from gui.tabs.login_tab import LoginTab
 from gui.tabs.equipment_tab import EquipmentTab
 from gui.signals import SignalManager
-
+from gui.tabs.events_tab import EventsTab
 from core.app_state import AppState
 from core.request_handlers import RequestHandler
 from core.report_handlers import ReportHandler
 from core.auth import AuthManager
 from core.credential_manager import CredentialManager
-
 from utils.logger import adicionar_log
 
 class MognoMainWindow(QMainWindow):
@@ -61,10 +60,12 @@ class MognoMainWindow(QMainWindow):
 
         self.login_tab = LoginTab(self.signal_manager, self.app_state)
         self.equipment_tab = EquipmentTab(self.app_state)
+        self.events_tab = EventsTab(self.app_state, self.signal_manager)  # ✅ NOVO
 
         self.tabs.addTab(self.login_tab, "🔐 Login")
         self.tabs.addTab(self.equipment_tab, "⚙️ Análise de Equipamentos")
-
+        self.tabs.addTab(self.events_tab, "📋 Análise de Eventos")  # ✅ NOVO
+    
     def hide_tabs_before_login(self):
         """Esconde as abas de funcionalidade até o login ser bem-sucedido."""
         for i in range(self.tabs.count()):
@@ -103,6 +104,12 @@ class MognoMainWindow(QMainWindow):
 
         self.equipment_tab.file_selected.connect(self.equipment_tab.handle_file_selected)
         self.signal_manager.all_requests_finished.connect(self._handle_all_requests_finished)
+
+        # ✅ NOVO: EVENTOS
+        self.events_tab.start_events_request.connect(self.handle_events_request)
+        self.events_tab.generate_events_report.connect(self.handle_events_report)
+        self.signal_manager.events_request_completed.connect(self.events_tab._handle_request_completed)
+
 
         # Progresso geral
         self.signal_manager.equipment_progress_updated.connect(self.update_equipment_progress)
@@ -186,13 +193,38 @@ class MognoMainWindow(QMainWindow):
         self._mark_request_start("data_consumption")
         self.request_handler.execute_data_consumption(month, year)
 
+
+    def handle_events_request(self, serials, start_dt, end_dt, event_filters):
+        """Inicia requisição de eventos com multithread."""
+        adicionar_log(f"🚀 Requisição de eventos iniciada para {len(serials)} seriais.")
+        self._mark_request_start("events")
+
+        # ✅ Define número de workers baseado na quantidade de seriais
+        max_workers = min(10, max(2, len(serials) // 10))  # Entre 2 e 10 workers
+        adicionar_log(f"🧵 Usando {max_workers} threads para processar {len(serials)} seriais")
+
+        self.request_handler.execute_events_request(
+            serials, 
+            start_dt, 
+            end_dt, 
+            event_filters,
+            max_workers=max_workers  # ✅ Passa número de workers
+        )
+
     # -------------------------------------------------------------------------
     # RELATÓRIOS
     # -------------------------------------------------------------------------
     def handle_separate_reports(self, options: dict):
         """Gera relatórios separados por tipo de requisição."""
-        adicionar_log("📁 Gerando relatórios separados...")
+        adicionar_log("📁 Gerando relatórios...")
         self.report_handler.generate_reports(options)  # ← Chama o método unificado
+
+    # ✅ NOVO: Handler para geração de relatório de eventos
+    def handle_events_report(self, data):
+        """Gera relatório de eventos."""
+        adicionar_log("📊 Gerando relatório de eventos...")
+        self.report_handler.generate_events_report(data)
+
 
     # -------------------------------------------------------------------------
     # PROGRESSO / CONTROLE DE EXECUÇÃO

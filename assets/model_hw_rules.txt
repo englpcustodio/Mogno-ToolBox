@@ -5,6 +5,9 @@
 # ModelX | required: lorawan | optional: p2p
 
 MXT-130 | required: gsm, p2p, lorawan | optional: 
+MXT-130-P5 | required: gsm, p2p, lorawan | optional: 
+MXT-162 | required: gsm, p2p | optional:
+RI0352 - FROTAS 4G | required: gsm, p2p, lorawan | optional: 
 GS10G   | required: gsm | optional:
 IOTracking | required: p2p, lorawan | optional:
 IOTracking-1 | required: p2p, lorawan | optional:

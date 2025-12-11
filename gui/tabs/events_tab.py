@@ -1,15 +1,15 @@
 # gui/tabs/events_tab.py
 
-import os
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QTextEdit, QFileDialog, QGroupBox, QGridLayout, QCheckBox,
     QScrollArea, QDateTimeEdit, QProgressBar, QSpacerItem, QSizePolicy
 )
-from PyQt5.QtCore import QDateTime, Qt, pyqtSignal
-from utils.logger import adicionar_log
-from core import serial_management # Importar o módulo de gerenciamento de seriais
+from PyQt5.QtCore import QDateTime, Qt, pyqtSignal, QTime
 
+from config.settings import EVENT_NAMES
+from core import serial_management # Importar o módulo de gerenciamento de seriais
+from utils.logger import adicionar_log
 class EventsTab(QWidget):
     """
     Aba para análise de eventos de rastreadores.
@@ -65,23 +65,30 @@ class EventsTab(QWidget):
         period_group = QGroupBox("Período de Análise")
         period_layout = QGridLayout(period_group)
 
+        # ✅ DATA/HORA INÍCIO: Dia atual às 00:00:00
         period_layout.addWidget(QLabel("Data/Hora Início:"), 0, 0)
-        self.datetime_start = QDateTimeEdit(QDateTime.currentDateTime())
+        self.datetime_start = QDateTimeEdit()
         self.datetime_start.setCalendarPopup(True)
         self.datetime_start.setDisplayFormat("dd/MM/yyyy HH:mm:ss")
-        # Definir a data de hoje (27/11/2025) às 00:00:00
-        today = QDateTime(2025, 11, 27, 0, 0, 0)
-        self.datetime_start.setDateTime(today)
+
+        # Define data de início: hoje às 00:00:00
+        today_start = QDateTime.currentDateTime()
+        today_start.setTime(QTime(0, 0, 0))  # 00:00:00
+        self.datetime_start.setDateTime(today_start)
         period_layout.addWidget(self.datetime_start, 0, 1)
 
+        # ✅ DATA/HORA FIM: Dia atual às 23:59:59
         period_layout.addWidget(QLabel("Data/Hora Fim:"), 1, 0)
-        self.datetime_end = QDateTimeEdit(QDateTime.currentDateTime())
+        self.datetime_end = QDateTimeEdit()
         self.datetime_end.setCalendarPopup(True)
         self.datetime_end.setDisplayFormat("dd/MM/yyyy HH:mm:ss")
-        # Definir a data de hoje (27/11/2025) às 23:59:59
-        end_of_today = QDateTime(2025, 11, 27, 23, 59, 59)
-        self.datetime_end.setDateTime(end_of_today)
+
+        # Define data de fim: hoje às 23:59:59
+        today_end = QDateTime.currentDateTime()
+        today_end.setTime(QTime(23, 59, 59))  # 23:59:59
+        self.datetime_end.setDateTime(today_end)
         period_layout.addWidget(self.datetime_end, 1, 1)
+
         main_layout.addWidget(period_group)
 
         # --- Grupo de Filtros de Eventos ---
@@ -135,7 +142,7 @@ class EventsTab(QWidget):
     def _connect_signals(self):
         """Conecta os sinais dos widgets aos seus respectivos slots."""
         self.serials_text_edit.textChanged.connect(self._handle_manual_serials_input)
-        self.btn_select_file.clicked.connect(self._handle_file_selected)
+        self.btn_select_file.clicked.connect(self._on_select_file_clicked)  # ✅ AJUSTE
         self.btn_clear_serials.clicked.connect(self._on_clear_serials_clicked)
         self.btn_select_all_filters.clicked.connect(lambda: self._set_all_filters(True))
         self.btn_deselect_all_filters.clicked.connect(lambda: self._set_all_filters(False))
@@ -153,52 +160,7 @@ class EventsTab(QWidget):
     def _get_event_filters_map(self):
         """Retorna um dicionário com os IDs e nomes dos eventos."""
         # A lista de eventos fornecida pelo usuário
-        events_data = [
-            (0, "POSICAO"), (1, "PANICO"), (2, "FAKE_VIOLADO"), (3, "FAKE_RESTAURADO"), (4, "ANTENA_GPS_CORTADA"),
-            (5, "ANTENA_GPS_RECONECTADA"), (6, "IGNICAO_ON"), (7, "IGNICAO_OFF"), (8, "BATERIA_EXTERNA_PERDIDA"),
-            (9, "BATERIA_EXTERNA_RECONECTADA"), (10, "BATERIA_EXTERNA_BAIXA"), (11, "BATERIA_INTERNA_PERDIDA"),
-            (12, "BATERIA_INTERNA_RECONECTADA"), (13, "BATERIA_INTERNA_BAIXA"), (14, "BATERIA_INTERNA_ERRO"),
-            (15, "INICIO_SLEEP"), (16, "RESET_RASTREADOR"), (17, "INICIO_SUPER_SLEEP"), (18, "BLOQUEIO_ANTIFURTO"),
-            (19, "DESBLOQUEIO_ANTIFURTO"), (20, "RESPOSTA_POSICAO_SOLICITADA"), (21, "POSICAO_EM_SLEEP"),
-            (22, "POSICAO_EM_SUPER_SLEEP"), (23, "OPERADORA_CELULAR"), (24, "ALARME_ANTIFURTO"), (25, "DADOS_VIAGEM"),
-            (26, "DADOS_ESTACIONAMENTO"), (27, "PAINEL_VIOLADO"), (28, "PAINEL_RESTAURADO"), (29, "TECLADO_CONECTADO"),
-            (30, "TECLADO_DESCONECTADO"), (31, "SENSOR_LIVRE_RESTAURADO"), (32, "MACRO"), (33, "MENSAGEM_NUMERICA"),
-            (34, "TERMINO_SLEEP"), (35, "TERMINO_SUPER_SLEEP"), (36, "INICIO_DEEP_SLEEP"), (37, "TERMINO_DEEP_SLEEP"),
-            (38, "BATERIA_BACKUP_RECONECTADA"), (39, "BATERIA_BACKUP_DESCONECTADA"), (40, "ANTENA_GPS_EM_CURTO"),
-            (41, "ANTIFURTO_RESTAURADO"), (42, "ANTIFURTO_VIOLADO"), (43, "INICIO_MODO_PANICO"), (44, "FIM_MODO_PANICO"),
-            (45, "ALERTA_ACELERACAO_FORA_PADRAO"), (46, "ALERTA_FREADA_BRUSCA"), (47, "ALERTA_CURVA_AGRESSIVA"),
-            (48, "ALERTA_DIRECAO_ACIMA_VELOCIDADE_PADRAO"), (49, "JAMMING_DETECTADO"), (50, "PLATAFORMA_ACIONADA"),
-            (51, "BOTAO_ANTIFURTO_PRESSIONADO"), (52, "EVENTO_GENERICO"), (53, "CARCACA_VIOLADA"),
-            (54, "JAMMING_RESTAURADO"), (55, "GPS_FALHA"), (56, "IDENTIFICACAO_CONDUTOR"), (57, "BLOQUEADOR_VIOLADO"),
-            (58, "BLOQUEADOR_RESTAURADO"), (59, "COLISAO"), (60, "ECU_VIOLADA"), (61, "ECU_INSTALADA"),
-            (62, "IDENTIFICACAO_CONDUTOR_NAO_CADASTRADO"), (63, "FREQ_CONT_PULSOS_ACIMA_LIMITE"),
-            (64, "PLATAFORMA_DESACIONADA"), (65, "BETONEIRA_CARREGANDO"), (66, "BETONEIRA_DESCARREGANDO"),
-            (67, "PORTA_ABERTA"), (68, "PORTA_FECHADA"), (69, "ALERTA_FREADA_BRUSCA_ACELERACAO_FORA_PADRAO"),
-            (70, "TIMEOUT_IDENTIFICADOR_CONDUTOR"), (71, "BAU_ABERTO"), (72, "BAU_FECHADO"), (73, "CARRETA_ENGATADA"),
-            (74, "CARRETA_DESENGATADA"), (75, "TECLADO_MENSAGEM"), (76, "ACAO_EMBARCADA_ACIONADA"),
-            (77, "ACAO_EMBARCADA_DESACIONADA"), (78, "FIM_VELOCIDADE_ACIMA_DO_PADRAO"), (79, "ENTRADA_EM_BANGUELA"),
-            (80, "SAIDA_DE_BANGUELA"), (81, "RPM_EXCEDIDO"),
-            (82, "ALERTA_DE_DIRECAO_COM_VELOCIDADE_EXCESSIVA_NA_CHUVA"),
-            (83, "FIM_DE_VELOCIDADE_ACIMA_DO_PADRAO_NA_CHUVA"),
-            (84, "VEICULO_PARADO_COM_MOTOR_FUNCIONANDO"), (85, "VEICULO_PARADO"),
-            (86, "CALIBRACAO_AUTOMATICA_DO_RPM_REALIZADA"),
-            (87, "CALIBRACAO_DO_ODOMETRO_FINALIZADA"), (88, "MODO_ERB"),
-            (89, "EMERGENCIA_OU_POSICAO_DE_DISPOSITIVO_RF_EM_MODO_ERB"), (90, "EMERGENCIA_POR_PRESENCA"),
-            (91, "EMERGENCIA_POR_RF"), (92, "DISPOSITIVO_PRESENCA_AUSENTE"),
-            (93, "BATERIA_VEICULO_ABAIXO_LIMITE_PRE_DEFINIDO"), (94, "LEITURA_OBD"),
-            (95, "VEICULO_PARADO_COM_RPM"), (96, "MODO_EMERGENCIA_POR_JAMMING"), (97, "EMERGENCIA_POR_GPRS"),
-            (98, "DETECCAO_RF"), # Adicionado DETECCAO_RF com ID 98
-            (99, "DISPOSITIVO_PRESENCA_RECUPERADO"), (100, "ENTRADA_MODO_EMERGENCIA"),
-            (101, "SAIDA_MODO_EMERGENCIA"), (102, "EMERGENCIA"), (103, "INICIO_DE_MOVIMENTO"),
-            (104, "FIM_DE_MOVIMENTO"), (105, "VEICULO_PARADO_COM_IGNICAO_LIGADA"),
-            (106, "REGRA_GEOGRAFICO"), (107, "ALERTA_DE_IGNICAO_SEM_FAROL"),
-            (108, "FIM_DE_IGNICAO_SEM_FAROL"), (109, "INICIO_MOVIMENTO_SEM_BATERIA_EXTERNA"),
-            (110, "FIM_MOVIMENTO_SEM_BATERIA_EXTERNA"), (111, "RASTREAMENTO_ATIVADO"),
-            (112, "RASTREAMENTO_DESATIVADO"), (113, "ALERTA_DE_MOTORISTA_COM_SONOLENCIA"),
-            (114, "ALERTA_DE_MOTORISTA_COM_DISTRACAO"), (115, "ALERTA_DE_MOTORISTA_BOCEJANDO"),
-            (116, "ALERTA_DE_MOTORISTA_AO_TELEFONE"), (117, "ALERTA_DE_MOTORISTA_FUMANDO")
-        ]
-        return {name: id for id, name in events_data} # Inverte para ter nome -> ID
+        return {name: id for id, name in EVENT_NAMES} # Inverte para ter nome -> ID
 
     def _populate_event_filters(self):
         """Preenche o layout de filtros com checkboxes para cada evento."""
@@ -249,6 +211,21 @@ class EventsTab(QWidget):
         self._update_serial_count_label(info) # <--- Ajuste aqui: info já contém os dados necessários
         self._check_enable_start_button()
 
+    # ✅ NOVO: Método para seleção de arquivo
+    def _on_select_file_clicked(self):
+        """Abre diálogo para selecionar arquivo de seriais."""
+        from PyQt5.QtWidgets import QFileDialog
+        filepath, _ = QFileDialog.getOpenFileName(
+            self,
+            "Selecionar Arquivo de Seriais",
+            "",
+            "Arquivos CSV/Excel (*.csv *.xlsx);;Todos os Arquivos (*)"
+        )
+
+        if filepath:
+            self._handle_file_selected(filepath)
+
+
     def _on_clear_serials_clicked(self):
         """Limpa a área de texto de seriais e a lista interna."""
         serial_management.limpar_seriais()
@@ -291,26 +268,38 @@ class EventsTab(QWidget):
 
     def _on_start_request_clicked(self):
         """Lida com o clique no botão 'Iniciar Requisição de Eventos'."""
-        serials = serial_management.get_seriais()
-        if not serials:
-            self.signal_manager.show_toast_warning.emit("Por favor, carregue seriais antes de iniciar a requisição.")
-            return
+        try:
+            serials = serial_management.get_seriais()
+            if not serials:
+                self.signal_manager.show_toast_warning.emit("Por favor, carregue seriais antes de iniciar a requisição.")
+                return
 
-        start_dt = self.datetime_start.dateTime().toString("dd/MM/yyyy HH:mm:ss")
-        end_dt = self.datetime_end.dateTime().toString("dd/MM/yyyy HH:mm:ss")
-        event_filters = self._get_selected_event_filters()
+            start_dt = self.datetime_start.dateTime().toString("dd/MM/yyyy HH:mm:ss")
+            end_dt = self.datetime_end.dateTime().toString("dd/MM/yyyy HH:mm:ss")
+            event_filters = self._get_selected_event_filters()
 
-        if not event_filters:
-            self.signal_manager.show_toast_warning.emit("Por favor, selecione pelo menos um tipo de evento para filtrar.")
-            return
+            if not event_filters:
+                self.signal_manager.show_toast_warning.emit("Por favor, selecione pelo menos um tipo de evento para filtrar.")
+                return
 
-        adicionar_log(f"Iniciando requisição de eventos para {len(serials)} seriais de {start_dt} a {end_dt} com filtros: {event_filters}")
-        self._reset_progress()
-        self.btn_start_request.setEnabled(False)
-        self.btn_generate_report.setEnabled(False) # Desabilita o botão de relatório ao iniciar nova requisição
+            adicionar_log(f"Iniciando requisição de eventos para {len(serials)} seriais de {start_dt} a {end_dt} com filtros: {event_filters}")
+            self._reset_progress()
+            self.btn_start_request.setEnabled(False)
+            self.btn_generate_report.setEnabled(False) # Desabilita o botão de relatório ao iniciar nova requisição
 
-        # Emite o sinal para o RequestHandler iniciar a requisição
-        self.start_events_request.emit(serials, start_dt, end_dt, event_filters)
+            # ✅ SALVA CONFIGURAÇÃO NO APP_STATE
+            self.app_state["eventos_config"] = {
+                "start_datetime": start_dt,
+                "end_datetime": end_dt,
+                "filtros": event_filters,
+                "serials": serials 
+            }
+
+            # Emite sinal
+            self.start_events_request.emit(serials, start_dt, end_dt, event_filters)
+
+        except Exception as e:
+            adicionar_log(f"❌ Erro ao iniciar requisição: {e}")
 
     def _on_generate_report_clicked(self):
         """Lida com o clique no botão 'Gerar Relatório Excel'."""
@@ -364,10 +353,10 @@ class EventsTab(QWidget):
             self.btn_generate_report.setEnabled(False)
             self.progress_status_label.setText("Requisição concluída. Nenhum evento encontrado.")
 
-    def _handle_all_requests_finished(self):
-        """Lida com o sinal de que todas as requisições foram finalizadas."""
-        # Este sinal é mais genérico e pode ser usado para lógicas globais.
-        # A habilitação do botão de relatório já é tratada por _handle_request_completed,
-        # que é mais específico para a conclusão da requisição de eventos.
-        pass
+#    def _handle_all_requests_finished(self):
+#        """Lida com o sinal de que todas as requisições foram finalizadas."""
+#        # Este sinal é mais genérico e pode ser usado para lógicas globais.
+#        # A habilitação do botão de relatório já é tratada por _handle_request_completed,
+#        # que é mais específico para a conclusão da requisição de eventos.
+#        pass
 

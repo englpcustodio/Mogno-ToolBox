@@ -19,9 +19,7 @@ class SignalManager(QObject):
     update_start_button_text = pyqtSignal(str)
     update_timer_label = pyqtSignal(str)
     csv_file_selected = pyqtSignal(str)
-
-    # Novo sinal para indicar que o login é necessário (token expirado, etc.)
-    reauthentication_required = pyqtSignal()
+    reauthentication_required = pyqtSignal() # indicar que o login é necessário (token expirado, etc.)
 
     # ========== Requisições de equipamentos ==========
     request_last_position_api = pyqtSignal(str, list)       # tipo_api, serials
@@ -29,9 +27,14 @@ class SignalManager(QObject):
     request_status_equipment = pyqtSignal(list)             # serials
     request_data_consumption = pyqtSignal(int, int)         # mes, ano
 
+    # ========== Requisições de eventos ==========
+    request_events = pyqtSignal(list, str, str, str)  # serials, start_dt, end_dt, filters
+    events_progress_updated = pyqtSignal(int, int, str)  # current, total, label
+    events_request_completed = pyqtSignal(list)  # dados dos eventos
+
     # ========== Relatórios ==========
-    generate_consolidated_report = pyqtSignal(dict)
     generate_separate_reports = pyqtSignal(dict)
+    generate_events_report = pyqtSignal(list)
 
     # ========== Agendador ==========
     scheduler_saved = pyqtSignal(dict)
@@ -48,3 +51,4 @@ class SignalManager(QObject):
     show_toast_success = pyqtSignal(str)
     show_toast_warning = pyqtSignal(str)
     show_toast_error = pyqtSignal(str)
+    show_toast_info = pyqtSignal(str) 

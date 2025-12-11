@@ -9,6 +9,30 @@ _arquivo_carregado = False
 _origem_serials = None  # 'arquivo' ou 'manual'
 
 
+def _ler_csv_com_codificacao_automatica(filepath, nome_arquivo):
+    """
+    Tenta ler o CSV automaticamente testando múltiplas codificações.
+    Retorna o DataFrame ou gera exceção se todas falharem.
+    """
+    codificacoes_teste = ["utf-8", "utf-8-sig", "cp1252", "latin1"]
+
+    ultima_excecao = None
+
+    for encoding in codificacoes_teste:
+        try:
+            df = pd.read_csv(filepath, encoding=encoding)
+            adicionar_log(f"Arquivo '{nome_arquivo}' lido com encoding: {encoding}")
+            return df
+        except Exception as e:
+            ultima_excecao = e
+
+    # Se todas as tentativas falharam
+    raise Exception(
+        f"Falha ao ler '{nome_arquivo}' com todas as codificações testadas "
+        f"({', '.join(codificacoes_teste)}). Erro final: {ultima_excecao}"
+    )
+
+
 def ler_arquivo_serials(filepath):
     """
     Lê um arquivo .csv ou .xlsx contendo seriais, identifica a coluna relevante,
@@ -24,17 +48,28 @@ def ler_arquivo_serials(filepath):
     extensao = os.path.splitext(filepath)[1].lower()
 
     try:
+        # --------------------------------------------------------
+        # CSV → leitura automática de encoding
+        # --------------------------------------------------------
         if extensao == ".csv":
-            df = pd.read_csv(filepath)
+            df = _ler_csv_com_codificacao_automatica(filepath, nome_arquivo)
+
+        # --------------------------------------------------------
+        # XLSX → leitura normal
+        # --------------------------------------------------------
         elif extensao == ".xlsx":
             df = pd.read_excel(filepath)
+            adicionar_log(f"Arquivo '{nome_arquivo}' lido como Excel (.xlsx).")
+
         else:
             raise ValueError(f"Formato de arquivo não suportado: {extensao}")
 
         if df.empty:
             raise ValueError("Arquivo vazio ou sem dados válidos.")
 
-        # Identifica a coluna com números de série
+        # ------------------------------------
+        # Identificação da coluna de serial
+        # ------------------------------------
         palavras_chave = [
             "serial", "seriais", "numero_serial", "serial_device",
             "serial_number", "rastreador_numero_serie"
@@ -45,6 +80,7 @@ def ler_arquivo_serials(filepath):
         )
 
         serials = df[coluna_serial].dropna().astype(str).str.strip().tolist()
+
         total_lidos = len(serials)
         serials_unicos = list(set(serials))
         duplicados = total_lidos - len(serials_unicos)
@@ -74,7 +110,6 @@ def carregar_seriais_manualmente(texto):
         adicionar_log("⚠️ Nenhum serial manual inserido.")
         return {'unicos': [], 'total_lidos': 0, 'duplicados': 0}
 
-    # Divide por ';' ou quebra de linha
     partes = [s.strip() for s in texto.replace("\n", ";").split(";") if s.strip()]
     total_lidos = len(partes)
     serials_unicos = list(set(partes))
@@ -89,12 +124,10 @@ def carregar_seriais_manualmente(texto):
 
 
 def get_seriais():
-    """Retorna a lista atual de seriais únicos."""
     return _serials_list.copy()
 
 
 def limpar_seriais():
-    """Limpa a lista de seriais carregada."""
     global _serials_list, _arquivo_carregado, _origem_serials
     _serials_list = []
     _arquivo_carregado = False
@@ -103,7 +136,6 @@ def limpar_seriais():
 
 
 def get_info_serials():
-    """Retorna um resumo da situação atual dos seriais."""
     return {
         "quantidade": len(_serials_list),
         "origem": _origem_serials,

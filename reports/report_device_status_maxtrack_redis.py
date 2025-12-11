@@ -162,25 +162,41 @@ def relatorio_status_excel(seriais, dados_status, output_path):
     df_inicial = pd.DataFrame(registros_inicial)
     df_detalhado = pd.DataFrame(registros_detalhados)
 
-    if "Seriais" in df_inicial.columns:
-        df_inicial = df_inicial[["Seriais", "Dados de Status"]]
+    # Identifica seriais sem dados
+    df_sem_status = df_inicial[df_inicial["Dados de Status"] == "Não possui informações de Status"].copy()
 
-    if "Número de Série" in df_detalhado.columns:
-        cols = ["Número de Série"] + [c for c in df_detalhado.columns if c != "Número de Série"]
-        df_detalhado = df_detalhado[cols]
+    # Filtra df_detalhado para remover entradas sem dados
+    df_detalhado_limpo = df_detalhado[
+        ~(df_detalhado["Status"].astype(str).str.contains("Não possui informações de Status", na=False))
+        if "Status" in df_detalhado.columns
+        else df_detalhado
+    ].copy()
+
+    # Garantir ordem da coluna principal
+    if "Número de Série" in df_detalhado_limpo.columns:
+        cols = ["Número de Série"] + [c for c in df_detalhado_limpo.columns if c != "Número de Série"]
+        df_detalhado_limpo = df_detalhado_limpo[cols]
 
     # ---------------------------------------------------------------------
-    # Escrever Excel
+    # Escrever Excel nas abas certas
     # ---------------------------------------------------------------------
     with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
+
+        # Aba 1
         df_inicial.to_excel(writer, sheet_name="status_device_MXT", index=False)
-        df_detalhado.to_excel(writer, sheet_name="status_device_MXT_detalhado", index=False)
+
+        # Aba 2 — nova, conforme solicitado
+        df_sem_status.to_excel(writer, sheet_name="sem_status", index=False)
+
+        # Aba 3 — somente com conteúdo válido
+        df_detalhado_limpo.to_excel(writer, sheet_name="status_device_MXT_detalhado", index=False)
 
     # Ajuste das colunas
     book = load_workbook(output_path)
-    for aba in ["status_device_MXT", "status_device_MXT_detalhado"]:
+    for aba in ["status_device_MXT", "sem_status", "status_device_MXT_detalhado"]:
         if aba in book.sheetnames:
             auto_size_columns(book[aba])
+
     book.save(output_path)
 
     adicionar_log(f"📁 Relatório final salvo em {output_path}")

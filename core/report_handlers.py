@@ -29,7 +29,8 @@ from utils.logger import adicionar_log
 from reports import (
     report_device_status_maxtrack_redis,
     report_last_position, 
-    report_traffic_data_redis
+    report_traffic_data_redis,
+    report_events
 )
 
 class ReportHandler:
@@ -40,7 +41,8 @@ class ReportHandler:
         "last_position_api": report_last_position,
         "last_position_redis": report_last_position,
         "status_equipment": report_device_status_maxtrack_redis,
-        "data_consumption": report_traffic_data_redis
+        "data_consumption": report_traffic_data_redis,
+        "events": report_events
     }
 
     # Labels amigáveis
@@ -48,7 +50,8 @@ class ReportHandler:
         "last_position_api": "📡 Últimas Posições - API Mogno",
         "last_position_redis": "📍 Últimas Posições - Redis",
         "status_equipment": "⚙️ Status dos Equipamentos",
-        "data_consumption": "📶 Consumo de Dados no Servidor"
+        "data_consumption": "📶 Consumo de Dados no Servidor",
+        "events": "📋 Análise de Eventos"
     }
 
     # Subdiretórios
@@ -56,7 +59,8 @@ class ReportHandler:
         "last_position_api": "ultimas_posicoes",
         "last_position_redis": "ultimas_posicoes",
         "status_equipment": "status_equipamentos",
-        "data_consumption": "consumo_dados"
+        "data_consumption": "consumo_dados",
+        "events": "analise_eventos"
     }
 
     def __init__(self, app_state, signal_manager, main_window):
@@ -194,3 +198,56 @@ class ReportHandler:
             adicionar_log(f"❌ Erro ao gerar relatório '{query_type}': {e}")
             adicionar_log(traceback.format_exc())
             raise
+
+    def generate_events_report(self, eventos_data):
+        """Gera relatório específico de eventos."""
+        try:
+            if not eventos_data:
+                self.signal_manager.show_toast_warning.emit("⚠️ Nenhum evento para gerar relatório")
+                return
+
+            from datetime import datetime
+            import os
+
+            # Diretório base
+            base_dir = os.path.join(os.getcwd(), "relatorios_gerados", "analise_eventos")
+            os.makedirs(base_dir, exist_ok=True)
+
+            # Timestamp
+            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            filename = f"report_events_{timestamp}.xlsx"
+            output_path = os.path.join(base_dir, filename)
+
+            # Recupera parâmetros da requisição
+            eventos_config = self.app_state.get("eventos_config", {})
+            start_datetime = eventos_config.get("start_datetime", "N/A")
+            end_datetime = eventos_config.get("end_datetime", "N/A")
+            filtros_str = eventos_config.get("filtros", "")
+            serials = eventos_config.get("serials", [])
+
+            # ✅ MODO RÁPIDO: Ativado por padrão para grandes volumes
+            modo_rapido = len(eventos_data) > 10000
+
+            adicionar_log(f"📁 Salvando relatório de eventos em: {os.path.relpath(output_path)}")
+            adicionar_log(f"⚡ Modo rápido: {'ATIVADO' if modo_rapido else 'DESATIVADO'} ({len(eventos_data)} eventos)")
+
+            result_path = report_events.gerar_relatorio(
+                serials=serials,
+                eventos_data=eventos_data,
+                output_path=output_path,
+                start_datetime=start_datetime,
+                end_datetime=end_datetime,
+                filtros_str=filtros_str,
+                modo_rapido=modo_rapido  # ✅ TOGGLE
+            )
+
+            if result_path:
+                adicionar_log(f"✅ Relatório de eventos gerado com sucesso!")
+                self.signal_manager.show_toast_success.emit("✅ Relatório de eventos gerado com sucesso!")
+            else:
+                raise Exception("Gerador retornou None")
+
+        except Exception as e:
+            adicionar_log(f"❌ Erro ao gerar relatório de eventos: {e}")
+            adicionar_log(traceback.format_exc())
+            self.signal_manager.show_toast_error.emit(f"❌ Erro ao gerar relatório: {e}")

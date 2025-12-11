@@ -9,7 +9,7 @@ from threading import Thread, Lock
 from utils.logger import adicionar_log
 from services.api_requests import modo_requisitar_lotes
 from services.redis_service import ultima_posicao_tipo, status_equipamento, obter_dados_consumo
-
+from services.events_api import requisitar_eventos_lote
 
 class RequestHandler:
     """Gerencia todas as requisições da aplicação (API e Redis) de forma otimizada."""
@@ -26,12 +26,15 @@ class RequestHandler:
             "last_position_redis": (ultima_posicao_tipo, self.signal_manager.last_position_completed),
             "status_equipment": (status_equipamento, self.signal_manager.status_equipment_completed),
             "data_consumption": (obter_dados_consumo, self.signal_manager.data_consumption_completed),
+            "events": (requisitar_eventos_lote, self.signal_manager.events_request_completed),
         }
 
-        # Conecta sinais de término às funções internas
+        # Conecta sinais
         self.signal_manager.last_position_completed.connect(self._handle_finished)
         self.signal_manager.status_equipment_completed.connect(self._handle_finished)
         self.signal_manager.data_consumption_completed.connect(self._handle_finished)
+        self.signal_manager.events_request_completed.connect(self._handle_finished)
+
 
     # ------------------------------------------------------------------
     # Controle de requisições ativas
@@ -55,7 +58,7 @@ class RequestHandler:
     # Execução genérica com threading
     # ------------------------------------------------------------------
     def _exec_async(self, tipo, func, *args, **kwargs):
-        """Executa qualquer função de requisição em thread separada."""
+        """Executa função de requisição em thread separada."""
         self._inc()
 
         def run():
@@ -106,3 +109,28 @@ class RequestHandler:
     def execute_data_consumption(self, month, year):
         """Executa requisição de consumo de dados (não requer seriais)."""
         self._exec_async("data_consumption", obter_dados_consumo, month, year)
+
+    def execute_events_request(self, serials, start_datetime, end_datetime, event_filters, max_workers=4):
+        """
+        Executa requisição de eventos via API Mogno com multithread.
+
+        Args:
+            serials (list): Lista de seriais
+            start_datetime (str): Data/hora início
+            end_datetime (str): Data/hora fim
+            event_filters (str): Filtros de eventos (IDs separados por vírgula)
+            max_workers (int): Número de threads simultâneas (padrão: 4)
+        """
+        self._exec_async(
+            "events",
+            requisitar_eventos_lote,
+            serials,
+            start_datetime,
+            end_datetime,
+            event_filters,
+            self.app_state,
+            max_workers=max_workers,  # ✅ Parâmetro de workers
+            progress_callback=lambda cur, tot, lbl: self.signal_manager.events_progress_updated.emit(
+                cur, tot, lbl
+            ),
+        )
