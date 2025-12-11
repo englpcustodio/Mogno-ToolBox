@@ -612,3 +612,4 @@ def gerar_relatorio(serials, resultados, output_path, selected_periods=None, ori
         adicionar_log(f"❌ Erro crítico em gerar_relatorio: {e}")
         adicionar_log(traceback.format_exc())
         return None
+# teste
