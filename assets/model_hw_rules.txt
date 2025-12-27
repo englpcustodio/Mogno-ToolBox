@@ -4,10 +4,29 @@
 # Exemplo de novo modelo:
 # ModelX | required: lorawan | optional: p2p
 
+
+E3 Plus | required: gsm | optional:
+FMB130 | required: gsm | optional:
+FMC150 | required: gsm | optional:
+GS10G | required: gsm | optional:
+GV300CAN | required: gsm | optional:
+GV350CEU | required: gsm | optional:
+MT2000 | required: gsm | optional:
+RT345BT | required: gsm | optional:
+SA200 | required: gsm | optional:
+ST300H | required: gsm | optional:
+ST340LC | required: gsm | optional:
+ST350LC | required: gsm | optional:
+ST380 | required: gsm | optional:
+RI0350 - FROTAS 2G | required: gsm, p2p, lorawan | optional: 
+RI0352 - FROTAS 4G | required: gsm, p2p, lorawan | optional: 
 MXT-130 | required: gsm, p2p, lorawan | optional: 
 MXT-130-P5 | required: gsm, p2p, lorawan | optional: 
-MXT-162 | required: gsm, p2p | optional:
-RI0352 - FROTAS 4G | required: gsm, p2p, lorawan | optional: 
-GS10G   | required: gsm | optional:
+MXT-162 | required: gsm | optional:
 IOTracking | required: p2p, lorawan | optional:
 IOTracking-1 | required: p2p, lorawan | optional:
+IOTracking--1 | required: p2p, lorawan | optional:
+A40 | required: p2p, lorawan | optional:
+Contingencia - Autonomo | required: p2p, lorawan | optional:
+Contingencia - Autonomo:0 | required: p2p, lorawan | optional:
+MXT-RFG | required: p2p, lorawan | optional:

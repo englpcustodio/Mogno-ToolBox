@@ -110,7 +110,7 @@ class RequestHandler:
         """Executa requisição de consumo de dados (não requer seriais)."""
         self._exec_async("data_consumption", obter_dados_consumo, month, year)
 
-    def execute_events_request(self, serials, start_datetime, end_datetime, event_filters, max_workers=4):
+    def execute_events_request(self, serials, start_datetime, end_datetime, event_filters, max_workers=20):
         """
         Executa requisição de eventos via API Mogno com multithread.
 
@@ -119,7 +119,7 @@ class RequestHandler:
             start_datetime (str): Data/hora início
             end_datetime (str): Data/hora fim
             event_filters (str): Filtros de eventos (IDs separados por vírgula)
-            max_workers (int): Número de threads simultâneas (padrão: 4)
+            max_workers (int): Número de threads simultâneas (padrão: 20)
         """
         self._exec_async(
             "events",
@@ -129,7 +129,7 @@ class RequestHandler:
             end_datetime,
             event_filters,
             self.app_state,
-            max_workers=max_workers,  # ✅ Parâmetro de workers
+            max_workers=max_workers,  # Parâmetro de workers
             progress_callback=lambda cur, tot, lbl: self.signal_manager.events_progress_updated.emit(
                 cur, tot, lbl
             ),

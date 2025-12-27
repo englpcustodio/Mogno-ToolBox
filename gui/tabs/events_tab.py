@@ -65,7 +65,7 @@ class EventsTab(QWidget):
         period_group = QGroupBox("Período de Análise")
         period_layout = QGridLayout(period_group)
 
-        # ✅ DATA/HORA INÍCIO: Dia atual às 00:00:00
+        # DATA/HORA INÍCIO: Dia atual às 00:00:00
         period_layout.addWidget(QLabel("Data/Hora Início:"), 0, 0)
         self.datetime_start = QDateTimeEdit()
         self.datetime_start.setCalendarPopup(True)
@@ -77,7 +77,7 @@ class EventsTab(QWidget):
         self.datetime_start.setDateTime(today_start)
         period_layout.addWidget(self.datetime_start, 0, 1)
 
-        # ✅ DATA/HORA FIM: Dia atual às 23:59:59
+        # DATA/HORA FIM: Dia atual às 23:59:59
         period_layout.addWidget(QLabel("Data/Hora Fim:"), 1, 0)
         self.datetime_end = QDateTimeEdit()
         self.datetime_end.setCalendarPopup(True)
@@ -152,10 +152,6 @@ class EventsTab(QWidget):
         # Conectar sinais do SignalManager para atualização de progresso
         self.signal_manager.events_progress_updated.connect(self.update_progress)
         self.signal_manager.events_request_completed.connect(self._handle_request_completed)
-        # Reutilizar para habilitar/desabilitar o botão de iniciar (se necessário, embora _check_enable_start_button já faça isso)
-        # self.signal_manager.enable_start_button.connect(self._set_start_button_enabled)
-        # Para reabilitar o botão de gerar relatório (já tratado em _handle_request_completed)
-        # self.signal_manager.all_requests_finished.connect(self._handle_all_requests_finished)
 
     def _get_event_filters_map(self):
         """Retorna um dicionário com os IDs e nomes dos eventos."""
@@ -211,7 +207,7 @@ class EventsTab(QWidget):
         self._update_serial_count_label(info) # <--- Ajuste aqui: info já contém os dados necessários
         self._check_enable_start_button()
 
-    # ✅ NOVO: Método para seleção de arquivo
+    # Método para seleção de arquivo
     def _on_select_file_clicked(self):
         """Abre diálogo para selecionar arquivo de seriais."""
         from PyQt5.QtWidgets import QFileDialog
@@ -287,7 +283,7 @@ class EventsTab(QWidget):
             self.btn_start_request.setEnabled(False)
             self.btn_generate_report.setEnabled(False) # Desabilita o botão de relatório ao iniciar nova requisição
 
-            # ✅ SALVA CONFIGURAÇÃO NO APP_STATE
+            # SALVA CONFIGURAÇÃO NO APP_STATE
             self.app_state["eventos_config"] = {
                 "start_datetime": start_dt,
                 "end_datetime": end_dt,
@@ -307,7 +303,7 @@ class EventsTab(QWidget):
             self.signal_manager.show_toast_warning.emit("Nenhum dado de evento para gerar relatório.")
             return
 
-        adicionar_log("Gerando relatório de eventos...")
+        #adicionar_log("Gerando relatório de eventos...")
         self.signal_manager.show_toast_info.emit("Gerando relatório de eventos... Por favor, aguarde.")
         self.btn_generate_report.setEnabled(False) # Desabilita enquanto gera o relatório
         # Emite o sinal para o ReportHandler com os dados coletados
@@ -342,7 +338,7 @@ class EventsTab(QWidget):
 
     def _handle_request_completed(self, data: list):
         """Lida com a conclusão da requisição de eventos."""
-        adicionar_log(f"Requisição de eventos concluída. {len(data)} registros recebidos.")
+        adicionar_log(f"✅ Requisição de eventos concluída. {len(data)} registros recebidos.")
         self.btn_start_request.setEnabled(True) # Reabilita o botão de iniciar
         self.last_events_data = data # Armazena os dados para o relatório
 
@@ -352,11 +348,4 @@ class EventsTab(QWidget):
         else:
             self.btn_generate_report.setEnabled(False)
             self.progress_status_label.setText("Requisição concluída. Nenhum evento encontrado.")
-
-#    def _handle_all_requests_finished(self):
-#        """Lida com o sinal de que todas as requisições foram finalizadas."""
-#        # Este sinal é mais genérico e pode ser usado para lógicas globais.
-#        # A habilitação do botão de relatório já é tratada por _handle_request_completed,
-#        # que é mais específico para a conclusão da requisição de eventos.
-#        pass
 

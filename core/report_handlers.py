@@ -97,7 +97,7 @@ class ReportHandler:
                 periods = sheet_config.get("periods", [])
                 adicionar_log(f"📊 Config de abas: Tipos={comm_types}, Períodos={periods}")
 
-            # ✅ LOGA A CONFIGURAÇÃO ATUAL (debug)
+            # LOGA A CONFIGURAÇÃO ATUAL (debug)
             config = self.app_state.get("sheet_config", {})
             if config:
                 adicionar_log(f"📊 Config de abas: {config}")
@@ -206,8 +206,7 @@ class ReportHandler:
                 self.signal_manager.show_toast_warning.emit("⚠️ Nenhum evento para gerar relatório")
                 return
 
-            from datetime import datetime
-            import os
+
 
             # Diretório base
             base_dir = os.path.join(os.getcwd(), "relatorios_gerados", "analise_eventos")
@@ -225,10 +224,10 @@ class ReportHandler:
             filtros_str = eventos_config.get("filtros", "")
             serials = eventos_config.get("serials", [])
 
-            # ✅ MODO RÁPIDO: Ativado por padrão para grandes volumes
-            modo_rapido = len(eventos_data) > 10000
+            # MODO RÁPIDO: Ativado por padrão para grandes volumes
+            modo_rapido = len(eventos_data) > 5000
 
-            adicionar_log(f"📁 Salvando relatório de eventos em: {os.path.relpath(output_path)}")
+            #adicionar_log(f"📁 Salvando relatório de eventos em: {os.path.relpath(output_path)}")
             adicionar_log(f"⚡ Modo rápido: {'ATIVADO' if modo_rapido else 'DESATIVADO'} ({len(eventos_data)} eventos)")
 
             result_path = report_events.gerar_relatorio(
@@ -238,7 +237,7 @@ class ReportHandler:
                 start_datetime=start_datetime,
                 end_datetime=end_datetime,
                 filtros_str=filtros_str,
-                modo_rapido=modo_rapido  # ✅ TOGGLE
+                modo_rapido=modo_rapido  # TOGGLE
             )
 
             if result_path:

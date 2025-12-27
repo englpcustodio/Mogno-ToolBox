@@ -110,7 +110,7 @@ def requisitar_eventos_serial(serial, start_datetime, end_datetime, event_filter
 
 
 def requisitar_eventos_lote(serials, start_datetime, end_datetime, event_filters, app_state, 
-                           max_workers=4, progress_callback=None):
+                           max_workers=20, progress_callback=None):
     """
     Requisita eventos de múltiplos seriais usando multithread.
 
@@ -190,60 +190,61 @@ def requisitar_eventos_lote(serials, start_datetime, end_datetime, event_filters
                 adicionar_log(f"❌ Exceção ao processar {serial}: {e}")
                 adicionar_log(traceback.format_exc())
 
-    adicionar_log(f"✅ Requisição de eventos concluída: {len(todos_eventos)} eventos encontrados")
+    #adicionar_log(f"✅ Requisição de eventos concluída: {len(todos_eventos)} eventos encontrados")
     return todos_eventos
 
 
-def requisitar_eventos_lote_sequencial(serials, start_datetime, end_datetime, event_filters, app_state, 
-                                      progress_callback=None):
-    """
-    Requisita eventos de múltiplos seriais sequencialmente (sem multithread).
-    Útil para debugging ou quando há problemas de concorrência.
-
-    Args:
-        serials (list): Lista de números de série
-        start_datetime (str): Data/hora início
-        end_datetime (str): Data/hora fim
-        event_filters (str): Filtros de eventos
-        app_state: Instância do AppState
-        progress_callback (callable): Função para atualizar progresso (current, total, label)
-
-    Returns:
-        list: Lista consolidada de todos os eventos encontrados
-    """
-    todos_eventos = []
-    total_serials = len(serials)
-
-    adicionar_log(f"🚀 Iniciando requisição de eventos para {total_serials} seriais (sequencial)...")
-    adicionar_log(f"📅 Período: {start_datetime} até {end_datetime}")
-    adicionar_log(f"🔍 Filtros: {event_filters}")
-
-    for idx, serial in enumerate(serials, start=1):
-        try:
-            # Atualiza progresso
-            if progress_callback:
-                progress_callback(idx, total_serials, f"Processando serial {serial}")
-
-            # Requisita eventos do serial
-            eventos = requisitar_eventos_serial(
-                serial,
-                start_datetime,
-                end_datetime,
-                event_filters,
-                app_state,
-                page=1
-            )
-
-            # Adiciona informações extras a cada evento
-            for evento in eventos:
-                evento['serial_requisitado'] = serial
-                evento['data_requisicao'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-            todos_eventos.extend(eventos)
-
-        except Exception as e:
-            adicionar_log(f"❌ Erro ao processar serial {serial}: {e}")
-            continue
-
-    adicionar_log(f"✅ Requisição de eventos concluída: {len(todos_eventos)} eventos encontrados")
-    return todos_eventos
+#def requisitar_eventos_lote_sequencial(serials, start_datetime, end_datetime, event_filters, app_state, 
+#                                      progress_callback=None):
+#    """
+#    Requisita eventos de múltiplos seriais sequencialmente (sem multithread).
+#    Útil para debugging ou quando há problemas de concorrência.
+#
+#    Args:
+#        serials (list): Lista de números de série
+#        start_datetime (str): Data/hora início
+#        end_datetime (str): Data/hora fim
+#        event_filters (str): Filtros de eventos
+#        app_state: Instância do AppState
+#        progress_callback (callable): Função para atualizar progresso (current, total, label)
+#
+#    Returns:
+#        list: Lista consolidada de todos os eventos encontrados
+#    """
+#    todos_eventos = []
+#    total_serials = len(serials)
+#
+#    adicionar_log(f"🚀 Iniciando requisição de eventos para {total_serials} seriais (sequencial)...")
+#    adicionar_log(f"📅 Período: {start_datetime} até {end_datetime}")
+#    adicionar_log(f"🔍 Filtros: {event_filters}")
+#
+#    for idx, serial in enumerate(serials, start=1):
+#        try:
+#            # Atualiza progresso
+#            if progress_callback:
+#                progress_callback(idx, total_serials, f"Processando serial {serial}")
+#
+#            # Requisita eventos do serial
+#            eventos = requisitar_eventos_serial(
+#                serial,
+#                start_datetime,
+#                end_datetime,
+#                event_filters,
+#                app_state,
+#                page=1
+#            )
+#
+#            # Adiciona informações extras a cada evento
+#            for evento in eventos:
+#                evento['serial_requisitado'] = serial
+#                evento['data_requisicao'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+#
+#            todos_eventos.extend(eventos)
+#
+#        except Exception as e:
+#            adicionar_log(f"❌ Erro ao processar serial {serial}: {e}")
+#            continue
+#
+#    adicionar_log(f"✅ Requisição de eventos concluída: {len(todos_eventos)} eventos encontrados")
+#    return todos_eventos
+#

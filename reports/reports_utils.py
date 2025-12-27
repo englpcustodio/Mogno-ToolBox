@@ -18,6 +18,7 @@ from utils.logger import adicionar_log
 # PARSING E CONVERSÃO DE DADOS
 # =============================================================================
 
+
 def parse_dados_redis(dados_str):
     """
     Parser robusto para converter texto hierárquico do Redis em dict achatado.
@@ -147,6 +148,7 @@ def parse_date_value(val):
 # FORMATAÇÃO DE PLANILHAS EXCEL
 # =============================================================================
 
+
 def formatar_cabecalho(ws, row_num=1):
     """
     Aplica formatação premium ao cabeçalho de uma planilha.
@@ -174,6 +176,56 @@ def formatar_cabecalho(ws, row_num=1):
 
     except Exception as e:
         adicionar_log(f"⚠️ Erro em formatar_cabecalho: {e}")
+
+
+def formatar_cabecalho_customizado(ws, row_num, cor_hex="305496"):
+    """Formata cabeçalho com cor customizada."""
+    try:
+        bold_font = Font(bold=True, color="FFFFFF", size=11)
+        header_fill = PatternFill(start_color=cor_hex, end_color=cor_hex, fill_type="solid")
+        thin_border = Border(
+            left=Side(style="thin", color="FFFFFF"),
+            right=Side(style="thin", color="FFFFFF"),
+            top=Side(style="thin", color="FFFFFF"),
+            bottom=Side(style="thin", color="FFFFFF")
+        )
+
+        for cell in ws[row_num]:
+            if cell.value:
+                cell.font = bold_font
+                cell.fill = header_fill
+                cell.border = thin_border
+                cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+    except Exception as e:
+        adicionar_log(f"⚠️ Erro em formatar_cabecalho_customizado: {e}")
+
+
+def mesclar_e_formatar_celula(ws, range_str, texto, cor_fundo="D9E1F2", negrito=True):
+    """
+    Mescla células e aplica formatação.
+
+    Args:
+        ws: Worksheet
+        range_str: Range de células (ex: "A1:D1")
+        texto: Texto a inserir
+        cor_fundo: Cor de fundo em hex
+        negrito: Se True, aplica negrito
+    """
+    try:
+        ws.merge_cells(range_str)
+        cell = ws[range_str.split(':')[0]]
+        cell.value = texto
+        cell.fill = PatternFill(start_color=cor_fundo, end_color=cor_fundo, fill_type="solid")
+        cell.font = Font(bold=negrito, size=11)
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+        cell.border = Border(
+            left=Side(style="thin"),
+            right=Side(style="thin"),
+            top=Side(style="thin"),
+            bottom=Side(style="thin")
+        )
+    except Exception as e:
+        adicionar_log(f"⚠️ Erro em mesclar_e_formatar_celula: {e}")
 
 
 def aplicar_estilo_zebra(ws, min_row=2):
@@ -240,42 +292,72 @@ def ajustar_largura_colunas(ws, min_width=10, max_width=80):
         adicionar_log(f"⚠️ Erro em ajustar_largura_colunas: {e}")
 
 
-#def formatar_planilha_completa(ws, header_row=1):
-#    """
-#    Aplica formatação completa (cabeçalho + corpo + ajustes) a uma planilha.
-#
-#    Args:
-#        ws: Worksheet do openpyxl
-#        header_row: Linha do cabeçalho (padrão: 1)
-#    """
-#    try:
-#        if ws.max_row < 1:
-#            return
-#
-#        # Formata cabeçalho
-#        formatar_cabecalho(ws, header_row)
-#
-#        # Formata corpo
-#        aplicar_estilo_zebra(ws, min_row=header_row + 1)
-#
-#        # Ajustes finais
-#        ajustar_largura_colunas(ws)
-#
-#        # Congela painéis
-#        ws.freeze_panes = f"A{header_row + 1}"
-#
-#        # Autofilter
-#        if ws.max_column >= 1 and ws.max_row >= header_row:
-#            last_col = get_column_letter(ws.max_column)
-#            ws.auto_filter.ref = f"A{header_row}:{last_col}{ws.max_row}"
-#
-#    except Exception as e:
-#        adicionar_log(f"⚠️ Erro em formatar_planilha_completa: {e}")
+def ajustar_largura_colunas_otimizado(ws, min_width=10, max_width=50, sample_size=1000):
+    """
+    Ajusta largura de colunas baseado em AMOSTRA dos dados (mais rápido).
 
+    Args:
+        ws: Worksheet do openpyxl
+        min_width: Largura mínima
+        max_width: Largura máxima
+        sample_size: Número de linhas a amostrar (padrão: 1000)
+    """
+    try:
+        num_rows = ws.max_row
+        num_cols = ws.max_column
+
+        if num_rows <= 1:
+            return
+
+        # Para planilhas grandes, amostra apenas N linhas
+        if num_rows > sample_size:
+            # Amostra: cabeçalho + primeiras 500 + últimas 500
+            sample_rows = [1] + list(range(2, min(502, num_rows))) + list(range(max(num_rows - 499, 502), num_rows + 1))
+            #adicionar_log(f"📏 Ajustando largura de {num_cols} colunas (amostra de {len(sample_rows)} linhas)")
+        else:
+            sample_rows = range(1, num_rows + 1)
+
+        # Calcula largura por coluna
+        for col_idx in range(1, num_cols + 1):
+            max_length = 0
+            column_letter = get_column_letter(col_idx)
+
+            for row_idx in sample_rows:
+                try:
+                    cell = ws.cell(row_idx, col_idx)
+                    if cell.value:
+                        cell_length = len(str(cell.value))
+                        max_length = max(max_length, cell_length)
+                except:
+                    pass
+
+            adjusted_width = max(min_width, min(max_length + 2, max_width))
+            ws.column_dimensions[column_letter].width = adjusted_width
+
+    except Exception as e:
+        adicionar_log(f"⚠️ Erro em ajustar_largura_colunas_otimizado: {e}")
+
+
+def auto_size_columns(sheet):
+    for column in sheet.columns:
+        max_length = 0
+        column_letter = column[0].column_letter
+        for cell in column:
+            try:
+                if cell.value is not None:
+                    # Converte para string para calcular o comprimento
+                    cell_value_str = str(cell.value)
+                    if len(cell_value_str) > max_length:
+                        max_length = len(cell_value_str)
+            except:
+                pass
+        adjusted_width = (max_length + 5)  # Adiciona um Padding
+        sheet.column_dimensions[column_letter].width = adjusted_width
 
 # =============================================================================
 # CRIAÇÃO DE ABAS ESPECIALIZADAS
 # =============================================================================
+
 
 def criar_aba_detalhada_ordenada(wb, sheet_name, data_map, origem='redis'):
     """
@@ -490,10 +572,10 @@ def criar_abas_por_periodo(wb, base_name, data_map, origem='redis', selected_per
         return {}
 
 
-
 # =============================================================================
 # CARREGAMENTO DE REGRAS DE HW
 # =============================================================================
+
 
 def carregar_regras_hw(path=None):
     """
@@ -566,117 +648,10 @@ def carregar_regras_hw(path=None):
     return regras
 
 
-
-
-
-
-
-
-# =============================================================================
-# FUNÇÕES ESPECÍFICAS PARA EVENTOS
-# =============================================================================
-
-def extrair_tipo_evento(proto_str):
-    """
-    Extrai o tipo de evento do campo 'proto'.
-
-    Exemplo: "tipo_evento: IGNICAO_ON rastreador..." → "IGNICAO_ON"
-
-    Args:
-        proto_str: String com dados do proto
-
-    Returns:
-        str: Nome do tipo de evento ou "DESCONHECIDO"
-    """
-    try:
-        match = re.search(r'tipo_evento:\s*(\w+)', proto_str)
-        if match:
-            return match.group(1)
-    except:
-        pass
-    return "DESCONHECIDO"
-
-
-def calcular_periodo_dias(start_datetime, end_datetime):
-    """
-    Calcula o número de dias entre duas datas.
-
-    Args:
-        start_datetime: String no formato "dd/MM/yyyy HH:mm:ss"
-        end_datetime: String no formato "dd/MM/yyyy HH:mm:ss"
-
-    Returns:
-        int: Número de dias ou 0 em caso de erro
-    """
-    try:
-        fmt = "%d/%m/%Y %H:%M:%S"
-        dt_start = datetime.strptime(start_datetime, fmt)
-        dt_end = datetime.strptime(end_datetime, fmt)
-        return (dt_end - dt_start).days
-    except:
-        return 0
-
-
-def formatar_cabecalho_customizado(ws, row_num, cor_hex="305496"):
-    """
-    Formata cabeçalho com cor customizada.
-
-    Args:
-        ws: Worksheet do openpyxl
-        row_num: Número da linha do cabeçalho
-        cor_hex: Cor em hexadecimal (sem #)
-    """
-    try:
-        bold_font = Font(bold=True, color="FFFFFF", size=11)
-        header_fill = PatternFill(start_color=cor_hex, end_color=cor_hex, fill_type="solid")
-        thin_border = Border(
-            left=Side(style="thin", color="FFFFFF"),
-            right=Side(style="thin", color="FFFFFF"),
-            top=Side(style="thin", color="FFFFFF"),
-            bottom=Side(style="thin", color="FFFFFF")
-        )
-
-        for cell in ws[row_num]:
-            if cell.value:
-                cell.font = bold_font
-                cell.fill = header_fill
-                cell.border = thin_border
-                cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-
-    except Exception as e:
-        adicionar_log(f"⚠️ Erro em formatar_cabecalho_customizado: {e}")
-
-
-def mesclar_e_formatar_celula(ws, range_str, texto, cor_fundo="D9E1F2", negrito=True):
-    """
-    Mescla células e aplica formatação.
-
-    Args:
-        ws: Worksheet
-        range_str: Range de células (ex: "A1:D1")
-        texto: Texto a inserir
-        cor_fundo: Cor de fundo em hex
-        negrito: Se True, aplica negrito
-    """
-    try:
-        ws.merge_cells(range_str)
-        cell = ws[range_str.split(':')[0]]
-        cell.value = texto
-        cell.fill = PatternFill(start_color=cor_fundo, end_color=cor_fundo, fill_type="solid")
-        cell.font = Font(bold=negrito, size=11)
-        cell.alignment = Alignment(horizontal="center", vertical="center")
-        cell.border = Border(
-            left=Side(style="thin"),
-            right=Side(style="thin"),
-            top=Side(style="thin"),
-            bottom=Side(style="thin")
-        )
-    except Exception as e:
-        adicionar_log(f"⚠️ Erro em mesclar_e_formatar_celula: {e}")
-
 # =============================================================================
 # FORMATAÇÃO OTIMIZADA PARA GRANDES VOLUMES
 # =============================================================================
+
 
 def formatar_planilha_modo_rapido(ws, header_row=1, cor_header="305496"):
     """
@@ -709,244 +684,19 @@ def formatar_planilha_modo_rapido(ws, header_row=1, cor_header="305496"):
         adicionar_log(f"⚠️ Erro em formatar_planilha_modo_rapido: {e}")
 
 
-def ajustar_largura_colunas_otimizado(ws, min_width=10, max_width=50, sample_size=1000):
-    """
-    Ajusta largura de colunas baseado em AMOSTRA dos dados (mais rápido).
-
-    Args:
-        ws: Worksheet do openpyxl
-        min_width: Largura mínima
-        max_width: Largura máxima
-        sample_size: Número de linhas a amostrar (padrão: 1000)
-    """
-    try:
-        num_rows = ws.max_row
-        num_cols = ws.max_column
-
-        if num_rows <= 1:
-            return
-
-        # Para planilhas grandes, amostra apenas N linhas
-        if num_rows > sample_size:
-            # Amostra: cabeçalho + primeiras 500 + últimas 500
-            sample_rows = [1] + list(range(2, min(502, num_rows))) + list(range(max(num_rows - 499, 502), num_rows + 1))
-            adicionar_log(f"📏 Ajustando largura de {num_cols} colunas (amostra de {len(sample_rows)} linhas)")
-        else:
-            sample_rows = range(1, num_rows + 1)
-
-        # Calcula largura por coluna
-        for col_idx in range(1, num_cols + 1):
-            max_length = 0
-            column_letter = get_column_letter(col_idx)
-
-            for row_idx in sample_rows:
-                try:
-                    cell = ws.cell(row_idx, col_idx)
-                    if cell.value:
-                        cell_length = len(str(cell.value))
-                        max_length = max(max_length, cell_length)
-                except:
-                    pass
-
-            adjusted_width = max(min_width, min(max_length + 2, max_width))
-            ws.column_dimensions[column_letter].width = adjusted_width
-
-    except Exception as e:
-        adicionar_log(f"⚠️ Erro em ajustar_largura_colunas_otimizado: {e}")
-
-
-#def criar_aba_seriais_sem_evento(wb, seriais_requisitados, eventos_encontrados, filtros_list):
-#    """
-#    Cria aba com seriais que não tiveram eventos dos filtros encontrados.
-#
-#    Args:
-#        wb: Workbook do openpyxl
-#        seriais_requisitados (list): Lista de todos os seriais requisitados
-#        eventos_encontrados (dict): {serial: {tipo_evento: dados}}
-#        filtros_list (list): Lista de nomes de eventos filtrados
-#
-#    Returns:
-#        Worksheet criado ou None
-#    """
-#    try:
-#        # Identifica seriais sem eventos
-#        seriais_sem_evento = []
-#
-#        for serial in seriais_requisitados:
-#            eventos_serial = eventos_encontrados.get(serial, {})
-#
-#            # Verifica se tem pelo menos um evento dos filtros
-#            tem_evento = any(filtro in eventos_serial for filtro in filtros_list)
-#
-#            if not tem_evento:
-#                # Monta linha com status de cada filtro
-#                linha = {"Serial": serial}
-#
-#                for filtro in filtros_list:
-#                    if filtro in eventos_serial and eventos_serial[filtro]['ultima_data']:
-#                        linha[filtro] = eventos_serial[filtro]['ultima_data'].strftime("%d/%m/%Y %H:%M:%S")
-#                    else:
-#                        linha[filtro] = "NÃO ENCONTRADO"
-#
-#                seriais_sem_evento.append(linha)
-#
-#        if not seriais_sem_evento:
-#            adicionar_log("ℹ️ Todos os seriais tiveram eventos encontrados")
-#            return None
-#
-#        # Cria aba
-#        ws = wb.create_sheet("Seriais_sem_evento")
-#
-#        # Cabeçalho
-#        headers = ["Serial"] + filtros_list
-#        ws.append(headers)
-#
-#        # Dados
-#        for item in seriais_sem_evento:
-#            row = [item.get("Serial", "")]
-#            for filtro in filtros_list:
-#                row.append(item.get(filtro, "NÃO ENCONTRADO"))
-#            ws.append(row)
-#
-#        # Formatação
-#        formatar_cabecalho_customizado(ws, 1, "C00000")  # Vermelho para destacar
-#        ajustar_largura_colunas_otimizado(ws, min_width=15, max_width=40)
-#        ws.freeze_panes = 'A2'
-#
-#        # Autofilter
-#        if ws.max_column >= 1 and ws.max_row >= 1:
-#            last_col = get_column_letter(ws.max_column)
-#            ws.auto_filter.ref = f"A1:{last_col}{ws.max_row}"
-#
-#        adicionar_log(f"✅ Aba 'Seriais_sem_evento' criada: {len(seriais_sem_evento)} seriais")
-#        return ws
-#
-#    except Exception as e:
-#        adicionar_log(f"❌ Erro ao criar aba de seriais sem evento: {e}")
-#        adicionar_log(traceback.format_exc())
-#        return None
-#    
-
-
 # =============================================================================
-# PARSING ESPECÍFICO PARA EVENTOS (PROTO)
+# FORMATAÇÃO OTIMIZADA PARA CONSULTAS MENORES
 # =============================================================================
 
-def parse_proto_eventos(proto_str):
-    """
-    Parser especializado para o campo 'proto' de eventos.
 
-    Ignora HTML inicial e processa apenas a partir de 'tipo_evento:'.
-    Converte estrutura hierárquica em dicionário achatado.
-
-    Args:
-        proto_str: String com dados do proto (incluindo HTML)
-
-    Returns:
-        dict: Dicionário achatado com todas as chaves
-    """
-    try:
-        # Remove HTML e pega apenas a partir de 'tipo_evento:'
-        if 'tipo_evento:' in proto_str:
-            proto_str = proto_str[proto_str.index('tipo_evento:'):]
-        else:
-            adicionar_log("⚠️ Campo 'tipo_evento:' não encontrado no proto")
-            return {}
-
-        # Remove tags HTML residuais
-        proto_str = re.sub(r'<[^>]*>', '', proto_str)
-        proto_str = re.sub(r'&[a-z]+;', '', proto_str)  # Remove entidades HTML
-
-        # Normaliza quebras de linha
-        proto_str = proto_str.replace("\r", "")
-        proto_str = re.sub(r"\n+", "\n", proto_str.strip())
-
-        dados = {}
-        prefixos = []
-
-        for linha in proto_str.splitlines():
-            linha = linha.strip()
-            if not linha:
-                continue
-
-            # Fecha bloco hierárquico
-            if linha == "}":
-                if prefixos:
-                    prefixos.pop()
-                continue
-
-            # Abre bloco hierárquico
-            if linha.endswith("{"):
-                prefixos.append(linha[:-1].strip())
-                continue
-
-            # Processa pares chave:valor
-            if ":" in linha:
-                try:
-                    chave, valor = linha.split(":", 1)
-                    chave = chave.strip()
-                    valor = valor.strip().strip('"')
-
-                    # Conversões automáticas
-                    if isinstance(valor, str):
-                        # Booleanos
-                        if valor.lower() in ("true", "false"):
-                            valor = valor.lower() == "true"
-                        # Números
-                        elif re.match(r"^-?\d+(\.\d+)?$", valor):
-                            valor = float(valor) if "." in valor else int(valor)
-
-                    # Monta chave final com prefixos
-                    chave_final = "_".join(prefixos + [chave]) if prefixos else chave
-                    dados[chave_final] = valor
-
-                except Exception as e:
-                    adicionar_log(f"⚠️ parse_proto_eventos: erro na linha '{linha[:50]}...': {e}")
-                    continue
-
-        return dados
-
-    except Exception as e:
-        adicionar_log(f"❌ Falha crítica em parse_proto_eventos(): {e}")
-        adicionar_log(traceback.format_exc())
-        return {}
-
-
-#def extrair_tipo_evento(proto_str):
-#    """
-#    Extrai o tipo de evento do campo 'proto'.
-#
-#    Exemplo: "tipo_evento: IGNICAO_ON rastreador..." → "IGNICAO_ON"
-#
-#    Args:
-#        proto_str: String com dados do proto
-#
-#    Returns:
-#        str: Nome do tipo de evento ou "DESCONHECIDO"
-#    """
-#    try:
-#        # Procura após 'tipo_evento:'
-#        match = re.search(r'tipo_evento:\s*(\w+)', proto_str)
-#        if match:
-#            return match.group(1)
-#    except:
-#        pass
-#    return "DESCONHECIDO"
-#
-#
-
-# =============================================================================
-# FORMATAÇÃO OTIMIZADA (COM TOGGLE)
-# =============================================================================
-
-def formatar_planilha_completa(ws, header_row=1, aplicar_zebra=False, ajustar_colunas=True):
+def formatar_planilha_completa(ws, header_row=1, aplicar_zebra=True, ajustar_colunas=True):
     """
     Aplica formatação completa (cabeçalho + corpo + ajustes) a uma planilha.
 
     Args:
         ws: Worksheet do openpyxl
         header_row: Linha do cabeçalho (padrão: 1)
-        aplicar_zebra: Se True, aplica estilo zebrado (padrão: False)
+        aplicar_zebra: Se True, aplica estilo zebrado (padrão: True)
         ajustar_colunas: Se True, ajusta largura das colunas (padrão: True)
     """
     try:
@@ -975,42 +725,3 @@ def formatar_planilha_completa(ws, header_row=1, aplicar_zebra=False, ajustar_co
     except Exception as e:
         adicionar_log(f"⚠️ Erro em formatar_planilha_completa: {e}")
 
-
-def criar_aba_seriais_sem_evento(wb, seriais_sem_evento, filtros_list):
-    """
-    Cria aba "Seriais_sem_evento" com seriais que não tiveram eventos encontrados.
-
-    Args:
-        wb: Workbook do openpyxl
-        seriais_sem_evento: list de seriais (strings)
-        filtros_list: list de nomes de eventos filtrados
-
-    Returns:
-        Worksheet criado ou None
-    """
-    if not seriais_sem_evento:
-        adicionar_log("ℹ️ Nenhum serial sem evento para criar aba")
-        return None
-
-    try:
-        ws = wb.create_sheet("Seriais_sem_evento", 1)  # Posição 1 (segunda aba)
-
-        # Cabeçalho: Seriais + cada filtro
-        headers = ["Seriais"] + filtros_list
-        ws.append(headers)
-
-        # Dados: cada serial + "NÃO ENCONTRADO" para cada filtro
-        for serial in seriais_sem_evento:
-            row = [serial] + ["NÃO ENCONTRADO"] * len(filtros_list)
-            ws.append(row)
-
-        # Formata (sem zebra, com ajuste de colunas)
-        formatar_planilha_completa(ws, header_row=1, aplicar_zebra=False, ajustar_colunas=True)
-
-        adicionar_log(f"✅ Aba 'Seriais_sem_evento' criada com {len(seriais_sem_evento)} seriais")
-        return ws
-
-    except Exception as e:
-        adicionar_log(f"❌ Erro ao criar aba Seriais_sem_evento: {e}")
-        adicionar_log(traceback.format_exc())
-        return None

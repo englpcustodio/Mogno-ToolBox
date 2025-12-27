@@ -114,19 +114,12 @@ def epoch_to_datetime(epoch_seconds):
         adicionar_log(f"⚠️ Erro ao converter epoch para datetime: {e}")
         return None
 
-# Ajusta automaticamente a largura das colunas de uma planilha
-def auto_size_columns(sheet):
-    for column in sheet.columns:
-        max_length = 0
-        column_letter = column[0].column_letter
-        for cell in column:
-            try:
-                if cell.value is not None:
-                    # Converte para string para calcular o comprimento
-                    cell_value_str = str(cell.value)
-                    if len(cell_value_str) > max_length:
-                        max_length = len(cell_value_str)
-            except:
-                pass
-        adjusted_width = (max_length + 5)  # Adiciona um Padding
-        sheet.column_dimensions[column_letter].width = adjusted_width
+def calcular_periodo_dias(start_datetime, end_datetime):
+    """Calcula dias entre duas datas (dd/MM/yyyy HH:mm:ss)."""
+    try:
+        fmt = "%d/%m/%Y %H:%M:%S"
+        dt_start = datetime.strptime(start_datetime, fmt)
+        dt_end = datetime.strptime(end_datetime, fmt)
+        return (dt_end - dt_start).days
+    except:
+        return 0

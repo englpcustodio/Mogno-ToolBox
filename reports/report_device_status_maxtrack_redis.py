@@ -5,7 +5,7 @@ import pandas as pd
 from datetime import datetime
 from google.protobuf.json_format import MessageToDict
 from openpyxl import load_workbook
-from utils.helpers import auto_size_columns
+from reports.reports_utils import auto_size_columns
 from utils.logger import adicionar_log
 import traceback
 
@@ -33,7 +33,6 @@ def flatten_dict(data, parent_key=''):
 
     return items
 
-
 # -------------------------------------------------------------------------
 # API para o ReportHandler
 # -------------------------------------------------------------------------
@@ -50,7 +49,6 @@ def gerar_relatorio(serials, resultados, output_path):
         adicionar_log(traceback.format_exc())
         return None
 
-
 # -------------------------------------------------------------------------
 # Função principal
 # -------------------------------------------------------------------------
@@ -58,10 +56,19 @@ def relatorio_status_excel(seriais, dados_status, output_path):
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
-    registros_inicial = []
+    registros_status_mxt = []
     registros_detalhados = []
+    seriais_sem_status = []
 
     adicionar_log("🔍 Iniciando processamento serial por serial...")
+
+    # Cabeçalhos fixos para a aba status_device_MXT
+    colunas_fixas = [
+        "Número de Série", "imei", "FT_FIRMWARE_APP", "FT_FIRMWARE_MODEM",
+        "FT_BOOTLOADER", "FT_PROFILE", "FT_GEO_LIBRARY", "FT_CAN_LIBRARY",
+        "FT_ACTIONS2", "FT_USERS", "FT_MAXIO_CONFIG", "FT_LORA_ACTIONS",
+        "primaryICCID", "macBT", "lastResetReason", "loraID"
+    ]
 
     for serial in seriais:
 
@@ -72,14 +79,12 @@ def relatorio_status_excel(seriais, dados_status, output_path):
             )
 
             # ---------------------------------------------------------
-            # Sem dados
+            # Sem dados → vai para aba separada
             # ---------------------------------------------------------
             if not status_data or not status_data.get("Dados"):
                 adicionar_log(f"[{serial}] ⚠️ Sem dados de status no Redis.")
-                registros_inicial.append({
-                    "Seriais": serial,
-                    "Dados de Status": "Não possui informações de Status"
-                })
+                seriais_sem_status.append({"Número de Série": serial})
+
                 registros_detalhados.append({
                     "Número de Série": serial,
                     "Status": "Não possui informações de Status"
@@ -130,11 +135,38 @@ def relatorio_status_excel(seriais, dados_status, output_path):
                 adicionar_log(f"[{serial}] ❓ Tipo desconhecido: {type(dados_brutos)}")
                 parsed_data = {"raw_unknown": str(dados_brutos)}
 
-            # Registro simples
-            registros_inicial.append({
-                "Seriais": serial,
-                "Dados de Status": json.dumps(parsed_data, ensure_ascii=False)
-            })
+            # ---------------------------------------------------------
+            # Construção da linha formatada para status_device_MXT
+            # ---------------------------------------------------------
+            linha_status = {c: "" for c in colunas_fixas}
+            linha_status["Número de Série"] = serial
+
+            # imei
+            linha_status["imei"] = (
+                parsed_data.get("identificationPack", {}).get("imei", "")
+            )
+
+            # Campos diretos
+            for chave in ["primaryICCID", "macBT", "lastResetReason", "loraID"]:
+                linha_status[chave] = parsed_data.get(chave, "")
+
+            # Arquivos FT_*
+            files = parsed_data.get("files", [])
+
+            for file in files:
+                file_type = file.get("fileType", "")
+                if file_type in linha_status:
+
+                    # Caso major/minor/patch → firmware 3.1.22
+                    if all(k in file for k in ("major", "minor", "patch")):
+                        linha_status[file_type] = f"{file['major']}.{file['minor']}.{file['patch']}"
+
+                    # Caso tenha fileID
+                    elif "fileID" in file:
+                        linha_status[file_type] = file["fileID"]
+
+            # Adiciona à aba status_device_MXT (somente se tem dados)
+            registros_status_mxt.append(linha_status)
 
             # Registro detalhado (achatar)
             dados_achatados = flatten_dict(parsed_data)
@@ -147,10 +179,9 @@ def relatorio_status_excel(seriais, dados_status, output_path):
             adicionar_log(f"⚠️ Erro processando {serial}: {e}")
             adicionar_log(traceback.format_exc())
 
-            registros_inicial.append({
-                "Seriais": serial,
-                "Dados de Status": f"Erro ao converter: {str(e)}"
-            })
+            # Serial com erro vai para sem_status
+            seriais_sem_status.append({"Número de Série": serial})
+
             registros_detalhados.append({
                 "Número de Série": serial,
                 "Erro": f"Erro ao converter: {str(e)}"
@@ -159,11 +190,9 @@ def relatorio_status_excel(seriais, dados_status, output_path):
     # ---------------------------------------------------------------------
     # DataFrames
     # ---------------------------------------------------------------------
-    df_inicial = pd.DataFrame(registros_inicial)
+    df_status_mxt = pd.DataFrame(registros_status_mxt)
+    df_sem_status = pd.DataFrame(seriais_sem_status)
     df_detalhado = pd.DataFrame(registros_detalhados)
-
-    # Identifica seriais sem dados
-    df_sem_status = df_inicial[df_inicial["Dados de Status"] == "Não possui informações de Status"].copy()
 
     # Filtra df_detalhado para remover entradas sem dados
     df_detalhado_limpo = df_detalhado[
@@ -182,14 +211,17 @@ def relatorio_status_excel(seriais, dados_status, output_path):
     # ---------------------------------------------------------------------
     with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
 
-        # Aba 1
-        df_inicial.to_excel(writer, sheet_name="status_device_MXT", index=False)
+        # Aba 1 — status_device_MXT com colunas fixas formatadas (SOMENTE com dados)
+        if not df_status_mxt.empty:
+            df_status_mxt.to_excel(writer, sheet_name="status_device_MXT", index=False)
 
-        # Aba 2 — nova, conforme solicitado
-        df_sem_status.to_excel(writer, sheet_name="sem_status", index=False)
+        # Aba 2 — seriais sem status
+        if not df_sem_status.empty:
+            df_sem_status.to_excel(writer, sheet_name="sem_status", index=False)
 
-        # Aba 3 — somente com conteúdo válido
-        df_detalhado_limpo.to_excel(writer, sheet_name="status_device_MXT_detalhado", index=False)
+        # Aba 3 — detalhado com conteúdo válido
+        if not df_detalhado_limpo.empty:
+            df_detalhado_limpo.to_excel(writer, sheet_name="status_device_MXT_detalhado", index=False)
 
     # Ajuste das colunas
     book = load_workbook(output_path)

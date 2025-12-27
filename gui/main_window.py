@@ -219,10 +219,10 @@ class MognoMainWindow(QMainWindow):
         adicionar_log("📁 Gerando relatórios...")
         self.report_handler.generate_reports(options)  # ← Chama o método unificado
 
-    # ✅ NOVO: Handler para geração de relatório de eventos
+    # Handler para geração de relatório de eventos
     def handle_events_report(self, data):
         """Gera relatório de eventos."""
-        adicionar_log("📊 Gerando relatório de eventos...")
+        #adicionar_log("📊 Gerando relatório de eventos...")
         self.report_handler.generate_events_report(data)
 
 
@@ -252,7 +252,7 @@ class MognoMainWindow(QMainWindow):
 
     def _mark_request_done(self, name: str):
         """Marca o término de uma requisição."""
-        adicionar_log(f"✅ Execução concluída para [{name}].")
+        #adicionar_log(f"✅ Execução concluída para [{name}].")
         self.app_state.set("request_in_progress", False)
 
     def closeEvent(self, event):
