@@ -267,7 +267,7 @@ class EquipmentTab(QWidget):
         layout.addSpacing(15)
 
         # Checkbox principal de consumo de dados
-        self.chk_data_consumption = QCheckBox("📊 Consumo de Dados")
+        self.chk_data_consumption = QCheckBox("📊 Tráfego de Dados no Servidor")
         self.chk_data_consumption.setFont(QFont("Segoe UI", 10, QFont.Bold))
         layout.addWidget(self.chk_data_consumption)
 

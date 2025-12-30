@@ -6,11 +6,14 @@ Mantém formatações e layouts específicos para cada fonte.
 
 Atualizado para:
 - Total de Seriais Válidos
-- Valor Absoluto (%) = Encontrado / Total Inseridos * 100
+- Encontrada/Esperada [%] = Encontrado / Total Esperado * 100
+- Posição Hoje, Posição 1-7 dias, Posição 8-15 dias, Posição +16 dias
 - Separação de Data e Hora (GSM, LoRaWAN, P2P)
 - Ordenação por prioridade: GSM (mais recente) -> P2P -> LoRaWAN
 - Contagens por período baseadas nas abas por período geradas
 - Ordenação da aba Equip_sem_posicao do menor para o maior
+- NOVO: Aba "Resumo_Ultima_posicao" limpa (sem bloco de Modelo de HW)
+- NOVO: Aba "Resumo_Modelo_HW" obrigatória (segunda posição)
 """
 
 import os
@@ -18,8 +21,10 @@ import traceback
 from datetime import datetime
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
+from openpyxl.styles import Font, Alignment, PatternFill
 
 from core.app_state import AppState
+from utils.logger import adicionar_log
 from reports.reports_utils import (
     parse_dados_redis,
     carregar_regras_hw,
@@ -32,7 +37,6 @@ from reports.reports_utils import (
     criar_abas_por_periodo
 )
 
-from utils.logger import adicionar_log
 
 # =============================================================================
 # GERAÇÃO ESPECÍFICA PARA REDIS
@@ -57,7 +61,7 @@ def gerar_relatorio_redis(serials_list, resultados, output_path, selected_period
 
         wb = Workbook()
         ws_main = wb.active
-        ws_main.title = "Resumo_Tipos"
+        ws_main.title = "Resumo_Ultima_posicao"
 
         # Estruturas de dados
         # contagem por serial (único): quantos seriais trouxeram posição por tecnologia
@@ -261,15 +265,16 @@ def gerar_relatorio_redis(serials_list, resultados, output_path, selected_period
                 adicionar_log("ℹ️ P2P sem dados")
 
         # =====================================================================
-        # ABA RESUMO_TIPOS - Agora com Totais, Válidos, Valores relativos e absolutos,
-        # e colunas de contagem por período
+        # ABA RESUMO_ULTIMA_POSICAO
         # =====================================================================
 
         # Funções utilitárias
         def calc_rel(found, expect):
+            """Encontrada/Esperada [%]"""
             return (found / expect * 100) if expect else 0.0
 
         def calc_abs(found, total):
+            """Posição Hoje [%] ou similar"""
             return (found / total * 100) if total else 0.0
 
         # Contadores únicos por tecnologia (encontrado)
@@ -288,24 +293,26 @@ def gerar_relatorio_redis(serials_list, resultados, output_path, selected_period
         # Total válidos = inseridos - sem comunicação
         total_validos = total_seriais - sem_comunic
 
-        # Cabeçalho inicial e totais
+        # =====================================================================
+        # BLOCO 1: TOTAIS (linhas 1-3)
+        # =====================================================================
+
         ws_main.append(["Total de Seriais Inseridos", total_seriais])
-        ws_main.append(["Total de Seriais Válidos", total_validos])
+        ws_main.append(["Total de Seriais Válidos", total_validos, f"{(total_validos/total_seriais*100):.1f}%" if total_seriais else "0%"])
+        ws_main.append(["Sem comunicação", sem_comunic, f"{(sem_comunic/total_seriais*100):.1f}%" if total_seriais else "0%"])
 
-        if not REGRAS_HW:
-            ws_main.append(["⚠️ Tabela de modelo de HW não encontrada. Validação comprometida."])
+        # Formata bloco de totais (negrito)
+        for row_idx in range(1, 4):
+            for col_idx in range(1, 4):
+                cell = ws_main.cell(row=row_idx, column=col_idx)
+                cell.font = Font(bold=True)
 
+        # Linha em branco
         ws_main.append([])
 
-        # Cabeçalhos da tabela
-        # Primeiro linha com títulos fixos
-        header_row_1 = [
-            "Tipo de Comunicação", "Encontrado", "Valor Esperado", "Valor Relativo (%)", "Valor Absoluto (%)"
-        ]
-        # Em seguida, colunas de períodos (dinâmicas conforme 'periods')
-        period_headers = ["Período " + p for p in periods]
-        ws_main.append(header_row_1 + period_headers)
-        main_header_row_index = ws_main.max_row
+        # =====================================================================
+        # BLOCO 2: TIPO DE COMUNICAÇÃO (linhas 5+)
+        # =====================================================================
 
         # Função para contar quantos seriais há em uma aba específica criada (se existir)
         def count_entries_in_sheet(wb_obj, sheet_name):
@@ -320,10 +327,7 @@ def gerar_relatorio_redis(serials_list, resultados, output_path, selected_period
             return count
 
         # Mapeia os nomes das abas de período que provavelmente foram criadas por criar_abas_por_periodo
-        # Ex.: "GSM_Hoje", "GSM_1-7", "GSM_8-15", "GSM_+16"
         def build_period_sheet_name(prefix, period_label):
-            # mantemos o label tal como vem (ex: "+16")
-            # remove espaços e usa underline para consistência
             label = str(period_label).strip()
             return f"{prefix}_{label}"
 
@@ -336,52 +340,59 @@ def gerar_relatorio_redis(serials_list, resultados, output_path, selected_period
                 counts.append(cnt)
             return counts
 
-        # Prepara linhas para cada tecnologia
-        # GSM
+        # Prepara contagens por período
         gsm_counts_by_period = get_period_counts_for_prefix("GSM")
         lorawan_counts_by_period = get_period_counts_for_prefix("LoRaWAN")
         p2p_counts_by_period = get_period_counts_for_prefix("P2P")
 
-        ws_main.append([
-            "GSM",
-            contagem["gsm"],
-            expected["gsm"],
-            f"{calc_rel(contagem['gsm'], expected['gsm']):.1f}%",
-            f"{calc_abs(contagem['gsm'], total_seriais):.1f}%"
-        ] + gsm_counts_by_period)
+        # Cabeçalho do bloco de comunicação
+        header_comm = ["Tipo de Comunicação", "Quantidade Encontrada", "Quantidade Esperada", "Encontrada/Esperada [%]"]
 
-        ws_main.append([
-            "LoRaWAN",
-            contagem["lorawan"],
-            expected["lorawan"],
-            f"{calc_rel(contagem['lorawan'], expected['lorawan']):.1f}%",
-            f"{calc_abs(contagem['lorawan'], total_seriais):.1f}%"
-        ] + lorawan_counts_by_period)
+        # Adiciona cabeçalhos de períodos
+        for p in periods:
+            header_comm.append(f"Posição {p}")
+            header_comm.append(f"Posição {p} [%]")
 
-        ws_main.append([
-            "P2P",
-            contagem["p2p"],
-            expected["p2p"],
-            f"{calc_rel(contagem['p2p'], expected['p2p']):.1f}%",
-            f"{calc_abs(contagem['p2p'], total_seriais):.1f}%"
-        ] + p2p_counts_by_period)
+        ws_main.append(header_comm)
+        header_comm_row = ws_main.max_row
 
-        ws_main.append([
-            "Sem comunicação",
-            sem_comunic,
-            "-",
-            "-",
-            f"{calc_abs(sem_comunic, total_seriais):.1f}%"
-        ] + (["-"] * len(periods)))
+        # Formata cabeçalho de comunicação (negrito + centralizado)
+        for col_idx in range(1, len(header_comm) + 1):
+            cell = ws_main.cell(row=header_comm_row, column=col_idx)
+            cell.font = Font(bold=True)
+            cell.alignment = Alignment(horizontal='center', vertical='center')
 
+        # Dados de comunicação
+        # GSM
+        gsm_encontrada_esperada = calc_rel(contagem["gsm"], expected["gsm"])
+        gsm_row = ["GSM", contagem["gsm"], expected["gsm"], f"{gsm_encontrada_esperada:.1f}%"]
+        for idx, p in enumerate(periods):
+            gsm_row.append(gsm_counts_by_period[idx])
+            gsm_row.append(f"{calc_abs(gsm_counts_by_period[idx], contagem['gsm']):.2f}%" if contagem["gsm"] > 0 else "0%")
+        ws_main.append(gsm_row)
+
+        # LoRaWAN
+        lorawan_encontrada_esperada = calc_rel(contagem["lorawan"], expected["lorawan"])
+        lorawan_row = ["LoRaWAN", contagem["lorawan"], expected["lorawan"], f"{lorawan_encontrada_esperada:.1f}%"]
+        for idx, p in enumerate(periods):
+            lorawan_row.append(lorawan_counts_by_period[idx])
+            lorawan_row.append(f"{calc_abs(lorawan_counts_by_period[idx], contagem['lorawan']):.2f}%" if contagem["lorawan"] > 0 else "0%")
+        ws_main.append(lorawan_row)
+
+        # P2P
+        p2p_encontrada_esperada = calc_rel(contagem["p2p"], expected["p2p"])
+        p2p_row = ["P2P", contagem["p2p"], expected["p2p"], f"{p2p_encontrada_esperada:.1f}%"]
+        for idx, p in enumerate(periods):
+            p2p_row.append(p2p_counts_by_period[idx])
+            p2p_row.append(f"{calc_abs(p2p_counts_by_period[idx], contagem['p2p']):.2f}%" if contagem["p2p"] > 0 else "0%")
+        ws_main.append(p2p_row)
+
+        # Linha em branco
         ws_main.append([])
 
-        # Contagem por modelo
-        ws_main.append(["Modelo de HW", "Quantidade"])
-        for modelo in sorted(modelo_counts.keys(), key=lambda s: str(s).lower()):
-            ws_main.append([modelo, modelo_counts[modelo]])
-
-        ws_main.append([])
+        # =====================================================================
+        # TABELA PRINCIPAL DE SERIAIS
+        # =====================================================================
 
         # Tabela principal: cabeçalhos com Data/Hora separados
         headers = [
@@ -439,17 +450,121 @@ def gerar_relatorio_redis(serials_list, resultados, output_path, selected_period
             ws_main.append(row)
 
         # Formata aba principal usando funções centralizadas
+        # Formata cabeçalho usando função do report_utils
         formatar_cabecalho(ws_main, main_header_row)
-        aplicar_estilo_zebra(ws_main, main_header_row + 1)
-        ajustar_largura_colunas(ws_main)
+
+        # Aplica zebra apenas na tabela principal (a partir de main_header_row + 1)
+        #aplicar_estilo_zebra(ws_main, main_header_row + 1)
+
+        # Congela a linha do cabeçalho
         ws_main.freeze_panes = f"A{main_header_row + 1}"
 
+        # Aplica filtro automático
         if ws_main.max_column >= 1:
             last_col = get_column_letter(ws_main.max_column)
             ws_main.auto_filter.ref = f"A{main_header_row}:{last_col}{ws_main.max_row}"
 
+        # Ajusta largura das colunas
+        ajustar_largura_colunas(ws_main)
+
         # =====================================================================
-        # ABA EQUIP_SEM_POSICAO
+        # ABA RESUMO_MODELO_HW (NOVA - SEGUNDA POSIÇÃO)
+        # =====================================================================
+
+        ws_modelo = wb.create_sheet("Resumo_Modelo_HW")
+
+        # Função para contar quantos seriais de um modelo específico estão em uma aba de período
+        def count_model_in_period_sheet(wb_obj, sheet_name, modelo_target):
+            """
+            Conta quantos seriais do modelo especificado aparecem na aba de período.
+            """
+            if sheet_name not in wb_obj.sheetnames:
+                return 0
+
+            ws = wb_obj[sheet_name]
+            count = 0
+
+            # Procura na primeira coluna (Serial), a partir da linha 2
+            for row_idx in range(2, ws.max_row + 1):
+                serial_cell = ws.cell(row=row_idx, column=1).value
+                if serial_cell and serial_cell in serial_data:
+                    modelo_serial = serial_data[serial_cell].get("Modelo de HW", "N/A")
+                    if modelo_serial == modelo_target:
+                        count += 1
+
+            return count
+
+        # Cabeçalho do bloco de modelo
+        header_modelo = ["Modelo de HW", "Quantidade encontrada", "Quantidade Encontrada [%]"]
+
+        # Adiciona cabeçalhos de períodos baseados nos tipos de comunicação selecionados
+        for comm_type in comm_types:
+            for p in periods:
+                header_modelo.append(f"Posição {comm_type} {p}")
+                header_modelo.append(f"Posição {comm_type} {p} [%]")
+
+        ws_modelo.append(header_modelo)
+        header_modelo_row = ws_modelo.max_row
+
+        # Dados de modelo
+        for modelo in sorted(modelo_counts.keys(), key=lambda s: str(s).lower()):
+            modelo_total = modelo_counts[modelo]
+            modelo_pct = (modelo_total / total_seriais * 100) if total_seriais else 0
+
+            modelo_row = [modelo, modelo_total, f"{modelo_pct:.2f}%"]
+
+            # Para cada tipo de comunicação selecionado
+            for comm_type in comm_types:
+                # Mapeia tipo para prefixo de aba
+                if comm_type == "GSM":
+                    prefix = "GSM"
+                elif comm_type == "LoRaWAN":
+                    prefix = "LoRaWAN"
+                elif comm_type == "P2P":
+                    prefix = "P2P"
+                else:
+                    continue
+
+                # Para cada período, conta quantos seriais deste modelo estão naquele período
+                for p in periods:
+                    sheet_name = build_period_sheet_name(prefix, p)
+                    periodo_count = count_model_in_period_sheet(wb, sheet_name, modelo)
+                    periodo_pct = (periodo_count / modelo_total * 100) if modelo_total > 0 else 0
+
+                    modelo_row.append(periodo_count)
+                    modelo_row.append(f"{periodo_pct:.2f}%")
+
+            ws_modelo.append(modelo_row)
+
+        # Formata aba de modelo usando funções centralizadas
+        # Formata cabeçalho usando função do report_utils
+        formatar_cabecalho(ws_modelo, header_modelo_row)
+
+        # Aplica zebra a partir da linha após o cabeçalho
+        #aplicar_estilo_zebra(ws_modelo, header_modelo_row + 1)
+
+        # Congela APENAS a primeira coluna (coluna A) para rolagem horizontal
+        ws_modelo.freeze_panes = "B1"
+
+        # Aplica filtro automático
+        if ws_modelo.max_column >= 1:
+            last_col = get_column_letter(ws_modelo.max_column)
+            ws_modelo.auto_filter.ref = f"A{header_modelo_row}:{last_col}{ws_modelo.max_row}"
+
+        # Ajusta largura das colunas
+        ajustar_largura_colunas(ws_modelo)
+
+        # Reposiciona a aba Resumo_Modelo_HW para segunda posição
+        try:
+            if ws_modelo in wb._sheets:
+                wb._sheets.remove(ws_modelo)
+                wb._sheets.insert(1, ws_modelo)
+        except Exception:
+            pass
+
+
+        # =====================================================================
+        # ABA EQUIP_SEM_POSICAO (TERCEIRA POSIÇÃO)
         # =====================================================================
 
         ws_sem = wb.create_sheet("Equip_sem_posicao")
@@ -476,14 +591,12 @@ def gerar_relatorio_redis(serials_list, resultados, output_path, selected_period
         # Formata usando função centralizada
         formatar_planilha_completa(ws_sem)
 
-        # Reposiciona a aba sem_posicao para segunda posição
-        # garantindo que ela exista na lista de sheets
+        # Reposiciona a aba sem_posicao para terceira posição
         try:
             if ws_sem in wb._sheets:
                 wb._sheets.remove(ws_sem)
-                wb._sheets.insert(1, ws_sem)
+                wb._sheets.insert(2, ws_sem)
         except Exception:
-            # fallback: ignore se falhar
             pass
 
         # =====================================================================
@@ -500,7 +613,6 @@ def gerar_relatorio_redis(serials_list, resultados, output_path, selected_period
         adicionar_log(f"❌ Erro em gerar_relatorio_redis: {e}")
         adicionar_log(traceback.format_exc())
         return None
-
 
 # =============================================================================
 # GERAÇÃO ESPECÍFICA PARA API
@@ -574,7 +686,6 @@ def gerar_relatorio_api(serials, resultados, output_path):
         adicionar_log(traceback.format_exc())
         return None
 
-
 # =============================================================================
 # FUNÇÃO PRINCIPAL UNIFICADA (INTERFACE PÚBLICA)
 # =============================================================================
@@ -612,4 +723,3 @@ def gerar_relatorio(serials, resultados, output_path, selected_periods=None, ori
         adicionar_log(f"❌ Erro crítico em gerar_relatorio: {e}")
         adicionar_log(traceback.format_exc())
         return None
-# teste

@@ -318,7 +318,7 @@ def _criar_aba_resumo(wb, resumo_data, eventos_parseados, serials, start_datetim
         # ========== LINHA 5: Período de Avaliação ==========
         dias = calcular_periodo_dias(start_datetime, end_datetime)
         ws.append(["Período de Avaliação", start_datetime, end_datetime, f"{dias} dias"])
-
+        
         # ========== LINHA 6: Em branco ==========
         ws.append([])
 
@@ -350,7 +350,8 @@ def _criar_aba_resumo(wb, resumo_data, eventos_parseados, serials, start_datetim
         # ========== CABEÇALHO DA TABELA PRINCIPAL ==========
         headers_tabela = ["Serial", "Modelo de Dispositivo"]
         for tipo in tipos_eventos_resumo:
-            headers_tabela.extend([tipo, f"Quantidade_{tipo}"])
+            #headers_tabela.extend([tipo, f"Quantidade_{tipo}"])
+            headers_tabela.extend([tipo, "Quantidade"])
         ws.append(headers_tabela)
 
         linha_cabecalho = ws.max_row
@@ -487,8 +488,12 @@ def gerar_relatorio(
     start_datetime=None,
     end_datetime=None,
     filtros_str="",
-    modo_rapido=True
+    modo_rapido=True,
+    selected_sheets=None,  # ✅ NOVO
+    include_seriais_sem_evento=True,  # ✅ NOVO
+    include_event_types=None  # ✅ NOVO
 ):
+
     """
     Gera relatório Excel completo de eventos.
 
@@ -533,19 +538,34 @@ def gerar_relatorio(
         wb = Workbook()
         wb.remove(wb.active)
 
-        # ========== 5. CRIA ABA RESUMO (com formatação customizada interna) ==========
-        # adiciona 'serials' como parâmetro
-        _criar_aba_resumo(wb, resumo_data, eventos_parseados, serials, start_datetime, end_datetime, filtros_list)
+        # ========== 5. INICIALIZA CONFIGURAÇÃO DE ABAS ==========
+        if selected_sheets is None:
+            selected_sheets = ["Resumo_Eventos"]
+        if include_event_types is None:
+            include_event_types = []
 
-        # ========== 6. CRIA ABA SERIAIS SEM EVENTO ==========
+        adicionar_log(f"📋 Gerando abas: {selected_sheets}")
+
+        # ========== 6. CRIA ABA RESUMO (SEMPRE GERADA) ==========
+        if "Resumo_Eventos" in selected_sheets:
+            _criar_aba_resumo(wb, resumo_data, eventos_parseados, serials, start_datetime, end_datetime, filtros_list)
+
+        # ========== 7. CRIA ABA SERIAIS SEM EVENTO (SE SELECIONADA) ==========
         seriais_sem_evento = sorted(set(serials) - seriais_com_eventos)
-        if seriais_sem_evento:
+        if include_seriais_sem_evento and seriais_sem_evento:
             criar_aba_seriais_sem_evento(wb, seriais_sem_evento, filtros_list)
 
-        # ========== 7. CRIA ABAS DETALHADAS ==========
-        _criar_abas_detalhadas(wb, eventos_parseados, tipos_eventos)
+        # ========== 8. CRIA ABAS DETALHADAS (APENAS TIPOS SELECIONADOS) ==========
+        if include_event_types:
+            # Filtra apenas os tipos selecionados pelo usuário
+            tipos_a_gerar = [t for t in tipos_eventos if t in include_event_types]
+            adicionar_log(f"📊 Gerando abas de tipos de eventos: {tipos_a_gerar}")
+            _criar_abas_detalhadas(wb, eventos_parseados, tipos_a_gerar)
+        else:
+            adicionar_log("ℹ️ Nenhuma aba de tipo de evento será gerada (usuário não selecionou)")
 
-        # ========== 8. FORMATAÇÃO FINAL (EXCETO RESUMO_EVENTOS) ==========
+
+        # ========== 9. FORMATAÇÃO FINAL (EXCETO RESUMO_EVENTOS) ==========
         # pula a aba "Resumo_Eventos" para não interferir na formatação customizada
         for ws in wb.worksheets:
             if ws.title == "Resumo_Eventos":
@@ -557,7 +577,8 @@ def gerar_relatorio(
             else:
                 formatar_planilha_completa(ws)
 
-        # ========== 9. SALVA ARQUIVO ==========
+
+        # ========== 10. SALVA ARQUIVO ==========
         wb.save(output_path)
 
         adicionar_log("✅ Relatório gerado com sucesso")
@@ -565,8 +586,10 @@ def gerar_relatorio(
         adicionar_log(f"   📋 Tipos de eventos: {len(tipos_eventos)}")
         adicionar_log(f"   ✅ Seriais com eventos: {len(seriais_com_eventos)}")
         adicionar_log(f"   ❌ Seriais sem eventos: {len(seriais_sem_evento)}")
+        adicionar_log(f"   📋 Abas geradas: {[ws.title for ws in wb.worksheets]}")
 
         return output_path
+
 
     except Exception as e:
         adicionar_log(f"❌ Erro ao gerar relatório: {e}")

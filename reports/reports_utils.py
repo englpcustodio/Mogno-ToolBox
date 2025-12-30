@@ -354,6 +354,7 @@ def auto_size_columns(sheet):
         adjusted_width = (max_length + 5)  # Adiciona um Padding
         sheet.column_dimensions[column_letter].width = adjusted_width
 
+
 # =============================================================================
 # CRIAÇÃO DE ABAS ESPECIALIZADAS
 # =============================================================================
@@ -707,12 +708,9 @@ def formatar_planilha_completa(ws, header_row=1, aplicar_zebra=True, ajustar_col
         formatar_cabecalho(ws, header_row)
 
         # Formata corpo (opcional)
-        if aplicar_zebra:
-            aplicar_estilo_zebra(ws, min_row=header_row + 1)
+#        if aplicar_zebra:
+#            aplicar_estilo_zebra(ws, min_row=header_row + 1)
 
-        # Ajustes finais (ao final do processo)
-        if ajustar_colunas:
-            ajustar_largura_colunas(ws)
 
         # Congela painéis
         ws.freeze_panes = f"A{header_row + 1}"
@@ -722,6 +720,101 @@ def formatar_planilha_completa(ws, header_row=1, aplicar_zebra=True, ajustar_col
             last_col = get_column_letter(ws.max_column)
             ws.auto_filter.ref = f"A{header_row}:{last_col}{ws.max_row}"
 
+        # Ajustes finais (ao final do processo)
+        if ajustar_colunas:
+            ajustar_largura_colunas(ws)
+
     except Exception as e:
         adicionar_log(f"⚠️ Erro em formatar_planilha_completa: {e}")
 
+
+# =============================================================================
+# FORMATAÇÃO PARA A PLANILHA DE TRÁFEGO DE DADOS NO SERVIDOR
+# =============================================================================
+
+
+def formatar_planilha_consumo(ws, incluir_zebra=True):
+    """
+    Aplica formatação padrão para abas de consumo de dados.
+
+    Características:
+    - Cabeçalho azul com fonte branca
+    - Zebra (linhas alternadas cinzas)
+    - Cores de alerta: Vermelho (>50MB) e Amarelo (<1MB)
+    - Bordas em todas as células
+    - Largura automática de colunas
+    - Congelamento da linha de cabeçalho
+
+    Args:
+        ws: Worksheet do openpyxl
+        incluir_zebra (bool): Se True, aplica padrão zebra
+    """
+    try:
+        # Estilos
+        header_fill = PatternFill(start_color="305496", end_color="305496", fill_type="solid")
+        font_header = Font(bold=True, color="FFFFFF")
+        border = Border(
+            left=Side(style="thin", color="000000"),
+            right=Side(style="thin", color="000000"),
+            top=Side(style="thin", color="000000"),
+            bottom=Side(style="thin", color="000000"),
+        )
+        zebra_fill = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid")
+        red_fill = PatternFill(start_color="FF9999", end_color="FF9999", fill_type="solid")     # >50MB
+        yellow_fill = PatternFill(start_color="FFF2CC", end_color="FFF2CC", fill_type="solid")  # <1MB
+
+        # ─────────────────────────────────────────────────────────────────
+        # FORMATAÇÃO DO CABEÇALHO (linha 1)
+        # ─────────────────────────────────────────────────────────────────
+        for cell in ws[1]:
+            cell.font = font_header
+            cell.fill = header_fill
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+            cell.border = border
+
+        # ─────────────────────────────────────────────────────────────────
+        # FORMATAÇÃO DAS LINHAS DE DADOS
+        # ─────────────────────────────────────────────────────────────────
+        for i, row in enumerate(ws.iter_rows(min_row=2, max_col=ws.max_column), start=2):
+            try:
+                # Obtém valor de MB (coluna 4 = índice 3)
+                mb_value = row[3].value if len(row) > 3 else None
+
+                # Determina cor da linha
+                if isinstance(mb_value, (float, int)):
+                    if mb_value > 50:
+                        row_fill = red_fill
+                    elif mb_value < 1:
+                        row_fill = yellow_fill
+                    else:
+                        row_fill = zebra_fill if (incluir_zebra and i % 2 == 0) else None
+                else:
+                    row_fill = zebra_fill if (incluir_zebra and i % 2 == 0) else None
+
+                # Aplica formatação a cada célula
+                for cell in row:
+                    if row_fill:
+                        cell.fill = row_fill
+                    cell.alignment = Alignment(horizontal="center", vertical="center")
+                    cell.border = border
+
+            except Exception as e:
+                adicionar_log(f"⚠️ Erro ao formatar linha {i}: {e}")
+
+        # ─────────────────────────────────────────────────────────────────
+        # AJUSTE DE LARGURA DE COLUNAS
+        # ─────────────────────────────────────────────────────────────────
+        for col in ws.columns:
+            max_len = max(len(str(c.value)) if c.value else 0 for c in col)
+            col_letter = get_column_letter(col[0].column)
+            ws.column_dimensions[col_letter].width = max(10, min(max_len + 3, 60))
+
+        # ─────────────────────────────────────────────────────────────────
+        # CONGELAMENTO E FILTROS
+        # ─────────────────────────────────────────────────────────────────
+        ws.freeze_panes = "A2"
+
+        adicionar_log(f"✅ Aba '{ws.title}' formatada com sucesso")
+
+    except Exception as e:
+        adicionar_log(f"❌ Erro ao formatar planilha '{ws.title}': {e}")

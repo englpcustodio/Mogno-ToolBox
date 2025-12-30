@@ -3,7 +3,7 @@
 from PyQt5.QtWidgets import (
     QLabel, QGroupBox, QFrame, QPushButton,
     QGraphicsOpacityEffect, QDialog, QDialogButtonBox, 
-    QVBoxLayout, QHBoxLayout, QCheckBox
+    QVBoxLayout, QHBoxLayout, QCheckBox, QScrollArea, QWidget
 )
 from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QPoint
 from PyQt5.QtGui import QFont
@@ -519,4 +519,175 @@ class SheetSelectionDialog(QDialog):
 
         #adicionar_log(f"✅ Config salva: Tipos={selected_comm}, Períodos={selected_periods}")
 
+        super().accept()
+
+
+
+
+
+# =========================================================================
+# 🟦 EventsSheetSelectionDialog (EXCLUSIVO DA ABA DE EVENTOS)
+# =========================================================================
+
+class EventsSheetSelectionDialog(QDialog):
+    """
+    Diálogo para selecionar quais abas gerar no relatório de eventos.
+    - Resumo_Eventos: obrigatório
+    - Seriais_sem_evento: opcional
+    - Tipos de eventos: dinâmicos (baseados nos filtros usados)
+    """
+
+    def __init__(self, app_state, event_types, parent=None):
+        super().__init__(parent)
+
+        self.app_state = app_state
+        self.event_types = sorted(event_types)
+
+        self.setWindowTitle("📊 Selecionar Abas do Relatório de Eventos")
+        self.setModal(True)
+        self.setMinimumWidth(480)
+        self.setMinimumHeight(500)
+
+        self._build_ui()
+        self._update_ok_button()
+
+    def _build_ui(self):
+        layout = QVBoxLayout(self)
+
+        # Título
+        title = QLabel("Escolha as abas que deseja gerar no relatório:")
+        title.setFont(QFont("Segoe UI", 10, QFont.Bold))
+        layout.addWidget(title)
+
+        # Grupo principal
+        self.group = QGroupBox("📑 Abas Disponíveis")
+        self.group_layout = QVBoxLayout(self.group)
+
+        # Aba obrigatória
+        self.chk_resumo = QCheckBox("✅ Resumo_Eventos (obrigatória)")
+        self.chk_resumo.setChecked(True)
+        self.chk_resumo.setEnabled(False)
+        self.group_layout.addWidget(self.chk_resumo)
+
+        # Aba seriais sem evento
+        self.chk_sem_evento = QCheckBox("📋 Seriais_sem_evento")
+        self.chk_sem_evento.setChecked(True)
+        self.group_layout.addWidget(self.chk_sem_evento)
+
+        # Separador
+        separator = QFrame()
+        separator.setFrameShape(QFrame.HLine)
+        separator.setFrameShadow(QFrame.Sunken)
+        self.group_layout.addWidget(separator)
+
+        # --- Área de Scroll para Tipos de Eventos Dinâmicos ---
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_content = QWidget()
+        self.event_types_layout = QVBoxLayout(scroll_content) # Layout para os checkboxes de eventos
+        self.event_types_layout.setContentsMargins(0, 0, 0, 0) # Remover margens extras
+        self.event_types_layout.setSpacing(5) # Espaçamento entre os checkboxes
+
+        self.event_type_checks = {}
+        if self.event_types:
+            label = QLabel("📌 Tipos de Eventos:")
+            label.setFont(QFont("Segoe UI", 9, QFont.Bold))
+            self.event_types_layout.addWidget(label)
+
+            for et in self.event_types:
+                chk = QCheckBox(f"📊 {et}")
+                chk.setChecked(True)
+                self.event_type_checks[et] = chk
+                self.event_types_layout.addWidget(chk)
+        else:
+            label_info = QLabel("ℹ️ Nenhum tipo de evento foi filtrado.")
+            label_info.setStyleSheet("color: #666; font-style: italic;")
+            self.event_types_layout.addWidget(label_info)
+
+        self.event_types_layout.addStretch() # Empurra os checkboxes para cima
+        scroll_area.setWidget(scroll_content)
+        self.group_layout.addWidget(scroll_area) # Adiciona a área de scroll ao grupo principal
+
+        self.group_layout.addStretch()
+        layout.addWidget(self.group)
+
+
+        # Botões de ação rápida
+        btns = QHBoxLayout()
+        bt_all = QPushButton("Marcar Todos")
+        bt_all.clicked.connect(self._select_all)
+
+        bt_none = QPushButton("Desmarcar Todos")
+        bt_none.clicked.connect(self._deselect_all)
+
+        btns.addWidget(bt_all)
+        btns.addWidget(bt_none)
+        btns.addStretch()
+        layout.addLayout(btns)
+
+        # Ok/Cancel
+        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+        layout.addWidget(self.button_box)
+
+        self.btn_ok = self.button_box.button(QDialogButtonBox.Ok)
+
+    # ------------------------------
+    # LÓGICA DE SELEÇÃO
+    # ------------------------------
+
+    def _select_all(self):
+        self.chk_sem_evento.setChecked(True)
+        for chk in self.event_type_checks.values():
+            chk.setChecked(True)
+
+    def _deselect_all(self):
+        self.chk_sem_evento.setChecked(False)
+        for chk in self.event_type_checks.values():
+            chk.setChecked(False)
+
+    def _update_ok_button(self):
+        # Sempre habilitado (Resumo_Eventos é obrigatório)
+        self.btn_ok.setEnabled(True)
+
+    # ------------------------------
+    # LEITURA DAS SELEÇÕES
+    # ------------------------------
+
+    def get_sheet_config(self):
+        sheets = ["Resumo_Eventos"]
+
+        if self.chk_sem_evento.isChecked():
+            sheets.append("Seriais_sem_evento")
+
+        for evt, chk in self.event_type_checks.items():
+            if chk.isChecked():
+                sheets.append(evt)
+
+        return {
+            "sheets": sheets,
+            "include_seriais_sem_evento": self.chk_sem_evento.isChecked(),
+            "include_event_types": [
+                evt for evt, chk in self.event_type_checks.items() if chk.isChecked()
+            ]
+        }
+
+    @staticmethod
+    def get_sheet_config_dialog(app_state, event_types, parent=None):
+        dialog = EventsSheetSelectionDialog(app_state, event_types, parent)
+        result = dialog.exec_()
+
+        if result == QDialog.Accepted:
+            return dialog.get_sheet_config(), True
+
+        return {
+            "sheets": ["Resumo_Eventos"],
+            "include_seriais_sem_evento": False,
+            "include_event_types": []
+        }, False
+
+    def accept(self):
+        config = self.get_sheet_config()
+        self.app_state.set("events_sheet_config", config)
         super().accept()

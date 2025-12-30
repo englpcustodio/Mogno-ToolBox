@@ -8,10 +8,12 @@ Serviços Redis refatorados:
 """
 import os
 import sys
+import time
 import redis
 import base64
 import binascii
-import time
+import traceback
+
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Dict, Any, Optional
 from utils.logger import adicionar_log
@@ -185,9 +187,17 @@ def status_equipamento(seriais: List[str]) -> List[Dict[str, Any]]:
 def obter_dados_consumo(mes: int, ano: int) -> Dict[str, Any]:
     """
     Obtém dados de consumo GSM (hash gateway:consumo_gsm:mes_ano).
+    Retorna dict com valores já convertidos para float validado.
+
+    Args:
+        mes (int): Mês (1-12)
+        ano (int): Ano (ex: 2025)
+
+    Returns:
+        Dict[str, float]: {serial: bytes_consumidos}
     """
     try:
-        mes_int = int(mes)  # ✅ Normaliza o mês para remover zeros à esquerda
+        mes_int = int(mes)
     except ValueError:
         adicionar_log(f"⚠️ Mês inválido recebido: {mes}. Valor ajustado para 1.")
         mes_int = 1
@@ -197,7 +207,6 @@ def obter_dados_consumo(mes: int, ano: int) -> Dict[str, Any]:
     if not redis_conn:
         return {}
 
-    # ✅ Chave com mês sem zero à esquerda
     chave = f"gateway:consumo_gsm:{mes_int}_{ano}"
 
     try:
@@ -207,15 +216,46 @@ def obter_dados_consumo(mes: int, ano: int) -> Dict[str, Any]:
             return {}
 
         resultado = {}
-        for serial, valor in trafego_dados_bytes.items():
+        erros = 0
+        total = len(trafego_dados_bytes)
+
+        for idx, (serial, valor) in enumerate(trafego_dados_bytes.items(), start=1):
             try:
-                serial_str = serial.decode("utf-8") if isinstance(serial, bytes) else str(serial)
-                valor_str = valor.decode("utf-8") if isinstance(valor, bytes) else str(valor)
-                resultado[serial_str] = valor_str
-            except Exception:
+                # Decodifica serial
+                if isinstance(serial, bytes):
+                    serial_str = serial.decode("utf-8", errors="replace").strip()
+                else:
+                    serial_str = str(serial).strip()
+
+                # Decodifica valor
+                if isinstance(valor, bytes):
+                    valor_str = valor.decode("utf-8", errors="replace").strip()
+                else:
+                    valor_str = str(valor).strip()
+
+                # Converte para float
+                valor_float = float(valor_str)
+
+                # Valida range
+                if valor_float < 0 or valor_float > 1e15:
+                    adicionar_log(f"⚠️ Valor suspeito ignorado para {serial_str}: {valor_float}")
+                    erros += 1
+                    continue
+
+                resultado[serial_str] = valor_float
+
+                # Log a cada 100 registros
+                if idx % 100 == 0:
+                    adicionar_log(f"📊 Processados {idx}/{total} registros")
+
+            except (ValueError, UnicodeDecodeError) as e:
+                erros += 1
                 continue
 
-        adicionar_log(f"📶 {len(resultado)} registros de consumo obtidos.")
+        if erros > 0:
+            adicionar_log(f"⚠️ {erros} registros ignorados por erro")
+
+        adicionar_log(f"📶 {len(resultado)} registros de consumo obtidos com sucesso.")
         return resultado
 
     except Exception as e:
@@ -227,4 +267,3 @@ def obter_dados_consumo(mes: int, ano: int) -> Dict[str, Any]:
             redis_conn.close()
         except Exception:
             pass
-

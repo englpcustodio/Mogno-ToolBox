@@ -99,13 +99,13 @@ class MognoMainWindow(QMainWindow):
         self.equipment_tab.start_status_equipment.connect(self.handle_status_equipment)
         self.equipment_tab.start_data_consumption.connect(self.handle_data_consumption)
 
-        # ✅ APENAS RELATÓRIOS SEPARADOS
+        # RELATÓRIOS SEPARADOS ------------------------------------------------
         self.equipment_tab.generate_separate_reports.connect(self.handle_separate_reports)
 
         self.equipment_tab.file_selected.connect(self.equipment_tab.handle_file_selected)
         self.signal_manager.all_requests_finished.connect(self._handle_all_requests_finished)
 
-        # ✅ NOVO: EVENTOS
+        # EVENTOS --------------------------------------------------------------
         self.events_tab.start_events_request.connect(self.handle_events_request)
         self.events_tab.generate_events_report.connect(self.handle_events_report)
         self.signal_manager.events_request_completed.connect(self.events_tab._handle_request_completed)
@@ -219,11 +219,23 @@ class MognoMainWindow(QMainWindow):
         adicionar_log("📁 Gerando relatórios...")
         self.report_handler.generate_reports(options)  # ← Chama o método unificado
 
-    # Handler para geração de relatório de eventos
-    def handle_events_report(self, data):
-        """Gera relatório de eventos."""
-        #adicionar_log("📊 Gerando relatório de eventos...")
-        self.report_handler.generate_events_report(data)
+    # Em main_window.py
+
+    def handle_events_report(self, eventos_data: list):
+        """
+        Método intermediário para geração de relatório de eventos.
+        Recebe a lista e delega ao ReportHandler.
+        """
+        try:
+            adicionar_log(f"📊 Iniciando geração de relatório de eventos ({len(eventos_data)} registros)")
+
+            # ✅ CORRETO: Chama o wrapper que aceita list
+            self.report_handler.generate_events_report(eventos_data)
+
+        except Exception as e:
+            adicionar_log(f"❌ Erro ao processar relatório de eventos: {e}")
+            self.signal_manager.show_toast_error.emit(f"Erro ao gerar relatório: {e}")
+
 
 
     # -------------------------------------------------------------------------

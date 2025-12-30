@@ -2,11 +2,8 @@
 
 import os
 import shutil
-import json
-import datetime # Adicionado para epoch_to_datetime
-from time import time
+from datetime import datetime # Adicionado para epoch_to_datetime
 from utils.logger import adicionar_log # Importa o logger da nova localização
-
 
 
 # Exclui todos os dados de cache (__pycache__) das pastas ao iniciar a aplicação (evita dados em cache que podem comprometer alguma modificação recente)
@@ -109,17 +106,78 @@ def epoch_to_datetime(epoch_seconds):
         if epoch_seconds > 10000000000:  # Timestamp após ano 2286 em segundos
             epoch_seconds = epoch_seconds / 1000
         
-        return datetime.datetime.fromtimestamp(epoch_seconds)
+        return datetime.fromtimestamp(epoch_seconds)
     except Exception as e:
         adicionar_log(f"⚠️ Erro ao converter epoch para datetime: {e}")
         return None
 
 def calcular_periodo_dias(start_datetime, end_datetime):
-    """Calcula dias entre duas datas (dd/MM/yyyy HH:mm:ss)."""
+    """
+    Calcula o número de dias entre duas datas.
+
+    Suporta múltiplos formatos de data:
+    - "dd/MM/yyyy HH:mm:ss" (padrão da aplicação)
+    - "dd-MM-yyyy HH:mm:ss"
+    - "yyyy-MM-dd HH:mm:ss"
+    - "dd/MM/yyyy"
+    - "dd-MM-yyyy"
+
+    Args:
+        start_datetime (str): Data/hora inicial
+        end_datetime (str): Data/hora final
+
+    Returns:
+        int: Número de dias entre as datas (mínimo 1 se houver diferença)
+
+    Exemplos:
+        >>> calcular_periodo_dias('29/11/2025 00:00:00', '29/12/2025 23:59:59')
+        30
+        >>> calcular_periodo_dias('29/12/2025 10:00:00', '29/12/2025 15:00:00')
+        1  # Menos de 24h, mas conta como 1 dia
+    """
     try:
-        fmt = "%d/%m/%Y %H:%M:%S"
-        dt_start = datetime.strptime(start_datetime, fmt)
-        dt_end = datetime.strptime(end_datetime, fmt)
-        return (dt_end - dt_start).days
-    except:
+        # Lista de formatos suportados
+        formatos = [
+            "%d/%m/%Y %H:%M:%S",  # dd/MM/yyyy HH:mm:ss (padrão)
+            "%d-%m-%Y %H:%M:%S",  # dd-MM-yyyy HH:mm:ss
+            "%Y-%m-%d %H:%M:%S",  # yyyy-MM-dd HH:mm:ss
+            "%d/%m/%Y",           # dd/MM/yyyy
+            "%d-%m-%Y",           # dd-MM-yyyy
+        ]
+
+        dt_start = None
+        dt_end = None
+
+        # Tenta parsear com cada formato
+        for fmt in formatos:
+            try:
+                dt_start = datetime.strptime(start_datetime, fmt)
+                dt_end = datetime.strptime(end_datetime, fmt)
+                break  # Encontrou formato válido
+            except ValueError:
+                continue  # Tenta próximo formato
+
+        # Se não conseguiu parsear nenhum formato
+        if dt_start is None or dt_end is None:
+            adicionar_log(f"⚠️ Formato de data não reconhecido:")
+            adicionar_log(f"   Start: '{start_datetime}'")
+            adicionar_log(f"   End: '{end_datetime}'")
+            return 0
+
+        # Calcula diferença
+        diferenca = dt_end - dt_start
+        dias = diferenca.days
+
+        # Se for menos de 24h mas houver diferença, conta como 1 dia
+        #if dias == 0 and diferenca.total_seconds() > 0:
+        #    dias = 1
+
+        # Log de sucesso
+        adicionar_log(f"📅 Período calculado: {dias} dias")
+        return dias
+
+    except Exception as e:
+        adicionar_log(f"❌ Erro ao calcular período: {e}")
+        adicionar_log(f"   Start: '{start_datetime}'")
+        adicionar_log(f"   End: '{end_datetime}'")
         return 0
